@@ -1,26 +1,27 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
 import Sidebar from './layout/Sidebar.vue'
+import './assets/styles/common.css';
+import Breadcrumbs from '../src/components/Breadcrumbs.vue';
+
 </script>
 
 <template>
-  <!-- <h1 class="text-3xl font-bold underline">
-    Hello world!
-  </h1> -->
-  <Sidebar />
+  <div id="app">
+    <div class="main-container">
+      <aside class="sidebar">
+        <!-- Your sidebar content here -->
+        <Sidebar />
+        </aside>
+        <main class="content">
+          <div class="breadcrumb-div">
+            <Breadcrumbs />
+          </div>
+          <router-view></router-view>
+        </main>
+    </div>
+  </div>
 </template>
 
+
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
 </style>
