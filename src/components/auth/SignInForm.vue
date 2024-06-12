@@ -34,9 +34,8 @@
       </div>
 
       <p class="mt-10 text-center text-sm text-gray-500">
-        Not a member?
-        {{ ' ' }}
-        <a href="#" class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Start a 14 day free trial</a>
+        Don’t have any account?
+        <RouterLink to="/signup" class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Sign Up</RouterLink>
       </p>
     </div>
   </div>
@@ -44,7 +43,7 @@
 
 <script>
 import { loginUser } from '../../utils/api.js';
-
+import axios from 'axios';
 export default {
   name: 'SignIn',
   data() {
@@ -62,6 +61,7 @@ export default {
         const response = await loginUser(this.username, this.password);
         const token = response.access_token;
         localStorage.setItem('accessToken', token); // Store the token
+        localStorage.setItem('layout', 'Admin'); // Store the token
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`; // Set the token in the headers
         this.$router.push('/'); // Redirect to another page
       } catch (error) {

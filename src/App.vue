@@ -1,26 +1,19 @@
 <script setup>
-import Sidebar from './layout/Sidebar.vue'
-import './assets/styles/common.css';
-import Breadcrumbs from '../src/components/Breadcrumbs.vue';
+// import AdminLayout from './layout/AdminLayout.vue';
+// import AuthLayout from './layout/AuthLayout.vue';
+import { useRoute } from 'vue-router';
+// import { onMounted } from 'vue';
+
+const route = useRoute();
+// Accessing meta information
+const layout = route.meta.layout;
+const name = route.meta.name;
 
 </script>
 
 <template>
-  <div id="app">
-    <div class="main-container">
-      <aside class="sidebar">
-        <!-- Your sidebar content here -->
-        <Sidebar />
-        </aside>
-        <main class="content">
-          <div class="breadcrumb-div">
-            <Breadcrumbs />
-          </div>
-          <router-view></router-view>
-        </main>
-    </div>
-  </div>
-   <router-view></router-view>
+<!-- <AdminLayout /> -->
+<router-view></router-view>
 </template>
 
 

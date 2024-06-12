@@ -22,4 +22,35 @@ export const loginUser = async (username, password) => {
   }
 };
 
+
+export const createUser = async (user_data) => {
+  try {
+    const response = await instance.post('auth/register', user_data,
+    {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const signOut = async (user_data) => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    const response = await instance.post('auth/jwt/logout', {}, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
 // You can define more API functions here
