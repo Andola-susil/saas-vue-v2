@@ -1,19 +1,36 @@
-<script setup>
-// import AdminLayout from './layout/AdminLayout.vue';
-// import AuthLayout from './layout/AuthLayout.vue';
+
+
+<script>
+import { computed } from 'vue'
 import { useRoute } from 'vue-router';
-// import { onMounted } from 'vue';
+import AdminLayout from './layout/AdminLayout.vue';
 
-const route = useRoute();
-// Accessing meta information
-const layout = route.meta.layout;
-const name = route.meta.name;
-
+export default {
+  name: 'App',
+  components: {
+    AdminLayout,
+  },
+  setup() {
+    const route = useRoute()
+    const hideSidebar = computed(() => route.meta.hideSidebar)
+    
+    return {
+      hideSidebar
+    }
+  }
+}
 </script>
 
 <template>
-<!-- <AdminLayout /> -->
-<router-view></router-view>
+   <div id="app">
+    <div :class="['main', { 'no-sidebar': hideSidebar }]">
+      <AdminLayout v-if="!hideSidebar" />
+      <div :class="{ 'content': !hideSidebar, 'full-content': hideSidebar }">
+        <router-view v-if="hideSidebar"/>
+      </div>
+    </div>
+  </div>
+
 </template>
 
 
