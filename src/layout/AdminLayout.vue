@@ -172,7 +172,7 @@
 
       <main class="py-10">
         <div class="px-4 sm:px-6 lg:px-8">
-          <!-- Your content -->
+          <router-view></router-view>
         </div>
       </main>
     </div>
@@ -212,7 +212,7 @@ import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
 // Navigation data
 const navigation = [
   { name: 'Dashboard', href: '/', icon: HomeIcon, current: true },
-  { name: 'Time Sheet', href: '#', icon: UsersIcon, current: false },
+  { name: 'Time Sheet', href: '/time-sheet', icon: UsersIcon, current: false },
 
 ]
 const teams = [
@@ -244,17 +244,4 @@ const manageLogOut = async (item) => {
     }
   }
 }
-// onMounted(() => {
-//   console.log(router);
-//   const layout = localStorage.getItem('layout');
-
-//   // Check the current route and set showAdminLayout accordingly
-//   if (router.currentRoute.value.path === '/signin' || router.currentRoute.value.path === '/signup') {
-//     sidebarOpen.value = true;
-//   } else {
-//     sidebarOpen.value = false;
-//   }
-
-//   console.log(showAdminLayout.value, 2);
-// });
 </script>
