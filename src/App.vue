@@ -16,6 +16,7 @@ const name = route.meta.name;
 <router-view></router-view>
 </template>
 
+
 <style scoped>
 
 </style>
