@@ -1,32 +1,59 @@
 <template>
-    <div>
-      <h2 class="text-sm font-medium text-gray-500">Timesheet</h2>
-      <ul role="list" class="mt-3 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
-        <li v-for="project in projects" :key="project.name" class="col-span-1 flex rounded-md shadow-sm">
-          <div :class="[project.bgColor, 'flex w-16 flex-shrink-0 items-center justify-center rounded-l-md text-sm font-medium text-white']">{{ project.initials }}</div>
-          <div class="flex flex-1 items-center justify-between truncate rounded-r-md border-b border-r border-t border-gray-200 bg-white">
-            <div class="flex-1 truncate px-4 py-2 text-sm">
-              <a :href="project.href" class="font-medium text-gray-900 hover:text-gray-600">{{ project.name }}</a>
-              <p class="text-gray-500">{{ project.members }} Members</p>
-            </div>
-            <div class="flex-shrink-0 pr-2">
-              <button type="button" class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-transparent bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                <span class="sr-only">Open options</span>
-                <EllipsisVerticalIcon class="h-5 w-5" aria-hidden="true" />
-              </button>
-            </div>
-          </div>
-        </li>
-      </ul>
+  <div class="container mx-auto p-4">
+    <h1 class="text-center text-2xl font-bold mb-4">Timesheet</h1>
+    <TimesheetTable :tasks="tasks" @removeTask="removeTask" @calculateTotal="calculateTotal" />
+    <div class="flex justify-between mt-4">
+      <button @click="addTask" class="button-blue">New</button>
+      <button @click="saveTasks" class="button-green">Save</button>
+      <div class="flex space-x-2">
+        <div v-for="day in 7" :key="day" class="day-cell">{{ 8.00 }}</div>
+        <div class="total-cell">{{ calculateGrandTotal() }}</div>
+        <button @click="removeAllTasks" class="button-red">All</button>
+      </div>
     </div>
-  </template>
-  
-  <script setup>
-  import { EllipsisVerticalIcon } from '@heroicons/vue/20/solid'
-  
-  const projects = [
-    { name: 'Current Timesheet', initials: 'CT', href: '/current-timesheet', members: 16, bgColor: 'bg-pink-600' },
-    { name: 'Previous Timesheet', initials: 'PT', href: '/previous-timesheet', members: 12, bgColor: 'bg-purple-600' },
-    { name: 'Approved/Reject', initials: 'AR', href: '/approve-reject', members: 16, bgColor: 'bg-yellow-500' },
-  ]
-  </script>
+  </div>
+</template>
+
+<script>
+import TimesheetTable from '../components/TimesheetTable.vue'; // Importing sub-component
+
+const BUTTON_CLASSES = 'bg-blue-500 text-white py-2 px-4 rounded flex items-center';
+const DAY_CELL_CLASSES = 'bg-blue-500 text-white py-2 px-4 rounded';
+const TOTAL_CELL_CLASSES = 'bg-green-500 text-white py-2 px-4 rounded';
+
+export default {
+    name: 'Timesheet',
+    path: '/timesheet',
+  components: {
+    TimesheetTable,
+  },
+  data() {
+    return {
+      tasks: [
+        { mon: 8, tue: 8, wed: 8, thur: 8, fri: 8, sat: 8, sun: 8 },
+        { mon: 8, tue: 8, wed: 8, thur: 8, fri: 8, sat: 8, sun: 8 },
+      ],
+    };
+  },
+  methods: {
+    addTask() {
+      this.tasks.push({ mon: 8, tue: 8, wed: 8, thur: 8, fri: 8, sat: 8, sun: 8 });
+    },
+    removeTask(index) {
+      this.tasks.splice(index, 1);
+    },
+    calculateTotal(task) {
+      return task.mon + task.tue + task.wed + task.thur + task.fri + task.sat + task.sun;
+    },
+    calculateGrandTotal() {
+      return this.tasks.reduce((acc, task) => acc + this.calculateTotal(task), 0);
+    },
+    saveTasks() {
+      // Save tasks logic
+    },
+    removeAllTasks() {
+      this.tasks = [];
+    },
+  },
+};
+</script>
