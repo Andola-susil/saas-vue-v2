@@ -13,6 +13,8 @@ export default {
     SignUpForm,
     AuthLayout,
   },
+  name: 'signup',
+  path: '/signup',
 };
 </script>
 

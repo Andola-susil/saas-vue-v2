@@ -14,6 +14,7 @@ export default {
     AuthLayout,
   },
   name: 'signin',
+  path: '/signin',
   meta: {
     name: 'signin',
     layout: 'Auth',

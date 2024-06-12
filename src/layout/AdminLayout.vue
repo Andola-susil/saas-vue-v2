@@ -101,7 +101,7 @@
                 </li>
               </ul>
             </li>
-            <li>
+            <!-- <li>
               <div class="text-xs font-semibold leading-6 text-indigo-200">Your teams</div>
               <ul role="list" class="-mx-2 mt-2 space-y-1">
                 <li v-for="team in teams" :key="team.name">
@@ -111,7 +111,7 @@
                   </a>
                 </li>
               </ul>
-            </li>
+            </li> -->
             <li class="mt-auto">
               <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-indigo-200 hover:bg-indigo-700 hover:text-white">
                 <Cog6ToothIcon class="h-6 w-6 shrink-0 text-indigo-200 group-hover:text-white" aria-hidden="true" />
@@ -161,7 +161,7 @@
               <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
                 <MenuItems class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
                   <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
-                    <a :href="item.href" :class="[active ? 'bg-gray-50' : '', 'block px-3 py-1 text-sm leading-6 text-gray-900']">{{ item.name }}</a>
+                    <a @click="manageLogOut(item)" :href="item.href" :class="[active ? 'bg-gray-50' : '', 'block px-3 py-1 text-sm leading-6 text-gray-900']">{{ item.name }}</a>
                   </MenuItem>
                 </MenuItems>
               </transition>
@@ -180,7 +180,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { signOut } from '../utils/api.js'
+import axios from 'axios'
+import { onMounted, ref } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import {
   Dialog,
   Menu,
@@ -206,18 +209,16 @@ import {
 } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
 
+// Navigation data
 const navigation = [
-  { name: 'Dashboard', href: '#', icon: HomeIcon, current: true },
-  { name: 'Team', href: '#', icon: UsersIcon, current: false },
-  { name: 'Projects', href: '#', icon: FolderIcon, current: false },
-  { name: 'Calendar', href: '#', icon: CalendarIcon, current: false },
-  { name: 'Documents', href: '#', icon: DocumentDuplicateIcon, current: false },
-  { name: 'Reports', href: '#', icon: ChartPieIcon, current: false },
+  { name: 'Dashboard', href: '/', icon: HomeIcon, current: true },
+  { name: 'Time Sheet', href: '#', icon: UsersIcon, current: false },
+
 ]
 const teams = [
-  { id: 1, name: 'Heroicons', href: '#', initial: 'H', current: false },
-  { id: 2, name: 'Tailwind Labs', href: '#', initial: 'T', current: false },
-  { id: 3, name: 'Workcation', href: '#', initial: 'W', current: false },
+  // { id: 1, name: 'Heroicons', href: '#', initial: 'H', current: false },
+  // { id: 2, name: 'Tailwind Labs', href: '#', initial: 'T', current: false },
+  // { id: 3, name: 'Workcation', href: '#', initial: 'W', current: false },
 ]
 const userNavigation = [
   { name: 'Your profile', href: '#' },
@@ -225,4 +226,35 @@ const userNavigation = [
 ]
 
 const sidebarOpen = ref(false)
+const router = useRouter()
+const error = ref(null)
+const showAdminLayout = ref(true);
+const route = useRoute();
+// The async function to handle log out
+const manageLogOut = async (item) => {
+  if (item.name === 'Sign out') {
+    try {
+      await signOut()
+      localStorage.removeItem('accessToken')
+      localStorage.removeItem('layout')
+      delete axios.defaults.headers.common['Authorization']
+      router.push('/signin')
+    } catch (err) {
+      error.value = 'An error occurred. Please try again.'
+    }
+  }
+}
+// onMounted(() => {
+//   console.log(router);
+//   const layout = localStorage.getItem('layout');
+
+//   // Check the current route and set showAdminLayout accordingly
+//   if (router.currentRoute.value.path === '/signin' || router.currentRoute.value.path === '/signup') {
+//     sidebarOpen.value = true;
+//   } else {
+//     sidebarOpen.value = false;
+//   }
+
+//   console.log(showAdminLayout.value, 2);
+// });
 </script>
