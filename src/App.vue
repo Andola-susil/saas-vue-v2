@@ -20,8 +20,11 @@ import Breadcrumbs from '../src/components/Breadcrumbs.vue';
         </main>
     </div>
   </div>
+   <router-view></router-view>
 </template>
 
 
 <style scoped>
+
 </style>
+
