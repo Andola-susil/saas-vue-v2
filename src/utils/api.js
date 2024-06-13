@@ -4,7 +4,7 @@ import axios from 'axios';
 // Create an instance of axios with custom configurations if needed
 const instance = axios.create({
   baseURL: 'https://osbaseleaf-api.andolasoft.co.in/v1/',
-  timeout: 5000, // Set a timeout for requests
+  timeout: 1000, // Set a timeout for requests
 });
 
 // Define functions for making API requests

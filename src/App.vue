@@ -1,5 +1,3 @@
-
-
 <script>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router';
@@ -20,7 +18,6 @@ export default {
   }
 }
 </script>
-
 <template>
    <div id="app">
     <div :class="['main', { 'no-sidebar': hideSidebar }]">
@@ -30,11 +27,4 @@ export default {
       </div>
     </div>
   </div>
-
 </template>
-
-
-<style scoped>
-
-</style>
-
