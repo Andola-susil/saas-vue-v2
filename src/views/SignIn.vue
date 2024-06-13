@@ -1,7 +1,6 @@
 <template>
-  <AuthLayout>
+  <AuthLayout />
     <SignInForm />
-  </AuthLayout>
 </template>
 
 <script>

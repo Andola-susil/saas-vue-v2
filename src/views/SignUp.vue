@@ -1,7 +1,6 @@
 <template>
-  <AuthLayout>
-    <SignUpForm />
-  </AuthLayout>
+  <AuthLayout/>
+    <SignUpForm/>
 </template>
 
 <script>

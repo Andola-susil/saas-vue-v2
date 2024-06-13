@@ -8,13 +8,13 @@ import TimeSheet from '../views/TimeSheet.vue';
 import TimeTable from '../components/TimeTable.vue';
 
 const routes = [
-  { path: '/', name: 'Dashboard', component: Dashboard },
-  { path: '/timesheet', name: 'Timesheet', component: Timesheet },
-  { path: '/current-timesheet', name: 'Current Timesheet', component: CurrentTimesheet },
+  { path: '/', name: 'Dashboard', component: Dashboard, meta: { path: '/' }},
+  { path: '/timesheet', name: 'Timesheet', component: Timesheet, meta: { path: '/timesheet' }},
+  { path: '/current-timesheet', name: 'Current Timesheet', component: CurrentTimesheet, meta: { path: '/current-timesheet' }},
   { path: '/signin', name: 'SignIn', component: SignIn, meta: { hideSidebar: true }},
   { path: '/signup', name: 'SignUp', component: SignUp, meta: { hideSidebar: true }},
-  { path: '/time-sheet', name: 'TimeSheet', component: TimeSheet },
-  { path: '/time-table', name: 'TimeTable', component: TimeTable },
+  { path: '/time-sheet', name: 'TimeSheet', component: TimeSheet, meta: { path: '/time-sheet' }},
+  { path: '/time-table', name: 'TimeTable', component: TimeTable, meta: { path: '/time-table' }},
 ];
 
 const router = createRouter({

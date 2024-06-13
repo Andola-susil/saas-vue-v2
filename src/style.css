@@ -65,6 +65,29 @@ button:focus-visible {
   text-align: center;
 }
 
+.mb-5\.5 {
+  margin-bottom: 1.375rem;
+}
+.top-4 {
+  top: 1.4rem;
+}
+.left-4 {
+  left: 1rem;
+}
+.bg-indigo-600{background-color: rgb(208, 213, 247) !important;}
+.bg-indigo-700 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(137 146 215 / var(--tw-bg-opacity));
+}
+.hover\:bg-indigo-700:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(137 146 215 / var(--tw-bg-opacity));
+}
+.text-indigo-200 {
+  --tw-text-opacity: 0.1;
+  color: #363535;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

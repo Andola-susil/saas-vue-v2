@@ -93,8 +93,8 @@
           <ul role="list" class="flex flex-1 flex-col gap-y-7">
             <li>
               <ul role="list" class="-mx-2 space-y-1">
-                <li v-for="item in navigation" :key="item.name">
-                  <a @click="manageRoute(item)" href="#" :class="[item.current ? 'bg-indigo-700 text-white' : 'text-indigo-200 hover:bg-indigo-700 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6']">
+                <li v-for="(item,key) in navigation" :key="key">
+                  <a @click="manageRoute(item,key)" href="#" :class="[item.current ? 'bg-indigo-700 text-white' : 'text-indigo-200 hover:bg-indigo-700 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6']">
                     <component :is="item.icon" :class="[item.current ? 'text-white' : 'text-indigo-200 group-hover:text-white', 'h-6 w-6 shrink-0']" aria-hidden="true" />
                     {{ item.name }}
                   </a>
@@ -211,7 +211,7 @@ import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
 
 // Navigation data
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: HomeIcon, current: true },
+  { name: 'Dashboard', href: '/', icon: HomeIcon, current: false },
   { name: 'Time Sheet', href: '/time-sheet', icon: UsersIcon, current: false },
   { name: 'Weekly Time Sheet', href: '/time-table', icon: FolderIcon, current: false },
 
@@ -231,6 +231,10 @@ const router = useRouter()
 const error = ref(null)
 const showAdminLayout = ref(true);
 const route = useRoute();
+// onMounted(() => {
+// console.log(route);
+// });
+
 // The async function to handle log out
 const manageLogOut = async (item) => {
   if (item.name === 'Sign out') {
@@ -245,13 +249,16 @@ const manageLogOut = async (item) => {
     }
   }
 }
-const manageRoute = async (item) => {
+const manageRoute = async (item,key) => {
+  navigation.forEach((navItem, navKey) => {
+    navItem.current = navKey === key;
+  })
+  console.log(navigation);
   router.push(item.href);
 }
 </script>
 <style scoped>
-  .bg-indigo-600{background-color: rgb(208, 213, 247) !important;
-}
+.bg-indigo-600{background-color: rgb(208, 213, 247) !important;}
 .bg-indigo-700 {
   --tw-bg-opacity: 1;
   background-color: rgb(137 146 215 / var(--tw-bg-opacity));
