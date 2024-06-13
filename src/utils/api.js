@@ -7,7 +7,15 @@ const instance = axios.create({
   timeout: 5000, // Set a timeout for requests
 });
 
+const time_instance = axios.create({
+  baseURL: 'https://osbaseleaf-timelog.andolasoft.co.in/logtimesapi/',
+  timeout: 5000, // Set a timeout for requests
+});
 // Define functions for making API requests
+
+
+//SignIn API
+
 export const loginUser = async (username, password) => {
   try {
     const response = await instance.post('auth/jwt/login', {username,password,},
@@ -22,6 +30,7 @@ export const loginUser = async (username, password) => {
   }
 };
 
+//SignUp API
 
 export const createUser = async (user_data) => {
   try {
@@ -36,6 +45,8 @@ export const createUser = async (user_data) => {
     throw error;
   }
 };
+
+//LogOut API
 
 export const signOut = async (user_data) => {
   try {
@@ -52,5 +63,22 @@ export const signOut = async (user_data) => {
   }
 };
 
+
+//Get Time logs
+
+export const getAllTimeLogs = async (page) => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    const response = await time_instance.get('/log_times/', {
+      params: { page: page },
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 
 // You can define more API functions here
