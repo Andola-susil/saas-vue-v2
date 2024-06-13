@@ -213,6 +213,7 @@ import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
 const navigation = [
   { name: 'Dashboard', href: '/', icon: HomeIcon, current: true },
   { name: 'Time Sheet', href: '/time-sheet', icon: UsersIcon, current: false },
+  { name: 'Weekly Time Sheet', href: '/time-table', icon: FolderIcon, current: false },
 
 ]
 const teams = [
