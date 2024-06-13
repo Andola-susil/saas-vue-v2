@@ -4,7 +4,7 @@
   <div class="flex min-h-full flex-1 flex-col justify-center px-6 py-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
       <!-- <img class="mx-auto h-10 w-auto" src="../../assets/images/orange-nw-logo.svg" alt="Your Company" /> -->
-      <h2 class="mb-3 text-2xl font-bold text-black dark:text-white sm:text-title-xl2 text-center">Welcome!</h2>
+      <h2 class="mb-3 text-2xl font-bold text-black dark:text-white sm:text-title-xl2 text-center">Welcome !</h2>
     </div>
 
     <div class="mt-2 sm:mx-auto sm:w-full sm:max-w-sm">
@@ -40,11 +40,14 @@
       </p>
     </div>
   </div>
+  <Loader :loading="isLoading" />
 </template>
 
 <script>
 import { loginUser } from '../../utils/api.js';
+import Loader from '../../components/Loader.vue';
 import axios from 'axios';
+
 export default {
   name: 'SignIn',
   data() {
@@ -52,11 +55,16 @@ export default {
       username: '',
       password: '',
       error: null,
-      errorMessages: []
+      errorMessages: [],
+      isLoading: false,
     }
+  },
+  components: {
+    Loader,
   },
   methods: {
     async login() {
+      this.isLoading = true;
       this.error = null;
       try {
         const response = await loginUser(this.username, this.password);
@@ -68,6 +76,8 @@ export default {
       } catch (error) {
         // Handle login errors
         this.error = 'An error occurred. Please try again.';
+      } finally {
+        this.isLoading = false;
       }
     },
   },
