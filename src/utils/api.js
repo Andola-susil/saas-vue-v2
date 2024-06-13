@@ -9,7 +9,7 @@ const instance = axios.create({
 
 const time_instance = axios.create({
   baseURL: 'https://osbaseleaf-timelog.andolasoft.co.in/logtimesapi/',
-  timeout: 5000, // Set a timeout for requests
+  timeout: 1000, // Set a timeout for requests
 });
 // Define functions for making API requests
 

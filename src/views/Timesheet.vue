@@ -50,16 +50,19 @@
       </div>
     </div>
   </div>
+  <Loader :loading="isLoading" />
 </template>
 
 <script>
 import { getAllTimeLogs } from '../utils/api.js';
 import PaginationTemplate from '../components/common/PaginationTemplate.vue';
+import Loader from '../components/Loader.vue';
 export default {
     name: 'TimeSheet',
     path: '/timesheet',
   components: {
-    PaginationTemplate
+    PaginationTemplate,
+    Loader,
   },
   mounted() {
     this.getTimeLogs(this.paginationData.current_page);
@@ -76,18 +79,22 @@ export default {
         items_per_page: 10,
         current_page: 1,
       },
+      isLoading: false,
     }
   },
   methods: {
     async getTimeLogs(page) {
       this.paginationData.current_page = page;
       this.error = null;
+      this.isLoading = true;
       try {
         const response = await getAllTimeLogs(page);
         this.time_log = response.items;
         this.meta_data = response.meta;
       } catch (error) {
         this.error = 'An error occurred. Please try again.';
+      } finally {
+        this.isLoading = false;
       }
     },
   },

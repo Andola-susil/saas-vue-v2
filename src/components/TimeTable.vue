@@ -1,18 +1,12 @@
 <template>
-    <div class="container mx-auto py-8">
+    <div class="container">
       <h1 class="text-3xl font-bold text-center mb-8">Weekly Timesheet</h1>
       <div class="overflow-x-auto">
-        <table class="min-w-full bg-white border border-gray-200">
+        <table class="bg-white border border-gray-200">
           <thead>
-            <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+            <tr v-for="(header, index) in headers.days" :key="index" class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
               <th class="py-3 px-6 text-left">Project / Task</th>
-              <th class="py-3 px-6 text-center">Mon</th>
-              <th class="py-3 px-6 text-center">Tue</th>
-              <th class="py-3 px-6 text-center">Wed</th>
-              <th class="py-3 px-6 text-center">Thu</th>
-              <th class="py-3 px-6 text-center">Fri</th>
-              <th class="py-3 px-6 text-center">Sat</th>
-              <th class="py-3 px-6 text-center">Sun</th>
+              <th class="py-3 px-6 text-center">{{header}}</th>
               <th class="py-3 px-6 text-center">Total</th>
             </tr>
           </thead>
@@ -38,10 +32,15 @@
         <button @click="save" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Save</button>
       </div>
     </div>
+    <Loader :loading="isLoading" />
   </template>
   
   <script>
+  import Loader from '../components/Loader.vue';
   export default {
+    components: {
+        Loader,
+    },
     data() {
       return {
         rows: [
@@ -60,7 +59,13 @@
             days: ["8.00", "8.00", "8.00", "8.00", "8.00", "8.00", "8.00"],
             total: "40.00"
           }
-        ]
+        ],
+        headers: [
+          {
+            days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],            
+          },
+        ],
+        isLoading: false,
       };
     },
     methods: {
