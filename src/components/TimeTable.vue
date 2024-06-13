@@ -32,10 +32,15 @@
         <button @click="save" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Save</button>
       </div>
     </div>
+    <Loader :loading="isLoading" />
   </template>
   
   <script>
+  import Loader from '../components/Loader.vue';
   export default {
+    components: {
+        Loader,
+    },
     data() {
       return {
         rows: [
@@ -59,7 +64,8 @@
           {
             days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],            
           },
-        ]
+        ],
+        isLoading: false,
       };
     },
     methods: {
