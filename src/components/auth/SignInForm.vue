@@ -72,7 +72,7 @@ export default {
         localStorage.setItem('accessToken', token); // Store the token
         localStorage.setItem('layout', 'Admin'); // Store the token
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`; // Set the token in the headers
-        this.$router.push('/'); // Redirect to another page
+        this.$router.push('/dashboard'); // Redirect to another page
       } catch (error) {
         // Handle login errors
         this.error = 'An error occurred. Please try again.';
