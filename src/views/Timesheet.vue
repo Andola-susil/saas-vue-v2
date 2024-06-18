@@ -7,7 +7,7 @@
         <!-- <p class="mt-2 text-sm text-gray-700">A list of all the users in your account including their name, title, email and role.</p> -->
       </div>
       <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-        <button type="button" class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Add Time Log</button>
+        <button type="button" @click="showPopUp()" class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Add Time Log</button>
       </div>
     </div>
     <div class="mt-8 flow-root">
@@ -49,20 +49,23 @@
         </div>
       </div>
     </div>
+    <div v-if="showPopup">
+    <ModalPopup />
+    </div>
   </div>
-  <Loader :loading="isLoading" />
+  
 </template>
 
 <script>
 import { getAllTimeLogs } from '../utils/api.js';
 import PaginationTemplate from '../components/common/PaginationTemplate.vue';
-import Loader from '../components/Loader.vue';
+import ModalPopup from '../components/common/ModalPopup.vue';
 export default {
     name: 'TimeSheet',
     path: '/timesheet',
   components: {
     PaginationTemplate,
-    Loader,
+    ModalPopup
   },
   mounted() {
     this.getTimeLogs(this.paginationData.current_page);
@@ -79,23 +82,23 @@ export default {
         items_per_page: 10,
         current_page: 1,
       },
-      isLoading: false,
+      showPopup : false,
     }
   },
   methods: {
     async getTimeLogs(page) {
       this.paginationData.current_page = page;
       this.error = null;
-      this.isLoading = true;
       try {
         const response = await getAllTimeLogs(page);
         this.time_log = response.items;
         this.meta_data = response.meta;
       } catch (error) {
         this.error = 'An error occurred. Please try again.';
-      } finally {
-        this.isLoading = false;
       }
+    },
+    async showPopUp(){
+      this.showPopup = true;
     },
   },
   
