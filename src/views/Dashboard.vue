@@ -9,7 +9,7 @@
 // import AdminLayout from '../layout/AdminLayout.vue';
 export default {
     name: 'Dashboard',
-    path: '/',
+    path: '/dashboard',
   components: {
     // AdminLayout
   },

@@ -243,7 +243,7 @@ const manageLogOut = async (item) => {
       localStorage.removeItem('accessToken')
       localStorage.removeItem('layout')
       delete axios.defaults.headers.common['Authorization']
-      router.push('/signin')
+      router.push('/sign-in')
     } catch (err) {
       error.value = 'An error occurred. Please try again.'
     }
