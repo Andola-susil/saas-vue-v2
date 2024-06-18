@@ -1,26 +1,4 @@
-<!--
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
--->
 <template>
-  <!--
-    This example requires updating your template:
-
-    ```
-    <html class="h-full bg-white">
-    <body class="h-full">
-    ```
-  -->
   <div>
     <TransitionRoot as="template" :show="sidebarOpen">
       <Dialog class="relative z-50 lg:hidden" @close="sidebarOpen = false">
@@ -56,10 +34,10 @@
                         </li>
                       </ul>
                     </li>
-                    <li>
+                    <li v-if="is_admin == 'true'">
                       <div class="text-xs font-semibold leading-6 text-indigo-200">Your teams</div>
                       <ul role="list" class="-mx-2 mt-2 space-y-1">
-                        <li v-for="team in teams" :key="team.name">
+                        <li v-for="team in settings" :key="team.name">
                           <a :href="team.href" :class="[team.current ? 'bg-indigo-700 text-white' : 'text-indigo-200 hover:bg-indigo-700 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6']">
                             <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">{{ team.initial }}</span>
                             <span class="truncate">{{ team.name }}</span>
@@ -67,12 +45,12 @@
                         </li>
                       </ul>
                     </li>
-                    <li class="mt-auto">
+                    <!-- <li class="mt-auto">
                       <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-indigo-200 hover:bg-indigo-700 hover:text-white">
                         <Cog6ToothIcon class="h-6 w-6 shrink-0 text-indigo-200 group-hover:text-white" aria-hidden="true" />
                         Settings
                       </a>
-                    </li>
+                    </li> -->
                   </ul>
                 </nav>
               </div>
@@ -101,23 +79,23 @@
                 </li>
               </ul>
             </li>
-            <!-- <li>
-              <div class="text-xs font-semibold leading-6 text-indigo-200">Your teams</div>
+            <li v-if="is_admin == 'true'">
+              <div class="text-xs font-semibold leading-6 text-indigo-200">Settings</div>
               <ul role="list" class="-mx-2 mt-2 space-y-1">
-                <li v-for="team in teams" :key="team.name">
+                <li v-for="team in settings" :key="team.name">
                   <a :href="team.href" :class="[team.current ? 'bg-indigo-700 text-white' : 'text-indigo-200 hover:bg-indigo-700 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6']">
                     <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">{{ team.initial }}</span>
                     <span class="truncate">{{ team.name }}</span>
                   </a>
                 </li>
               </ul>
-            </li> -->
-            <li class="mt-auto">
+            </li>
+            <!-- <li class="mt-auto">
               <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-indigo-200 hover:bg-indigo-700 hover:text-white">
                 <Cog6ToothIcon class="h-6 w-6 shrink-0 text-indigo-200 group-hover:text-white" aria-hidden="true" />
                 Settings
               </a>
-            </li>
+            </li> -->
           </ul>
         </nav>
       </div>
@@ -208,18 +186,34 @@ import {
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
-
+const navigation = ref([]);
+const settings = ref([]);
 // Navigation data
-const navigation = [
-  { name: 'Dashboard', href: '/', icon: HomeIcon, current: false },
-  { name: 'Time Sheet', href: '/time-sheet', icon: UsersIcon, current: false },
-  { name: 'Weekly Time Sheet', href: '/time-table', icon: FolderIcon, current: false },
-
+const navigation_for_admin = [
+  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, current: false },
+  { name: 'Time Sheet', href: '/time-sheet', icon: DocumentDuplicateIcon, current: false },
+  { name: 'Past Time Sheet', href: '/time-sheet', icon: DocumentDuplicateIcon, current: false },
+  { name: 'Approvals', href: '/time-sheet', icon: FolderIcon, current: false },
+  { name: 'Reports', href: '/time-sheet', icon: ChartPieIcon, current: false },
 ]
-const teams = [
-  // { id: 1, name: 'Heroicons', href: '#', initial: 'H', current: false },
-  // { id: 2, name: 'Tailwind Labs', href: '#', initial: 'T', current: false },
-  // { id: 3, name: 'Workcation', href: '#', initial: 'W', current: false },
+const navigation_for_resource = [
+  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, current: false },
+  { name: 'Time Sheet', href: '/time-sheet', icon: DocumentDuplicateIcon, current: false },
+  { name: 'Past Time Sheet', href: '/time-sheet', icon: DocumentDuplicateIcon, current: false },
+  { name: 'Reports', href: '/time-sheet', icon: ChartPieIcon, current: false },
+]
+const navigation_for_auditors = [
+  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, current: false },
+  { name: 'Reports', href: '/time-sheet', icon: ChartPieIcon, current: false },
+]
+const settings_for_admin = [
+  { id: 1, name: 'Resource management', href: '/time-sheet', initial: 'R', current: false },
+  { id: 2, name: 'Company calendars', href: '/time-sheet', initial: 'C', current: false },
+  { id: 3, name: 'TimeSheet rules', href: '/time-sheet', initial: 'T', current: false },
+]
+const settings_resource = [
+  { id: 1, name: 'Company calendars', href: '/time-sheet', initial: 'C', current: false },
+  { id: 2, name: 'TimeSheet rules', href: '/time-sheet', initial: 'T', current: false },
 ]
 const userNavigation = [
   { name: 'Your profile', href: '#' },
@@ -231,9 +225,25 @@ const router = useRouter()
 const error = ref(null)
 const showAdminLayout = ref(true);
 const route = useRoute();
-// onMounted(() => {
-// console.log(route);
-// });
+const is_admin = ref(false);
+const is_approver = ref(false);
+const is_resource = ref(false);
+onMounted(() => {
+  is_admin.value = localStorage.getItem('is_admin');
+  if(is_admin.value == 'true'){
+    navigation.value = navigation_for_admin;
+    settings.value = settings_for_admin;
+  }
+  is_approver.value = localStorage.getItem('is_approver');
+  if(is_approver.value == 'true'){
+    navigation.value = navigation_for_auditors;
+  }
+  is_resource.value = localStorage.getItem('is_resource');
+  if(is_resource.value == 'true'){
+    navigation.value = navigation_for_resource;
+    settings.value = settings_resource;
+  }
+});
 
 // The async function to handle log out
 const manageLogOut = async (item) => {
@@ -250,10 +260,9 @@ const manageLogOut = async (item) => {
   }
 }
 const manageRoute = async (item,key) => {
-  navigation.forEach((navItem, navKey) => {
-    navItem.current = navKey === key;
-  })
-  console.log(navigation);
+  // navigation.forEach((navItem, navKey) => {
+  //   navItem.current = true;
+  // })
   router.push(item.href);
 }
 </script>

@@ -47,6 +47,7 @@
 import { loginUser } from '../../utils/api.js';
 import Loader from '../../components/Loader.vue';
 import axios from 'axios';
+import { useUserStore } from '../../stores/userInfo.js';
 
 export default {
   name: 'SignIn',
@@ -62,6 +63,10 @@ export default {
   components: {
     Loader,
   },
+  setup() {
+    const userStore = useUserStore();
+    return { userStore };
+  },
   methods: {
     async login() {
       this.isLoading = true;
@@ -70,9 +75,18 @@ export default {
         const response = await loginUser(this.username, this.password);
         const token = response.access_token;
         localStorage.setItem('accessToken', token); // Store the token
-        localStorage.setItem('layout', 'Admin'); // Store the token
+        localStorage.setItem('layout', 'Admin');
+        localStorage.setItem('is_admin', true); 
+        localStorage.setItem('is_approver', false); 
+        localStorage.setItem('is_resource', false); 
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`; // Set the token in the headers
+        // const data = [{
+        //   'accessToken'
+        // }];
+        // Update the Pinia store with user data
+        // await this.userStore.setUser();
         this.$router.push('/dashboard'); // Redirect to another page
+        
       } catch (error) {
         // Handle login errors
         this.error = 'An error occurred. Please try again.';
