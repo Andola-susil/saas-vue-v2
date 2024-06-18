@@ -1,18 +1,24 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Dashboard from '../views/Dashboard.vue';
-import Timesheet from '../views/TimeSheet.vue';
 import CurrentTimesheet from '../components/CurrentTimesheet.vue';
 import SignIn from '../views/SignIn.vue';
 import SignUp from '../views/SignUp.vue';
 import TimeTable from '../components/TimeTable.vue';
+import ApprovalRequests from '../views/ApprovalRequests.vue';
+import PastTimeSheet from '../views/PastTimeSheet.vue';
+import Reports from '../views/Reports.vue';
 
 const routes = [
   { path: '/dashboard', name: 'Dashboard', component: Dashboard, meta: { path: '/' }},
-  { path: '/timesheet', name: 'Timesheet', component: Timesheet, meta: { path: '/timesheet' }},
+  // { path: '/timesheet', name: 'Timesheet', component: Timesheet, meta: { path: '/timesheet' }},
   { path: '/current-timesheet', name: 'Current Timesheet', component: CurrentTimesheet, meta: { path: '/current-timesheet' }},
   { path: '/sign-in', name: 'SignIn', component: SignIn, meta: { hideSidebar: true }},
   { path: '/signup', name: 'SignUp', component: SignUp, meta: { hideSidebar: true }},
-  { path: '/time-sheet', name: 'TimeSheet', component: TimeTable, meta: { path: '/time-sheet' }},
+  { path: '/time-sheet', name: 'TimeSheet', component: TimeTable,props: route => ({ id: route.query.id }), meta: { path: '/time-sheet' }},
+  // { path: '/time-table', name: 'TimeTable', component: TimeTable, meta: { path: '/time-table' }},
+  { path: '/time-sheet-approvals', name: 'Time-sheet approvals', component: ApprovalRequests, meta: { path: '/time-sheet-approvals' }},
+  { path: '/past-time-sheet', name: 'Past Time-sheet', component: PastTimeSheet, meta: { path: '/past-time-sheet'}},
+  { path: '/time-sheet-reports', name: 'Time-sheet Reports', component: Reports, meta: { path: '/time-sheet-reports'}},
 ];
 
 const router = createRouter({

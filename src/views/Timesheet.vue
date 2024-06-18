@@ -3,7 +3,7 @@
   <div class="px-4 sm:px-6 lg:px-8">
     <div class="sm:flex sm:items-center">
       <div class="sm:flex-auto">
-        <h1 class="text-base font-semibold leading-6 text-gray-900">Time Sheet</h1>
+        <h1 class="text-base font-semibold leading-6 text-gray-900">TimeSheet</h1>
         <!-- <p class="mt-2 text-sm text-gray-700">A list of all the users in your account including their name, title, email and role.</p> -->
       </div>
       <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
@@ -63,44 +63,50 @@ import ModalPopup from '../components/common/ModalPopup.vue';
 export default {
     name: 'TimeSheet',
     path: '/timesheet',
-  components: {
-    PaginationTemplate,
-    ModalPopup
-  },
-  mounted() {
-    this.getTimeLogs(this.paginationData.current_page);
-  },
-  created() {
-    
-  },
-  data() {
-    return {
-      time_log : [],
-      meta_data : [],
-      paginationData: {
-        total_items: 0,
-        items_per_page: 10,
-        current_page: 1,
+    components: {
+      PaginationTemplate,
+      ModalPopup
+    },
+    props: {
+      id: {
+        type: String,
+        default: null,
       },
-      showPopup : false,
-    }
-  },
-  methods: {
-    async getTimeLogs(page) {
-      this.paginationData.current_page = page;
-      this.error = null;
-      try {
-        const response = await getAllTimeLogs(page);
-        this.time_log = response.items;
-        this.meta_data = response.meta;
-      } catch (error) {
-        this.error = 'An error occurred. Please try again.';
+    },
+    mounted() {
+      this.getTimeLogs(this.paginationData.current_page);
+    },
+    created() {
+      
+    },
+    data() {
+      return {
+        time_log : [],
+        meta_data : [],
+        paginationData: {
+          total_items: 0,
+          items_per_page: 10,
+          current_page: 1,
+        },
+        showPopup : false,
       }
     },
-    async showPopUp(){
-      this.showPopup = true;
+    methods: {
+      async getTimeLogs(page) {
+        this.paginationData.current_page = page;
+        this.error = null;
+        try {
+          const response = await getAllTimeLogs(page);
+          this.time_log = response.items;
+          this.meta_data = response.meta;
+        } catch (error) {
+          this.error = 'An error occurred. Please try again.';
+        }
+      },
+      async showPopUp(){
+        this.showPopup = true;
+      },
     },
-  },
   
 };
 </script>

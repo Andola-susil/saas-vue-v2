@@ -22,6 +22,12 @@
           ]//data for table to display
       }
     },
+    props: {
+      id: {
+        type: String,
+        default: null,
+      },
+    },
     methods: {
       cellEditedCallback(cell) {
         let row = cell.getRow();
