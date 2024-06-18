@@ -1,0 +1,8 @@
+@import  "tabulator-tables";
+.tabulator-row .tabulator-cell {
+    border: 2px solid rgb(208, 213, 247); /* Customize the border style */
+    padding: 5px; /* Add padding if needed */
+    border-radius: 4px; /* Add border radius if needed */
+    text-align: center;
+    box-sizing: border-box;
+}

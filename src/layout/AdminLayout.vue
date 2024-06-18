@@ -253,7 +253,6 @@ const manageRoute = async (item,key) => {
   navigation.forEach((navItem, navKey) => {
     navItem.current = navKey === key;
   })
-  console.log(navigation);
   router.push(item.href);
 }
 </script>
