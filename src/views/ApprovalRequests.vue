@@ -30,17 +30,20 @@
               </thead>
               <tbody class="divide-y divide-gray-200 bg-white">
                 <tr v-for="(val,key) in time_log" :key="key">
-                  <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{ val.id }}</td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.name }}</td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">#{{ val.week_no }}</td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.start_date }}</td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.end_date }}</td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.status }}</td>
-                  <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                    <!-- <a href="#" class="text-indigo-600 hover:text-indigo-900"
-                      >Edit<span class="sr-only">, {{ val.id }}</span></a
-                    > -->
-                    <button type="button" @click="viewTimeSheetDetails(val)" class="rounded-md bg-indigo-500 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">View</button>
+                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{ val.id }}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.name }}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">#{{ val.week_no }}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.start_date }}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.end_date }}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        <button v-if="val.status == 'Pending'" type="button" class="rounded-md bg-indigo-50 px-2.5 py-1.5 text-sm font-semibold text-indigo-600 shadow-sm hover:bg-indigo-100">{{ val.status }}</button>
+                        <button v-else type="button" class="rounded-md bg-indigo-50 px-2.5 py-1.5 text-sm font-semibold text-indigo-400 shadow-sm hover:bg-indigo-100">{{ val.status }}</button>
+                    </td>
+                    <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                        <!-- <a href="#" class="text-indigo-600 hover:text-indigo-900"
+                        >Edit<span class="sr-only">, {{ val.id }}</span></a
+                        > -->
+                        <button type="button" @click="viewTimeSheetDetails(val)" class="rounded-md bg-indigo-500 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">View</button>
                   </td>
                 </tr>
               </tbody>
@@ -106,7 +109,7 @@ export default {
           week_no: 52 - i + 1,
           start_date: startDate.toLocaleDateString('en-GB'),
           end_date: endDate.toLocaleDateString('en-GB'),
-          status: i % 2 === 0 ? 'Pending' : 'Completed',
+          status: i % 2 === 0 ? 'Pending' : 'Approved',
         });
       }
       return mockData;
@@ -121,8 +124,7 @@ export default {
     //   } catch (error) {
     //     this.error = 'An error occurred. Please try again.';
     //   }
-    this.time_log = this.generateMockData(10)
-    console.log(this.time_log);
+    this.time_log = this.generateMockData(10);
     },
     async showPopUp(){
       this.showPopup = true;

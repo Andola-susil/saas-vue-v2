@@ -82,8 +82,8 @@
             <li v-if="is_admin == 'true'">
               <div class="text-xs font-semibold leading-6 text-indigo-200">Settings</div>
               <ul role="list" class="-mx-2 mt-2 space-y-1">
-                <li v-for="team in settings" :key="team.name">
-                  <a :href="team.href" :class="[team.current ? 'bg-indigo-700 text-white' : 'text-indigo-200 hover:bg-indigo-700 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6']">
+                <li v-for="(team,skey) in settings" :key="skey">
+                  <a href="#" @click="manageRoute(team,skey)" :class="[team.current ? 'bg-indigo-700 text-white' : 'text-indigo-200 hover:bg-indigo-700 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6']">
                     <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">{{ team.initial }}</span>
                     <span class="truncate">{{ team.name }}</span>
                   </a>
@@ -208,11 +208,11 @@ const navigation_for_auditors = [
 ]
 const settings_for_admin = [
   { id: 1, name: 'Resource management', href: '/time-sheet', initial: 'R', current: false },
-  { id: 2, name: 'Company calendars', href: '/time-sheet', initial: 'C', current: false },
+  { id: 2, name: 'Company calendars', href: '/calender-view', initial: 'C', current: false },
   { id: 3, name: 'TimeSheet rules', href: '/time-sheet', initial: 'T', current: false },
 ]
 const settings_resource = [
-  { id: 1, name: 'Company calendars', href: '/time-sheet', initial: 'C', current: false },
+  { id: 1, name: 'Company calendars', href: '/calender-view', initial: 'C', current: false },
   { id: 2, name: 'TimeSheet rules', href: '/time-sheet', initial: 'T', current: false },
 ]
 const userNavigation = [
