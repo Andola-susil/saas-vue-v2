@@ -50,3 +50,7 @@
 .tabulator .tabulator-footer {
    border-top: none !important;
 }
+.tabulator .tabulator-header .tabulator-col .tabulator-col-content {
+  padding: 12px;
+  text-align: center;
+}

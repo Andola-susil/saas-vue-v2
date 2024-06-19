@@ -2,7 +2,7 @@
   import {TabulatorFull as Tabulator} from 'tabulator-tables'; //import Tabulator library
   import { PlusIcon } from '@heroicons/vue/20/solid'
   import Loader from '../components/Loader.vue';
-
+  import { useRoute } from 'vue-router';
   export default {
     data() {
       return {
@@ -47,6 +47,9 @@
       },
       deleteIcon(cell, formatterParams, onRendered) {
         return '<img src="/src/assets/images/trash-can.svg" alt="" class="h-5 w-5">';
+      },
+      approvalActions(cell, formatterParams, onRendered){
+        return '<div class="flex"><div class="px-1"><img src="/src/assets/images/circle-check.svg" alt="" class="h-6 w-6 "></div><div class="px-1"><img src="/src/assets/images/circle-xmark.svg" alt="" class="h-6 w-6"></div></div>';
       },
       addRowToTable() {
         this.tabulator.addRow({ project: "", task: "", col1: 0.0, col2: 0.0, col3: 0.0, col4: 0.0, col5: 0.0, col6: 0.0, col7: 0.0, total: 0.0 , action:""})
@@ -102,6 +105,26 @@
     mounted() {
       this.isLoading = true;
       //instantiate Tabulator when element is mounted
+      const columns = [
+          {title:"Project", field:"project", width:'16%', editor:"input", headerSort:false},
+          {title:"Task", field:"task", width:'15%', editor:"input", headerSort:false},
+          {title:"SUN", field:"col1", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
+          {title:"MON", field:"col2", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
+          {title:"TUE", field:"col3", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
+          {title:"WED", field:"col4", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
+          {title:"THU", field:"col5", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
+          {title:"FRI", field:"col6", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
+          {title:"SAT", field:"col7", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
+          {title:"Total", field:"total", hozAlign:"center", width:'8%', headerSort:false, bottomCalc:"sum", bottomCalcParams:{precision:2}, mutator: this.totalHrscustomMutator, formatter: this.totalHoursFormatter },
+          
+      ];
+      
+      const route = useRoute();
+      if(route.query.id){
+        columns.push({title:"Action", field:"action", hozAlign:"center", formatter:this.approvalActions, width:'10%', headerSort:false, cellClick:this.removeBottomRow,resizable: false});
+      }else{
+        columns.push({title:"", field:"action", hozAlign:"center", formatter:this.deleteIcon, width:'5%', headerSort:false, cellClick:this.removeBottomRow,resizable: false});
+      }
       this.tabulator = new Tabulator(this.$refs.table, {
         data: this.tableData, //link data to table
         height:"100%",
@@ -110,19 +133,7 @@
         reactiveData:true, //turn on data reactivity
         columnCalcs:"true",
         validationMode:"blocking",
-        columns:[
-              {title:"Project", field:"project", width:'15%', editor:"input", headerSort:false},
-              {title:"Task", field:"task", width:'15%', editor:"input", headerSort:false},
-              {title:"SUN", field:"col1", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-              {title:"MON", field:"col2", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-              {title:"TUE", field:"col3", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-              {title:"WED", field:"col4", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-              {title:"THU", field:"col5", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-              {title:"FRI", field:"col6", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-              {title:"SAT", field:"col7", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-              {title:"Total", field:"total", hozAlign:"center", width:'8%', headerSort:false, bottomCalc:"sum", bottomCalcParams:{precision:2}, mutator: this.totalHrscustomMutator, formatter: this.totalHoursFormatter },
-              {title:"", field:"action", hozAlign:"center", formatter:this.deleteIcon, width:'5%', headerSort:false, cellClick:this.removeBottomRow,resizable: false},
-          ], //define table columns
+        columns: columns, //Set columns
       });
       setTimeout(() => {
         this.isLoading = false;
