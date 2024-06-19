@@ -5,7 +5,7 @@
     data() {
       return {
         tabulator: null, //variable to hold your table
-        tabledata: [
+        tableData: [
             { 
               project: "",
               task: "",
@@ -39,7 +39,7 @@
         return parseFloat(data.row1) + parseFloat(data.row2) + parseFloat(data.row3) + parseFloat(data.row4) + parseFloat(data.row5) + parseFloat(data.row6) + parseFloat(data.row7);
       },
       deleteIcon(cell, formatterParams, onRendered) {
-        return '<i class="fa fa-trash-o" style="display:block;height:25px;width:25px;font-size:48px;color:red;"></i>';
+        return '<img class="h-8 w-auto" src="/images/trash.svg" alt="Delete" />';
       },
       addRowToTable() {
         this.tabulator.addRow({ project: "", task: "", row1: 0.0, row2: 0.0, row3: 0.0, row4: 0.0, row5: 0.0, row6: 0.0, row7: 0.0, total: 0.0 , action:""})
@@ -82,8 +82,9 @@
 
         return input;
       },
-      removeBottomRow() {
-        this.tabulator.pop(); // Remove the last row from tabledata array
+      removeBottomRow(e,cell) {
+        const row = cell.getRow();
+        row.delete();
       }
     },
     mounted() {
@@ -116,10 +117,13 @@
   }
 </script>
   <template>
-    <div ref="table"></div>
-    <div class="float-right">
-      <button type="button" class="btn btn-primary" @click="addRowToTable">Add Row</button>
-      <button @click="removeBottomRow">Remove Bottom Row</button>
+    <div>
+      <div class="w-full" ref="table"></div>
+      <div class="float-right">
+        <div class="pl-4 pr-3">
+          <button type="button" class="rounded-md bg-indigo-500 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" @click="addRowToTable">Add Row</button>
+        </div>
+      </div>
     </div>
   </template>
   <style scoped>
