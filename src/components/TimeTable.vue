@@ -39,7 +39,7 @@
         return parseFloat(data.row1) + parseFloat(data.row2) + parseFloat(data.row3) + parseFloat(data.row4) + parseFloat(data.row5) + parseFloat(data.row6) + parseFloat(data.row7);
       },
       deleteIcon(cell, formatterParams, onRendered) {
-        return '<img class="h-8 w-auto" src="/images/trash.svg" alt="Delete" />';
+        return '<button type="button" class="rounded-md bg-indigo-500 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Delete</button>';
       },
       addRowToTable() {
         this.tabulator.addRow({ project: "", task: "", row1: 0.0, row2: 0.0, row3: 0.0, row4: 0.0, row5: 0.0, row6: 0.0, row7: 0.0, total: 0.0 , action:""})
@@ -99,15 +99,15 @@
         columns:[
               {title:"Project", field:"project", width:150, editor:"input", headerSort:false},
               {title:"Task", field:"task", width:150, editor:"input", headerSort:false},
-              {title:"SUN", field:"row1", hozAlign:"center", width:95, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
-              {title:"MON", field:"row2", hozAlign:"center", width:95, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
-              {title:"TUE", field:"row3", hozAlign:"center", width:95, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
-              {title:"WED", field:"row4", hozAlign:"center", width:95, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
-              {title:"THU", field:"row5", hozAlign:"center", width:95, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
-              {title:"FRI", field:"row6", hozAlign:"center", width:95, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
-              {title:"SAT", field:"row7", hozAlign:"center", width:95, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
-              {title:"Total", field:"total", hozAlign:"center", width:95, headerSort:false, bottomCalc:"sum", bottomCalcParams:{precision:2}, mutator: this.totalHrscustomMutator, formatter: this.totalHoursFormatter },
-              {title:"", field:"action", hozAlign:"center", formatter:this.deleteIcon, width:100, headerSort:false, cellClick:this.removeBottomRow},
+              {title:"SUN", field:"row1", hozAlign:"center", width:65, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
+              {title:"MON", field:"row2", hozAlign:"center", width:65, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
+              {title:"TUE", field:"row3", hozAlign:"center", width:65, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
+              {title:"WED", field:"row4", hozAlign:"center", width:65, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
+              {title:"THU", field:"row5", hozAlign:"center", width:65, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
+              {title:"FRI", field:"row6", hozAlign:"center", width:65, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
+              {title:"SAT", field:"row7", hozAlign:"center", width:65, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
+              {title:"Total", field:"total", hozAlign:"center", width:65, headerSort:false, bottomCalc:"sum", bottomCalcParams:{precision:2}, mutator: this.totalHrscustomMutator, formatter: this.totalHoursFormatter },
+              {title:"Action", field:"action", hozAlign:"center", formatter:this.deleteIcon, width:100, headerSort:false, cellClick:this.removeBottomRow,resizable: false},
           ], //define table columns
       });
     },
@@ -131,5 +131,29 @@
       border: 2px solid #3498db; /* Customize the border style */
       padding: 5px; /* Add padding if needed */
       border-radius: 4px; /* Add border radius if needed */
+    }
+    .tabulator .tabulator-header {
+      border-bottom: 2px solid #dee2e6;
+      border: 1px solid #dee2e6 !important;
+      color: inherit;
+    }
+    .tabulator .tabulator-header .tabulator-col {
+        background-color: #fff;
+        border-right: 1px solid #dee2e6 !important;
+    }
+    .tabulator .tabulator-tableholder .tabulator-table {
+      /* background-color: #fff; */
+      color: #333;
+      display: inline-block;
+      overflow: visible;
+      position: relative;
+      white-space: nowrap;
+    }
+    .tabulator-row .tabulator-cell {
+      border: 1px solid rgb(208, 213, 247);
+      padding: 5px;
+      /* border-radius: 4px; */
+      text-align: center;
+      box-sizing: border-box;
     }
   </style>
