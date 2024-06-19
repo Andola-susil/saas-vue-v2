@@ -36,15 +36,15 @@
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.start_date }}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.end_date }}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        <img v-if="val.status == 'Pending'" src="/src/assets/images/pending.svg" alt="" class="h-5 w-5">
-                        <img v-else-if="val.status == 'Reject'" src="/src/assets/images/ban.svg" alt="" class="h-5 w-5">
-                        <img v-else src="/src/assets/images/circle-check.svg" alt="" class="h-5 w-5">
+                        <img v-if="val.status == 'Pending'" src="/src/assets/images/pending.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Pending">
+                        <img v-else-if="val.status == 'Reject'" src="/src/assets/images/ban.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Rejected">
+                        <img v-else src="/src/assets/images/circle-check.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Approved">
                     </td>
                     <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                         <!-- <a href="#" class="text-indigo-600 hover:text-indigo-900"
                         >Edit<span class="sr-only">, {{ val.id }}</span></a
                         > -->
-                        <button class="rounded-md bg-indigo-50 px-2.5 py-1.5 text-sm font-semibold text-indigo-400 shadow-sm hover:bg-indigo-100"><img src="/src/assets/images/eye.svg" alt="" class="h-5 w-5" @click="viewTimeSheetDetails(val)"></button>
+                        <button class="rounded-md bg-indigo-50 px-2.5 py-1.5 text-sm font-semibold text-indigo-400 shadow-sm hover:bg-indigo-100"><img src="/src/assets/images/eye.svg" alt="" class="h-5 w-5" @click="viewTimeSheetDetails(val)" v-b-tooltip.hover title="view"></button>
                   </td>
                 </tr>
               </tbody>

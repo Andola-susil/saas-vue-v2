@@ -23,6 +23,7 @@
             }
           ],//data for table to display
         isLoading:false,
+        json_output:null,
       }
     },
     props: {
@@ -52,11 +53,11 @@
           .then((row) => {
             // row - the row component for the row updated or added
             // run code after data has been updated
-            console.log("Row added:", row);
+            // console.log("Row added:", row);
           })
           .catch((error) => {
             // handle error updating data
-            console.error("Error adding row:", error);
+            // console.error("Error adding row:", error);
           });
       },
       dateEditor(cell, onRendered, success, cancel) {
@@ -94,6 +95,7 @@
       },
       submitTimesheet() {
         const allData = this.tabulator.getData();
+        this.json_output = allData;
         console.log("All Data:", allData);
       },
     },
@@ -111,14 +113,14 @@
         columns:[
               {title:"Project", field:"project", width:'15%', editor:"input", headerSort:false},
               {title:"Task", field:"task", width:'15%', editor:"input", headerSort:false},
-              {title:"SUN", field:"col1", hozAlign:"center", width:'10%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-              {title:"MON", field:"col2", hozAlign:"center", width:'10%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-              {title:"TUE", field:"col3", hozAlign:"center", width:'10%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-              {title:"WED", field:"col4", hozAlign:"center", width:'10%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-              {title:"THU", field:"col5", hozAlign:"center", width:'10%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-              {title:"FRI", field:"col6", hozAlign:"center", width:'10%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-              {title:"SAT", field:"col7", hozAlign:"center", width:'10%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-              {title:"Total", field:"total", hozAlign:"center", width:'10%', headerSort:false, bottomCalc:"sum", bottomCalcParams:{precision:2}, mutator: this.totalHrscustomMutator, formatter: this.totalHoursFormatter },
+              {title:"SUN", field:"col1", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
+              {title:"MON", field:"col2", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
+              {title:"TUE", field:"col3", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
+              {title:"WED", field:"col4", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
+              {title:"THU", field:"col5", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
+              {title:"FRI", field:"col6", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
+              {title:"SAT", field:"col7", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
+              {title:"Total", field:"total", hozAlign:"center", width:'8%', headerSort:false, bottomCalc:"sum", bottomCalcParams:{precision:2}, mutator: this.totalHrscustomMutator, formatter: this.totalHoursFormatter },
               {title:"", field:"action", hozAlign:"center", formatter:this.deleteIcon, width:'5%', headerSort:false, cellClick:this.removeBottomRow,resizable: false},
           ], //define table columns
       });
@@ -149,6 +151,9 @@
             </button>
           </div>
         </div>
+      </div>
+      <div ref="json">
+        <pre>{{json_output}}</pre>
       </div>
     </div>
   </template>

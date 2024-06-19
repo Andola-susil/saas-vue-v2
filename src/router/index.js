@@ -34,14 +34,23 @@ const isAuthenticated = () => {
 };
 
 router.beforeEach((to, from, next) => {
-  if (to.path === '/sign-in' && isAuthenticated() || to.path == '/') {
-    next('/dashboard');
-  } else if (!isAuthenticated() && to.path !== '/sign-in') {
-    next('/sign-in');
+  if (isAuthenticated()) {
+    // User is authenticated
+    if (to.path === '/sign-in' || to.path === '/signup' || to.path === '/') {
+      next('/dashboard');
+    } else {
+      next();
+    }
   } else {
-    next();
+    // User is not authenticated
+    if (to.path === '/sign-in' || to.path === '/signup') {
+      next();
+    } else {
+      next('/sign-in');
+    }
   }
 });
+
 
 
 
