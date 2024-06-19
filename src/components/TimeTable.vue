@@ -1,6 +1,6 @@
 <script>
   import {TabulatorFull as Tabulator} from 'tabulator-tables'; //import Tabulator library
-
+  import { PlusIcon } from '@heroicons/vue/20/solid'
   export default {
     data() {
       return {
@@ -39,7 +39,7 @@
         return parseFloat(data.col1) + parseFloat(data.col2) + parseFloat(data.col3) + parseFloat(data.col4) + parseFloat(data.col5) + parseFloat(data.col6) + parseFloat(data.col7);
       },
       deleteIcon(cell, formatterParams, onRendered) {
-        return '<i class="fa fa-trash" aria-hidden="true"></i>';
+        return '<img src="/src/assets/images/trash-can.svg" alt="" class="h-5 w-5">';
       },
       addRowToTable() {
         this.tabulator.addRow({ project: "", task: "", col1: 0.0, col2: 0.0, col3: 0.0, col4: 0.0, col5: 0.0, col6: 0.0, col7: 0.0, total: 0.0 , action:""})
@@ -101,17 +101,17 @@
         reactiveData:true, //turn on data reactivity
         columnCalcs:"true",
         columns:[
-              {title:"Project", field:"project", width:150, editor:"input", headerSort:false},
-              {title:"Task", field:"task", width:150, editor:"input", headerSort:false},
-              {title:"SUN", field:"col1", hozAlign:"center", width:95, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
-              {title:"MON", field:"col2", hozAlign:"center", width:95, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
-              {title:"TUE", field:"col3", hozAlign:"center", width:95, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
-              {title:"WED", field:"col4", hozAlign:"center", width:95, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
-              {title:"THU", field:"col5", hozAlign:"center", width:95, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
-              {title:"FRI", field:"col6", hozAlign:"center", width:95, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
-              {title:"SAT", field:"col7", hozAlign:"center", width:95, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
-              {title:"Total", field:"total", hozAlign:"center", width:95, headerSort:false, bottomCalc:"sum", bottomCalcParams:{precision:2}, mutator: this.totalHrscustomMutator, formatter: this.totalHoursFormatter },
-              {title:"Action", field:"action", hozAlign:"center", formatter:this.deleteIcon, width:100, headerSort:false, cellClick:this.removeBottomRow,resizable: false},
+              {title:"Project", field:"project", width:'15%', editor:"input", headerSort:false},
+              {title:"Task", field:"task", width:'15%', editor:"input", headerSort:false},
+              {title:"SUN", field:"col1", hozAlign:"center", width:'10%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
+              {title:"MON", field:"col2", hozAlign:"center", width:'10%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
+              {title:"TUE", field:"col3", hozAlign:"center", width:'10%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
+              {title:"WED", field:"col4", hozAlign:"center", width:'10%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
+              {title:"THU", field:"col5", hozAlign:"center", width:'10%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
+              {title:"FRI", field:"col6", hozAlign:"center", width:'10%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
+              {title:"SAT", field:"col7", hozAlign:"center", width:'10%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
+              {title:"Total", field:"total", hozAlign:"center", width:'10%', headerSort:false, bottomCalc:"sum", bottomCalcParams:{precision:2}, mutator: this.totalHrscustomMutator, formatter: this.totalHoursFormatter },
+              {title:"", field:"action", hozAlign:"center", formatter:this.deleteIcon, width:'5%', headerSort:false, cellClick:this.removeBottomRow,resizable: false},
           ], //define table columns
       });
     },
@@ -123,10 +123,20 @@
   <template>
     <div>
       <div class="w-full" ref="table"></div>
-      <div class="float-right">
+    
+      <div class="flex float-right">
         <div class="pl-4 pr-3">
-          <button type="button" class="rounded-md bg-indigo-500 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" @click="submitTimesheet">Submit Timesheet</button>
-          <button type="button" class="rounded-md bg-indigo-500 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" @click="addRowToTable">Add Row</button>
+          <div>
+            <button type="button" class="rounded-md bg-indigo-500 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" @click="submitTimesheet">Submit</button>
+          </div>
+        </div>
+        <div class="">
+          <div class="pl-4 pr-3">
+            <!-- <button type="button" class="rounded-md bg-indigo-500 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" @click="addRowToTable"><PlusIcon class="h-5 w-5" aria-hidden="true" /></button> -->
+            <button type="button" class="rounded-full bg-indigo-600 p-1.5 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" @click="addRowToTable">
+              <img src="/src/assets/images/plus.svg" alt="" class="h-5 w-5">
+            </button>
+          </div>
         </div>
       </div>
     </div>
