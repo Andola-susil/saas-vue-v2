@@ -39,7 +39,7 @@
         return parseFloat(data.col1) + parseFloat(data.col2) + parseFloat(data.col3) + parseFloat(data.col4) + parseFloat(data.col5) + parseFloat(data.col6) + parseFloat(data.col7);
       },
       deleteIcon(cell, formatterParams, onRendered) {
-        return '<button type="button" class="rounded-md bg-indigo-500 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Delete</button>';
+        return '<i class="fa fa-trash" aria-hidden="true"></i>';
       },
       addRowToTable() {
         this.tabulator.addRow({ project: "", task: "", col1: 0.0, col2: 0.0, col3: 0.0, col4: 0.0, col5: 0.0, col6: 0.0, col7: 0.0, total: 0.0 , action:""})
@@ -103,14 +103,14 @@
         columns:[
               {title:"Project", field:"project", width:150, editor:"input", headerSort:false},
               {title:"Task", field:"task", width:150, editor:"input", headerSort:false},
-              {title:"SUN", field:"row1", hozAlign:"center", width:65, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
-              {title:"MON", field:"row2", hozAlign:"center", width:65, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
-              {title:"TUE", field:"row3", hozAlign:"center", width:65, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
-              {title:"WED", field:"row4", hozAlign:"center", width:65, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
-              {title:"THU", field:"row5", hozAlign:"center", width:65, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
-              {title:"FRI", field:"row6", hozAlign:"center", width:65, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
-              {title:"SAT", field:"row7", hozAlign:"center", width:65, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
-              {title:"Total", field:"total", hozAlign:"center", width:65, headerSort:false, bottomCalc:"sum", bottomCalcParams:{precision:2}, mutator: this.totalHrscustomMutator, formatter: this.totalHoursFormatter },
+              {title:"SUN", field:"col1", hozAlign:"center", width:95, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
+              {title:"MON", field:"col2", hozAlign:"center", width:95, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
+              {title:"TUE", field:"col3", hozAlign:"center", width:95, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
+              {title:"WED", field:"col4", hozAlign:"center", width:95, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
+              {title:"THU", field:"col5", hozAlign:"center", width:95, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
+              {title:"FRI", field:"col6", hozAlign:"center", width:95, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
+              {title:"SAT", field:"col7", hozAlign:"center", width:95, editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback },
+              {title:"Total", field:"total", hozAlign:"center", width:95, headerSort:false, bottomCalc:"sum", bottomCalcParams:{precision:2}, mutator: this.totalHrscustomMutator, formatter: this.totalHoursFormatter },
               {title:"Action", field:"action", hozAlign:"center", formatter:this.deleteIcon, width:100, headerSort:false, cellClick:this.removeBottomRow,resizable: false},
           ], //define table columns
       });
