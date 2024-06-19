@@ -9,13 +9,13 @@
             { 
               project: "",
               task: "",
-              row1: 0.0,
-              row2: 0.0,
-              row3: 0.0,
-              row4: 0.0,
-              row5: 0.0,
-              row6: 0.0,
-              row7: 0.0,
+              col1: 0.0,
+              col2: 0.0,
+              col3: 0.0,
+              col4: 0.0,
+              col5: 0.0,
+              col6: 0.0,
+              col7: 0.0,
               total: 0.0 ,
               action:"",
             }
@@ -36,13 +36,13 @@
         row.update({ total: total });
       },
       totalHrscustomMutator(value, data, type, params, component) {
-        return parseFloat(data.row1) + parseFloat(data.row2) + parseFloat(data.row3) + parseFloat(data.row4) + parseFloat(data.row5) + parseFloat(data.row6) + parseFloat(data.row7);
+        return parseFloat(data.col1) + parseFloat(data.col2) + parseFloat(data.col3) + parseFloat(data.col4) + parseFloat(data.col5) + parseFloat(data.col6) + parseFloat(data.col7);
       },
       deleteIcon(cell, formatterParams, onRendered) {
         return '<button type="button" class="rounded-md bg-indigo-500 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Delete</button>';
       },
       addRowToTable() {
-        this.tabulator.addRow({ project: "", task: "", row1: 0.0, row2: 0.0, row3: 0.0, row4: 0.0, row5: 0.0, row6: 0.0, row7: 0.0, total: 0.0 , action:""})
+        this.tabulator.addRow({ project: "", task: "", col1: 0.0, col2: 0.0, col3: 0.0, col4: 0.0, col5: 0.0, col6: 0.0, col7: 0.0, total: 0.0 , action:""})
           .then((row) => {
             // row - the row component for the row updated or added
             // run code after data has been updated
@@ -85,7 +85,11 @@
       removeBottomRow(e,cell) {
         const row = cell.getRow();
         row.delete();
-      }
+      },
+      submitTimesheet() {
+        const allData = this.tabulator.getData();
+        console.log("All Data:", allData);
+      },
     },
     mounted() {
       //instantiate Tabulator when element is mounted
@@ -121,6 +125,7 @@
       <div class="w-full" ref="table"></div>
       <div class="float-right">
         <div class="pl-4 pr-3">
+          <button type="button" class="rounded-md bg-indigo-500 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" @click="submitTimesheet">Submit Timesheet</button>
           <button type="button" class="rounded-md bg-indigo-500 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" @click="addRowToTable">Add Row</button>
         </div>
       </div>
