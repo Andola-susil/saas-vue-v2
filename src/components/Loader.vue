@@ -29,7 +29,6 @@ export default {
   width: 100%;
   height: 100%;
   background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
   z-index: 1000;
 }
 .spinner {

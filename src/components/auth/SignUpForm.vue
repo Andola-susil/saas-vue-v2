@@ -41,6 +41,9 @@
 
 <script>
 import { createUser } from '../../utils/api.js';
+import { toast } from 'vue3-toastify';
+import '../../../node_modules/vue3-toastify/dist/index.css';
+
 import axios from 'axios';
 export default {
   name: 'SignUp',
@@ -51,6 +54,9 @@ export default {
       error: null,
       errorMessages: []
     }
+  },
+  components:{
+    toast
   },
   methods: {
     async register() {
@@ -70,6 +76,13 @@ export default {
         const token = response.access_token;
         localStorage.setItem('accessToken', token); // Store the token
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`; // Set the token in the headers
+        toast("Registered Successfully!!", {
+          "theme": "colored",
+          "type": "success",
+          "hideProgressBar": true,
+          "dangerouslyHTMLString": true,
+          "autoClose": 3000
+        })
         this.$router.push('/signin'); // Redirect to another page
       } catch (error) {
         // Handle login errors

@@ -186,6 +186,9 @@ import {
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+
 const navigation = ref([]);
 const settings = ref([]);
 // Navigation data
@@ -253,6 +256,13 @@ const manageLogOut = async (item) => {
       localStorage.removeItem('accessToken')
       localStorage.removeItem('layout')
       delete axios.defaults.headers.common['Authorization']
+      toast("Logout Successfully!!", {
+          "theme": "colored",
+          "type": "success",
+          "hideProgressBar": true,
+          "dangerouslyHTMLString": true,
+          "autoClose": 3000
+        })
       router.push('/sign-in')
     } catch (err) {
       error.value = 'An error occurred. Please try again.'
