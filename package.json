@@ -15,7 +15,8 @@
     "pinia": "^2.1.7",
     "tabulator-tables": "^6.2.1",
     "vue": "^3.4.21",
-    "vue-router": "^4.0.13"
+    "vue-router": "^4.0.13",
+    "vue3-toastify": "^0.2.1"
   },
   "devDependencies": {
     "@types/tabulator-tables": "^6.2.0",

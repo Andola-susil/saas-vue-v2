@@ -48,6 +48,8 @@ import { loginUser } from '../../utils/api.js';
 import Loader from '../../components/Loader.vue';
 import axios from 'axios';
 import { useUserStore } from '../../stores/userInfo.js';
+import { toast } from 'vue3-toastify';
+import '../../../node_modules/vue3-toastify/dist/index.css';
 
 export default {
   name: 'SignIn',
@@ -62,6 +64,7 @@ export default {
   },
   components: {
     Loader,
+    toast
   },
   setup() {
     const userStore = useUserStore();
@@ -74,6 +77,12 @@ export default {
       try {
         const response = await loginUser(this.username, this.password);
         const token = response.access_token;
+        toast("Login Successfull!!", {
+          "theme": "colored",
+          "type": "success",
+          "hideProgressBar": true,
+          "dangerouslyHTMLString": true
+        })
         localStorage.setItem('accessToken', token); // Store the token
         localStorage.setItem('layout', 'Admin');
         localStorage.setItem('is_admin', true); 

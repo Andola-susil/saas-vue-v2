@@ -4,6 +4,7 @@ import CurrentTimesheet from '../components/CurrentTimesheet.vue';
 import SignIn from '../views/SignIn.vue';
 import SignUp from '../views/SignUp.vue';
 import TimeTable from '../components/TimeTable.vue';
+import TreeTable from '../components/tables/TreeTable.vue';
 import ApprovalRequests from '../views/ApprovalRequests.vue';
 import PastTimeSheet from '../views/PastTimeSheet.vue';
 import Reports from '../views/Reports.vue';
@@ -17,7 +18,7 @@ const routes = [
   { path: '/time-sheet', name: 'TimeSheet', component: TimeTable,props: route => ({ id: route.query.id }), meta: { path: '/time-sheet' }},
   // { path: '/time-table', name: 'TimeTable', component: TimeTable, meta: { path: '/time-table' }},
   { path: '/time-sheet-approvals', name: 'Time-sheet approvals', component: ApprovalRequests, meta: { path: '/time-sheet-approvals' }},
-  { path: '/past-time-sheet', name: 'Past Time-sheet', component: PastTimeSheet, meta: { path: '/past-time-sheet'}},
+  { path: '/past-time-sheet', name: 'Past Time-sheet', component: TreeTable, meta: { path: '/past-time-sheet'}},
   { path: '/time-sheet-reports', name: 'Time-sheet Reports', component: Reports, meta: { path: '/time-sheet-reports'}},
   { path: '/calender-view', name: 'Calender', component: CalenderView, meta: { path: '/calender-view'}},
 ];
@@ -32,13 +33,16 @@ const isAuthenticated = () => {
   return !!localStorage.getItem('accessToken');
 };
 
-// router.beforeEach((to, from, next) => {
-//   if (to.path === '/sign-in' && isAuthenticated()) {
-//     next('/dashboard');
-//   } else {
-//     next('/sign-in');
-//   }
-// });
+router.beforeEach((to, from, next) => {
+  if (to.path === '/sign-in' && isAuthenticated() || to.path == '/') {
+    next('/dashboard');
+  } else if (!isAuthenticated() && to.path !== '/sign-in') {
+    next('/sign-in');
+  } else {
+    next();
+  }
+});
+
 
 
 
