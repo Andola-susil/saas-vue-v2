@@ -3,6 +3,7 @@
   import { PlusIcon } from '@heroicons/vue/20/solid'
   import Loader from '../components/Loader.vue';
   import { useRoute } from 'vue-router';
+  import ModalPopup from '../components/common/ModalPopup.vue';
   export default {
     data() {
       return {
@@ -26,6 +27,9 @@
           ],//data for table to display
         isLoading:false,
         json_output:null,
+        showPopup : false,
+        modalContent: {},
+        timeSheetId : null,
       }
     },
     props: {
@@ -36,6 +40,7 @@
     },
     components: {
         Loader,
+        ModalPopup
     },
     methods: {
       cellEditedCallback(cell) {
@@ -128,33 +133,80 @@
                   img.src = "/src/assets/images/circle-check-blank.svg";
                 }
             });
+            // this.modalContent = {
+            //   title: 'Are you sure? You want to reject this time line.',
+            //   description: '',
+            //   confirmLabel: 'Yes',
+            //   cancelLabel: 'No'
+            // }
+            
         } else {
             // Handle unexpected click (if needed)
         }
-      }
+      },
+      approveTimeSheet(){
+        this.tabulator.getRows().forEach(row => {
+          const cell = row.getCell("action");
+          const cellElement = cell.getElement();
 
+          // Find all img elements within the action cell
+          const imgElements = cellElement.querySelectorAll("img");
 
+            imgElements.forEach(img => {
+              const actionType = img.dataset.action;
+              if (actionType === "approve") {
+                img.src = "/src/assets/images/circle-check.svg";
+              } else if (actionType === "reject") {
+                img.src = "/src/assets/images/circle-x.svg";
+              }
+            });
+        });
+      },
+      rejectTimeSheet(){
+        this.tabulator.getRows().forEach(row => {
+          const cell = row.getCell("action");
+          const cellElement = cell.getElement();
+
+          // Find all img elements within the action cell
+          const imgElements = cellElement.querySelectorAll("img");
+
+            imgElements.forEach(img => {
+              const actionType = img.dataset.action;
+              if (actionType === "approve") {
+                img.src = "/src/assets/images/circle-check-blank.svg";
+              } else if (actionType === "reject") {
+                img.src = "/src/assets/images/circle-xmark.svg";
+              }
+            });
+        });
+      },
     },
     mounted() {
       this.isLoading = true;
       //instantiate Tabulator when element is mounted
+      const today = new Date(); 
+      const startOfWeek = new Date(today); 
+      const endOfWeek = new Date(today);
+      startOfWeek.setDate(today.getDate() - today.getDay());
+      endOfWeek.setDate(today.getDate() - today.getDay() + 6);
       const columns = [
           {title:"Id", field:"id", visible:false, htmlOutput:true},
           {title:"Project", field:"project", width:'16%', editor:"input", headerSort:false},
           {title:"Task", field:"task", width:'15%', editor:"input", headerSort:false},
-          {title:"SUN", field:"col1", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-          {title:"MON", field:"col2", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-          {title:"TUE", field:"col3", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-          {title:"WED", field:"col4", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-          {title:"THU", field:"col5", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-          {title:"FRI", field:"col6", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-          {title:"SAT", field:"col7", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
+          {title:`SUN<br>(${startOfWeek.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col1", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
+          {title:`MON<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col2", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
+          {title:`TUE<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col3", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
+          {title:`WED<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col4", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
+          {title:`THU<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col5", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
+          {title:`FRI<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col6", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
+          {title:`SAT<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col7", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
           {title:"Total", field:"total", hozAlign:"center", width:'8%', headerSort:false, bottomCalc:"sum", bottomCalcParams:{precision:2}, mutator: this.totalHrscustomMutator, formatter: this.totalHoursFormatter },
           
       ];
-      
+
       const route = useRoute();
       if(route.query.id){
+        this.timeSheetId = route.query.id;
         columns.push({title:"Action", field:"action", hozAlign:"center", formatter:this.approvalActions, width:'10%', headerSort:false, cellClick:this.reviewTimeSheet,resizable: false});
       }else{
         columns.push({title:"", field:"action", hozAlign:"center", formatter:this.deleteIcon, width:'5%', headerSort:false, cellClick:this.removeBottomRow,resizable: false});
@@ -180,9 +232,24 @@
 </script>
   <template>
     <div>
+      <nav class="flex float-right" v-if="timeSheetId != null">
+        <div class="hidden py-2 md:flex md:items-center">
+          <Menu as="div" class="relative">
+            <button @click="approveTimeSheet()" type="button" class="inline-flex items-center gap-x-1.5 rounded-md bg-green-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+              Approve TimeSheet
+            </button>
+          </Menu>
+          <Menu as="div" class="relative pl-3.5">
+            <button @click="rejectTimeSheet()" type="button" class="inline-flex items-center gap-x-1.5 rounded-md bg-red-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+              Reject TimeSheet
+            </button>
+          </Menu>
+        </div>
+      </nav>
       <div class="w-full" ref="table"></div>
       <Loader :loading="isLoading" />
-      <div class="flex float-right">
+      <!-- <div class="flex float-right" v-if="timeSheetId == null"> -->
+        <div class="flex float-right">
         <div class="pl-4 pr-3">
           <div>
             <button type="button" class="rounded-md bg-indigo-500 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" @click="submitTimesheet">Submit</button>
@@ -200,36 +267,15 @@
       <div ref="json">
         <pre>{{json_output}}</pre>
       </div>
+      <div v-if="showPopup">
+        <ModalPopup  :open="showPopup"
+                title="Are you sure? You want to reject this time line."
+                description=""
+                confirmLabel="Yes"
+                cancelLabel="No"/>
+      </div>
     </div>
   </template>
   <style scoped>
-    .tabulator-editing input {
-      border: 2px solid #3498db; /* Customize the border style */
-      padding: 5px; /* Add padding if needed */
-      border-radius: 4px; /* Add border radius if needed */
-    }
-    .tabulator .tabulator-header {
-      border-bottom: 2px solid #dee2e6;
-      border: 1px solid #dee2e6 !important;
-      color: inherit;
-    }
-    .tabulator .tabulator-header .tabulator-col {
-        background-color: #fff;
-        border-right: 1px solid #dee2e6 !important;
-    }
-    .tabulator .tabulator-tableholder .tabulator-table {
-      /* background-color: #fff; */
-      color: #333;
-      display: inline-block;
-      overflow: visible;
-      position: relative;
-      white-space: nowrap;
-    }
-    .tabulator-row .tabulator-cell {
-      border: 1px solid rgb(208, 213, 247);
-      padding: 5px;
-      /* border-radius: 4px; */
-      text-align: center;
-      box-sizing: border-box;
-    }
+    
   </style>
