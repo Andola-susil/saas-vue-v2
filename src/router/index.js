@@ -10,6 +10,7 @@ import PastTimeSheet from '../views/PastTimeSheet.vue';
 import Reports from '../views/Reports.vue';
 import CalenderView from '../views/CalenderView.vue';
 import Resource from '../components/tables/ResourceView.vue';
+import Settings from '../components/tables/SettingsView.vue';
 
 const routes = [
   { path: '/dashboard', name: 'Dashboard', component: Dashboard, meta: { path: '/' }},
@@ -26,6 +27,7 @@ const routes = [
   
   //Settings
   { path: '/resource', name: 'Resource Management', component: Resource, meta: { path: '/resource'}},
+  { path: '/time-sheet-rules', name: 'Timesheet Rules', component: Settings, meta: { path: '/time-sheet-rules'}},
 ];
 
 const router = createRouter({

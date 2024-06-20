@@ -212,7 +212,7 @@ const navigation_for_auditors = [
 const settings_for_admin = [
   { id: 1, name: 'Resource management', href: '/resource', initial: 'R', current: false },
   { id: 2, name: 'Company calendars', href: '/calender-view', initial: 'C', current: false },
-  { id: 3, name: 'TimeSheet rules', href: '/time-sheet', initial: 'T', current: false },
+  { id: 3, name: 'TimeSheet rules', href: '/time-sheet-rules', initial: 'T', current: false },
 ]
 const settings_resource = [
   { id: 1, name: 'Company calendars', href: '/calender-view', initial: 'C', current: false },
