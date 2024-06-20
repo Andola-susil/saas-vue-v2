@@ -124,7 +124,7 @@ export default {
           week_no: 52 - i + 1,
           start_date: startDate.toLocaleDateString('en-GB'),
           end_date: endDate.toLocaleDateString('en-GB'),
-          hour_logged: Math.floor(Math.random() * 5),
+          hour_logged: Math.floor(Math.random() * 50),
           status: i % 3 === 0 ? 'Pending' : (i % 3 === 1 ? 'Approved' : 'Reject'),
         });
       }

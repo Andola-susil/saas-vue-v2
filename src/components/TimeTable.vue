@@ -7,8 +7,10 @@
     data() {
       return {
         tabulator: null, //variable to hold your table
+        id_count : 1,
         tableData: [
             { 
+              id: 1,
               project: "",
               task: "",
               col1: 0.0,
@@ -49,10 +51,11 @@
         return '<img src="/src/assets/images/trash-can.svg" alt="" class="h-5 w-5">';
       },
       approvalActions(cell, formatterParams, onRendered){
-        return '<div class="flex"><div class="px-1"><img src="/src/assets/images/circle-check.svg" alt="" class="h-6 w-6 "></div><div class="px-1"><img src="/src/assets/images/circle-xmark.svg" alt="" class="h-6 w-6"></div></div>';
+        return '<div class="flex"><div class="px-1"><img src="/src/assets/images/circle-check-blank.svg" alt="" class="h-6 w-6 " data-action="approve"></div><div class="px-1"><img src="/src/assets/images/circle-x.svg" alt="" class="h-6 w-6" data-action="reject"></div></div>';
       },
       addRowToTable() {
-        this.tabulator.addRow({ project: "", task: "", col1: 0.0, col2: 0.0, col3: 0.0, col4: 0.0, col5: 0.0, col6: 0.0, col7: 0.0, total: 0.0 , action:""})
+        this.id_count ++;
+        this.tabulator.addRow({ id:this.id_count,project: "", task: "", col1: 0.0, col2: 0.0, col3: 0.0, col4: 0.0, col5: 0.0, col6: 0.0, col7: 0.0, total: 0.0 , action:""})
           .then((row) => {
             // row - the row component for the row updated or added
             // run code after data has been updated
@@ -126,12 +129,43 @@
             updated_by: 303,
             lineitem_details: allData
           };
+        },
+      reviewTimeSheet(e, cell) {
+        const actionType = e.target.dataset.action; // Get the data-action attribute of the clicked element
+        const row = cell.getRow();
+        const rowID = row.getIndex();
+        const imageElements = cell.getElement().querySelectorAll('img');
+        if (actionType === "approve") {
+            // Find the image element for approve button and update src attribute
+            imageElements.forEach(img => {
+                if (img.dataset.action === "approve") {
+                    img.src = "/src/assets/images/circle-check.svg";
+                }else{
+                  img.src = "/src/assets/images/circle-x.svg";
+                }
+            });
+            // row.update();
+        } else if (actionType === "reject") {
+            // Handle reject action
+            imageElements.forEach(img => {
+                if (img.dataset.action === "reject") {
+                    img.src = "/src/assets/images/circle-xmark.svg";
+                }else{
+                  img.src = "/src/assets/images/circle-check-blank.svg";
+                }
+            });
+        } else {
+            // Handle unexpected click (if needed)
         }
+      }
+
+
     },
     mounted() {
       this.isLoading = true;
       //instantiate Tabulator when element is mounted
       const columns = [
+          {title:"Id", field:"id", visible:false, htmlOutput:true},
           {title:"Project", field:"project", width:'16%', editor:"input", headerSort:false},
           {title:"Task", field:"task", width:'15%', editor:"input", headerSort:false},
           {title:"SUN", field:"col1", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
@@ -147,7 +181,7 @@
       
       const route = useRoute();
       if(route.query.id){
-        columns.push({title:"Action", field:"action", hozAlign:"center", formatter:this.approvalActions, width:'10%', headerSort:false, cellClick:this.removeBottomRow,resizable: false});
+        columns.push({title:"Action", field:"action", hozAlign:"center", formatter:this.approvalActions, width:'10%', headerSort:false, cellClick:this.reviewTimeSheet,resizable: false});
       }else{
         columns.push({title:"", field:"action", hozAlign:"center", formatter:this.deleteIcon, width:'5%', headerSort:false, cellClick:this.removeBottomRow,resizable: false});
       }
