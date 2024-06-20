@@ -106,9 +106,35 @@
       },
       submitTimesheet() {
         const allData = this.tabulator.getData();
-        this.json_output = allData;
-        console.log("All Data:", allData);
+        const logEntry = this.generateLogEntry(allData);
+        this.json_output = logEntry;
+        console.log("All Data:", logEntry);
       },
+      generateLogEntry(allData) {
+          return {
+            id: 1,
+            tenant_id: 101,
+            project_id: 202,
+            resource_type: "developer",
+            resource_id: 303,
+            task_id: 404,
+            time_log_date: "2024-06-18T08:30:00",
+            task_start_time: "2024-06-18T09:00:00",
+            task_end_time: "2024-06-18T17:00:00",
+            break_time: 3600,  // 1 hour in seconds
+            total_time: 25200,  // 7 hours in seconds
+            is_billable: 1,  // 1 for true
+            description: "Worked on module A development",
+            is_from_timer: 0,  // 0 for manual entry
+            approver_id: 505,
+            approval_status: "PENDING",
+            created_at: "2024-06-18T08:30:00",
+            created_by: 303,
+            updated_at: "2024-06-18T08:30:00",
+            updated_by: 303,
+            lineitem_details: allData
+          };
+        },
       reviewTimeSheet(e, cell) {
         const actionType = e.target.dataset.action; // Get the data-action attribute of the clicked element
         const row = cell.getRow();

@@ -13,39 +13,43 @@
     <div class="mt-8 flow-root">
       <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-          <!-- <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+          <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
             <table class="min-w-full divide-y divide-gray-300">
               <thead class="bg-gray-50">
                 <tr>
-                  <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Task ID</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Task Name</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Date</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Start Time</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">End Time</th>
+                  <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">SL NO.</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Resource Name</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Week No.</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Start Date</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">End Date</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Hours Logged</th>
                   <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
-                  <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                    <span class="sr-only">Edit</span>
+                  <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">                    
                   </th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200 bg-white">
                 <tr v-for="(val,key) in time_log" :key="key">
-                  <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{ val.id }}</td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.task_name }}</td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.time_log_date }}</td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.task_start_time }}</td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.task_end_time }}</td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.approval_status }}</td>
-                  <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                    <a href="#" class="text-indigo-600 hover:text-indigo-900"
-                      >Edit<span class="sr-only">, {{ val.id }}</span></a
-                    >
+                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{ val.id }}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.name }}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">#{{ val.week_no }}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.start_date }}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.end_date }}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.hour_logged }}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        <img src="/src/assets/images/circle-check.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Approved">
+                    </td>
+                    <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                        <!-- <a href="#" class="text-indigo-600 hover:text-indigo-900"
+                        >Edit<span class="sr-only">, {{ val.id }}</span></a
+                        > -->
+                        <button class="rounded-md bg-indigo-50 px-2.5 py-1.5 text-sm font-semibold text-indigo-400 shadow-sm hover:bg-indigo-100"><img src="/src/assets/images/eye.svg" alt="" class="h-5 w-5" @click="viewTimeSheetDetails(val)" v-b-tooltip.hover title="view"></button>
                   </td>
                 </tr>
               </tbody>
             </table>
             <PaginationTemplate :paginationData="meta_data" @page-changed="getTimeLogs"/>
-          </div> -->
+          </div>
         </div>
       </div>
     </div>
@@ -87,19 +91,49 @@ export default {
   },
   methods: {
     async getTimeLogs(page) {
-      this.paginationData.current_page = page;
-      this.error = null;
-      try {
-        const response = await getAllTimeLogs(page);
-        this.time_log = response.items;
-        this.meta_data = response.meta;
-      } catch (error) {
-        this.error = 'An error occurred. Please try again.';
-      }
+    //   this.paginationData.current_page = page;
+    //   this.error = null;
+    //   try {
+    //     const response = await getAllTimeLogs(page);
+    //     this.time_log = response.items;
+    //     this.meta_data = response.meta;
+    //   } catch (error) {
+    //     this.error = 'An error occurred. Please try again.';
+    //   }
+    this.time_log = this.generateMockData(5);
     },
     async showPopUp(){
       this.showPopup = true;
     },
+    generateMockData(count) {
+      const mockData = [];
+      const firstNames = ['John', 'Jane', 'Alex', 'Emily', 'Chris', 'Katie', 'Michael', 'Sarah', 'David', 'Laura'];
+      const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Martinez', 'Lopez'];
+
+      for (let i = 1; i <= count; i++) {
+        const startDate = new Date(2024, 4, 25 + (i - 1) * 7); // May 25, 2024
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + 6);
+
+        const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+        const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+
+        mockData.push({
+          id: i,
+          name: `${firstName} ${lastName}`,
+          week_no: 52 - i + 1,
+          start_date: startDate.toLocaleDateString('en-GB'),
+          end_date: endDate.toLocaleDateString('en-GB'),
+          hour_logged: Math.floor(Math.random() * 50),
+          status: i % 3 === 0 ? 'Pending' : (i % 3 === 1 ? 'Approved' : 'Reject'),
+        });
+      }
+      return mockData;
+    },
+    async viewTimeSheetDetails(val){
+      var id = val.id;
+      this.$router.push({ path: '/time-sheet', query: { id } });
+    }
   },
   
 };

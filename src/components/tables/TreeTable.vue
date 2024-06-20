@@ -1,4 +1,5 @@
 <template>
+    <div>Past timesheet</div>
     <div id="example-table"></div>
     <Loader :loading="isLoading" />
 </template>
@@ -22,13 +23,26 @@
     data() {
       return {
         tableDataNested: [
-          {name:"Oli Bob", location:"United Kingdom", gender:"male", col:"red", dob:"14/04/1984", _children:[
-                {name:"Mary May", location:"Germany", gender:"female", col:"blue", dob:"14/05/1982"},
-                {name:"Christine Lobowski", location:"France", gender:"female", col:"green", dob:"22/05/1982"},
-                {name:"Brendon Philips", location:"USA", gender:"male", col:"orange", dob:"01/08/1980"},
-                {name:"Margret Marmajuke", location:"Canada", gender:"female", col:"yellow", dob:"31/01/1999"},
-                {name:"Frank Harbours", location:"Russia", gender:"male", col:"red", dob:"12/05/1966"},
-          ]},
+            {name:"Christine Lobowski", location:"W12", gender:"66hr", col:"Approved", dob:"14/04/1984", _children:[
+                {name:"Oli Bob", location:"France", gender:"female", col:"green", dob:"22/05/1982"},
+                {name:"Oli Bob", location:"France", gender:"female", col:"green", dob:"22/05/1982"},
+                {name:"Oli Bob", location:"France", gender:"female", col:"green", dob:"22/05/1982"},
+                {name:"Oli Bob", location:"France", gender:"female", col:"green", dob:"22/05/1982"},
+            ]},
+            {name:"Liam Jones", location:"W22", gender:"63hr", col:"Approved", dob:"14/04/1984", _children:[
+                {name:"Oli Bob", location:"France", gender:"female", col:"green", dob:"22/05/1982"},
+                {name:"Oli Bob", location:"France", gender:"female", col:"green", dob:"22/05/1982"},
+                {name:"Oli Bob", location:"France", gender:"female", col:"green", dob:"22/05/1982"},
+                {name:"Oli Bob", location:"France", gender:"female", col:"green", dob:"22/05/1982"},
+                {name:"Oli Bob", location:"France", gender:"female", col:"green", dob:"22/05/1982"},
+            ]},
+            {name:"Ethan Rodriguez", location:"W32", gender:"45hr", col:"Approved", dob:"14/04/1984", _children:[
+                {name:"Oli Bob", location:"France", gender:"female", col:"green", dob:"22/05/1982"},
+                {name:"Oli Bob", location:"France", gender:"female", col:"green", dob:"22/05/1982"},
+                {name:"Oli Bob", location:"France", gender:"female", col:"green", dob:"22/05/1982"},
+                {name:"Oli Bob", location:"France", gender:"female", col:"green", dob:"22/05/1982"},
+                {name:"Oli Bob", location:"France", gender:"female", col:"green", dob:"22/05/1982"},
+            ]},
         ],
         isLoading: true,
       };
@@ -41,13 +55,13 @@
                 width: "100%",
                 data: this.tableDataNested,
                 dataTree: true,
-                dataTreeStartExpanded: true,
+                dataTreeStartExpanded: false,
                 columns: [
-                    {title:"Name", field:"name", width:200, responsive:0}, //never hide this column
-                    {title:"Location", field:"location", width:150},
-                    {title:"Gender", field:"gender", width:150, responsive:2}, //hide this column first
-                    {title:"Favourite Color", field:"col", width:150},
-                    {title:"Date Of Birth", field:"dob", hozAlign:"center", sorter:"date", width:150},
+                    {title:"Name", field:"name", hozAlign:"left", width:200, responsive:0}, //never hide this column
+                    {title:"Week no", field:"location", width:150},
+                    {title:"Logged Hours", field:"gender", width:200, responsive:2}, //hide this column first
+                    {title:"Status", field:"col", width:150},
+                    {title:"Submitted On", field:"dob", hozAlign:"center", sorter:"date", width:150},
                 ],
         });
         setTimeout(() => {
