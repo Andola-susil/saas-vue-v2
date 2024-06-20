@@ -9,6 +9,8 @@ import ApprovalRequests from '../views/ApprovalRequests.vue';
 import PastTimeSheet from '../views/PastTimeSheet.vue';
 import Reports from '../views/Reports.vue';
 import CalenderView from '../views/CalenderView.vue';
+import Resource from '../components/tables/ResourceView.vue';
+
 const routes = [
   { path: '/dashboard', name: 'Dashboard', component: Dashboard, meta: { path: '/' }},
   // { path: '/timesheet', name: 'Timesheet', component: Timesheet, meta: { path: '/timesheet' }},
@@ -18,9 +20,12 @@ const routes = [
   { path: '/time-sheet', name: 'TimeSheet', component: TimeTable,props: route => ({ id: route.query.id }), meta: { path: '/time-sheet' }},
   // { path: '/time-table', name: 'TimeTable', component: TimeTable, meta: { path: '/time-table' }},
   { path: '/time-sheet-approvals', name: 'Time-sheet approvals', component: ApprovalRequests, meta: { path: '/time-sheet-approvals' }},
-  { path: '/past-time-sheet', name: 'Past Time-sheet', component: TreeTable, meta: { path: '/past-time-sheet'}},
+  { path: '/past-time-sheet', name: 'Past Time-sheet', component: PastTimeSheet, meta: { path: '/past-time-sheet'}},
   { path: '/time-sheet-reports', name: 'Time-sheet Reports', component: Reports, meta: { path: '/time-sheet-reports'}},
   { path: '/calender-view', name: 'Calender', component: CalenderView, meta: { path: '/calender-view'}},
+  
+  //Settings
+  { path: '/resource', name: 'Resource Management', component: Resource, meta: { path: '/resource'}},
 ];
 
 const router = createRouter({

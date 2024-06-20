@@ -210,7 +210,7 @@ const navigation_for_auditors = [
   { name: 'Reports', href: '/time-sheet-reports', icon: ChartPieIcon, current: false },
 ]
 const settings_for_admin = [
-  { id: 1, name: 'Resource management', href: '/time-sheet', initial: 'R', current: false },
+  { id: 1, name: 'Resource management', href: '/resource', initial: 'R', current: false },
   { id: 2, name: 'Company calendars', href: '/calender-view', initial: 'C', current: false },
   { id: 3, name: 'TimeSheet rules', href: '/time-sheet', initial: 'T', current: false },
 ]
