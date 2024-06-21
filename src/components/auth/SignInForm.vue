@@ -1,6 +1,6 @@
 
 <template>
- 
+ <div>
   <div class="flex min-h-full flex-1 flex-col justify-center px-6 py-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
       <!-- <img class="mx-auto h-10 w-auto" src="../../assets/images/orange-nw-logo.svg" alt="Your Company" /> -->
@@ -41,6 +41,7 @@
     </div>
   </div>
   <Loader :loading="isLoading" />
+  </div>
 </template>
 
 <script>
@@ -89,11 +90,14 @@ export default {
         localStorage.setItem('is_approver', false); 
         localStorage.setItem('is_resource', false); 
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`; // Set the token in the headers
-        // const data = [{
-        //   'accessToken'
-        // }];
-        // Update the Pinia store with user data
-        // await this.userStore.setUser();
+        const data = [{
+          'accessToken': token,
+          'layout': 'Admin',
+          'is_admin': true,
+          'is_approver': false,
+          'is_resource': false,
+        }];
+        // await this.userStore.setUser(data);
         this.$router.push('/dashboard'); // Redirect to another page
         
       } catch (error) {

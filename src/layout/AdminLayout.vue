@@ -162,6 +162,7 @@ import { signOut } from '../utils/api.js'
 import axios from 'axios'
 import { onMounted, ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { useUserStore } from '../stores/userInfo.js';
 import {
   Dialog,
   Menu,
@@ -191,6 +192,7 @@ import 'vue3-toastify/dist/index.css';
 
 const navigation = ref([]);
 const settings = ref([]);
+const userStore = useUserStore();
 // Navigation data
 const navigation_for_admin = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, current: false },
@@ -232,6 +234,7 @@ const is_admin = ref(false);
 const is_approver = ref(false);
 const is_resource = ref(false);
 onMounted(() => {
+    console.log(userStore);
   is_admin.value = localStorage.getItem('is_admin');
   if(is_admin.value == 'true'){
     navigation.value = navigation_for_admin;
