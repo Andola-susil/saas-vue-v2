@@ -4,6 +4,7 @@
   import Loader from '../components/Loader.vue';
   import { useRoute } from 'vue-router';
   import ModalPopup from '../components/common/ModalPopup.vue';
+  import { toast } from 'vue3-toastify';
   export default {
     data() {
       return {
@@ -28,8 +29,15 @@
         isLoading:false,
         json_output:null,
         showPopup : false,
-        modalContent: {},
+        modalContent: {
+          title : '',
+          description: '',
+          confirmLabel: '',
+          cancelLabel: '',
+          showInputField: false,
+        },
         timeSheetId : null,
+        isModalOpen :false,
       }
     },
     props: {
@@ -105,10 +113,21 @@
         row.delete();
       },
       submitTimesheet() {
+        this.isLoading = true;
         const allData = this.tabulator.getData();
         const logEntry = this.generateLogEntry(allData);
-        this.json_output = logEntry;
-        console.log("All Data:", logEntry);
+        
+        setTimeout(() => {
+          this.isLoading = false;
+          this.json_output = logEntry;
+          toast("Timesheet submitted successfully!", {
+            "theme": "colored",
+            "type": "success",
+            "hideProgressBar": true,
+            "dangerouslyHTMLString": true
+          });
+          
+        }, 1000);
       },
       generateLogEntry(allData) {
           return {
@@ -187,6 +206,13 @@
               }
             });
         });
+        this.modalContent.title="Are you sure? You want to approve this timeSheet.";
+        this.modalContent.description="";
+        this.modalContent.confirmLabel="Yes";
+        this.modalContent.cancelLabel="No";
+        this.modalContent.showInputField = false;
+        this.showPopup = true;
+        this.openPopup();
       },
       rejectTimeSheet(){
         this.tabulator.getRows().forEach(row => {
@@ -205,6 +231,34 @@
               }
             });
         });
+        this.modalContent.title="Enter the timesheet rejection reason";
+        this.modalContent.description="";
+        this.modalContent.confirmLabel="Submit";
+        this.modalContent.cancelLabel="Cancel";
+        this.modalContent.showInputField = true;
+        this.showPopup = true;
+        this.openPopup();
+      },
+      openPopup(){
+        this.isModalOpen = true;
+      },
+      handleClosePopup(){
+        this.isModalOpen = false;
+      },
+      handleConfirmation(inputValue){
+        this.isLoading = true;
+        setTimeout(() => {
+          this.isLoading = false;
+          toast("Timesheet reviewed successfully!", {
+            "theme": "colored",
+            "type": "success",
+            "hideProgressBar": true,
+            "dangerouslyHTMLString": true
+          })
+        }, 1000);
+        
+        this.isModalOpen = false;
+        console.log('Confirmed with input:', inputValue)
       },
     },
     mounted() {
@@ -294,11 +348,16 @@
         <pre>{{json_output}}</pre>
       </div>
       <div v-if="showPopup">
-        <ModalPopup  :open="showPopup"
-                title="Are you sure? You want to reject this time line."
-                description=""
-                confirmLabel="Yes"
-                cancelLabel="No"/>
+        <ModalPopup  
+          :open="isModalOpen"
+          :title="modalContent.title"
+          :description="modalContent.description"
+          :confirmLabel="modalContent.confirmLabel"
+          :cancelLabel="modalContent.cancelLabel"
+          :showInputField="modalContent.showInputField"
+          @closePopup="handleClosePopup"
+          @confirmPopup="handleConfirmation"
+        />
       </div>
     </div>
   </template>

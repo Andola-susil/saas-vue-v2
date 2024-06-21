@@ -6,7 +6,7 @@
             <p class="mt-2 text-sm text-gray-700"></p>
         </div>
         <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-            <button type="button" class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">+ Invite User</button>
+            <button @click="addResource()" type="button" class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">+ Invite User</button>
         </div>
         </div>
         <div class="mt-8 flow-root">
@@ -78,6 +78,11 @@
           current_page: 1,
         },
       };
+    },
+    methods:{
+        addResource(){
+            this.$router.push({ path: '/create-resource'});
+        },
     },
     mounted() {
         this.getAllResources(98);        
