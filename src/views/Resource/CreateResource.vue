@@ -91,7 +91,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import Loader from '../components/Loader.vue';
+import Loader from '../../components/Loader.vue';
 import { toast } from 'vue3-toastify';
 
 const isLoading = ref(false);
