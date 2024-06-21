@@ -11,6 +11,11 @@ const time_instance = axios.create({
   baseURL: 'https://osbaseleaf-timelog.andolasoft.co.in/logtimesapi/',
   timeout: 1000, // Set a timeout for requests
 });
+
+const resource_instance = axios.create({
+  baseURL: 'https://osbaseleaf-timelog.andolasoft.co.in/resourceapi/',
+  timeout: 1000, // Set a timeout for requests
+});
 // Define functions for making API requests
 
 
@@ -82,3 +87,22 @@ export const getAllTimeLogs = async (page) => {
 };
 
 // You can define more API functions here
+
+
+//Get all list of all Users
+
+export const getResourceList = async (page) => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    const response = await resource_instance.get('/resources/', {
+      params: { 'x-tenant-id': page },
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

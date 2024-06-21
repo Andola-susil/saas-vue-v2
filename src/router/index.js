@@ -11,7 +11,7 @@ import Reports from '../views/Reports.vue';
 import CalenderView from '../views/CalenderView.vue';
 import Resource from '../components/tables/ResourceView.vue';
 import Settings from '../components/tables/SettingsView.vue';
-import CreateResource from '../views/CreateResource.vue';
+import CreateResource from '../views/Resource/CreateResource.vue';
 
 const routes = [
   { path: '/dashboard', name: 'Dashboard', component: Dashboard, meta: { path: '/' }},

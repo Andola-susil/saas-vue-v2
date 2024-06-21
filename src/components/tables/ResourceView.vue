@@ -50,6 +50,7 @@
 </template>
   <script>
   import Loader from '../../components/Loader.vue';
+  import { getResourceList } from '../../utils/api.js';
   
   
   export default {
@@ -73,22 +74,37 @@
                     {"name": "Ava Wilson", "access_levels": "Member", "skills": "System Administrator", "email": "ava.wilson@example.com", "date_added": "02/02/2024","status": "InActive"}
                 ],
         isLoading: true,
+        paginationData: {
+          total_items: 0,
+          items_per_page: 10,
+          current_page: 1,
+        },
       };
     },
     methods:{
         addResource(){
-            console.log('Here');
             this.$router.push({ path: '/create-resource'});
         },
     },
     mounted() {
-        
-        this.isLoading = true;
-        
-        setTimeout(() => {
-            this.isLoading = false;
-        }, 500);
-    }
+        this.getAllResources(98);        
+        // this.isLoading = true;
+        // setTimeout(() => {
+        //     this.isLoading = false;
+        // }, 500);
+    },
+    methods:{
+        async getAllResources(page) {
+            this.paginationData.current_page = page;
+            this.error = null;
+            try {
+                const response = await getResourceList(page);
+                console.warn(response);
+            } catch (error) {
+                this.error = 'An error occurred. Please try again.';
+            }
+        },
+    },    
   };
   </script>
   
