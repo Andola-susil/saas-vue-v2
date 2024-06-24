@@ -14,7 +14,12 @@
             { 
               id: 1,
               project: "",
+              project_id: 0,
               task: "",
+              task_id: 0,
+              time_log_date: "2024-06-18T08:30:00",
+              task_start_time: "2024-06-18T09:00:00",
+              task_end_time: "2024-06-18T17:00:00",
               col1: 0.0,
               col2: 0.0,
               col3: 0.0,
@@ -23,7 +28,7 @@
               col6: 0.0,
               col7: 0.0,
               total: 0.0 ,
-              action:"",
+              is_approved:"",
             }
           ],//data for table to display
         isLoading:false,
@@ -137,20 +142,9 @@
             resource_type: "developer",
             resource_id: 303,
             task_id: 404,
-            time_log_date: "2024-06-18T08:30:00",
-            task_start_time: "2024-06-18T09:00:00",
-            task_end_time: "2024-06-18T17:00:00",
-            break_time: 3600,  // 1 hour in seconds
-            total_time: 25200,  // 7 hours in seconds
-            is_billable: 1,  // 1 for true
-            description: "Worked on module A development",
             is_from_timer: 0,  // 0 for manual entry
             approver_id: 505,
             approval_status: "PENDING",
-            created_at: "2024-06-18T08:30:00",
-            created_by: 303,
-            updated_at: "2024-06-18T08:30:00",
-            updated_by: 303,
             lineitem_details: allData
           };
         },
@@ -274,12 +268,18 @@
           {title:"Project", field:"project", width:'16%', editor:"input", headerSort:false},
           {title:"Task", field:"task", width:'15%', editor:"input", headerSort:false},
           {title:`SUN<br>(${startOfWeek.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col1", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-          {title:`MON<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col2", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-          {title:`TUE<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col3", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-          {title:`WED<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col4", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-          {title:`THU<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col5", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-          {title:`FRI<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col6", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-          {title:`SAT<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col7", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
+          {title:`MON<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col2", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["float","required", "min:0","max:9","maxLength:1"], formatter: function(cell) {
+                        return cell.getValue().toFixed(2);}},
+          {title:`TUE<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col3", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["float","required", "min:0","max:9","maxLength:1"], formatter: function(cell) {
+                        return cell.getValue().toFixed(2);}},
+          {title:`WED<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col4", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["float","required", "min:0","max:9","maxLength:1"], formatter: function(cell) {
+                        return cell.getValue().toFixed(2);}},
+          {title:`THU<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col5", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["float","required", "min:0","max:9","maxLength:1"], formatter: function(cell) {
+                        return cell.getValue().toFixed(2);}},
+          {title:`FRI<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col6", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["float","required", "min:0","max:9","maxLength:1"], formatter: function(cell) {
+                        return cell.getValue().toFixed(2);}},
+          {title:`SAT<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col7", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["float","required", "min:0","max:9","maxLength:1"], formatter: function(cell) {
+                        return cell.getValue().toFixed(2);}},
           {title:"Total", field:"total", hozAlign:"center", width:'8%', headerSort:false, bottomCalc:"sum", bottomCalcParams:{precision:2}, mutator: this.totalHrscustomMutator, formatter: this.totalHoursFormatter },
           
       ];

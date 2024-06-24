@@ -29,7 +29,7 @@
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200 bg-white">
-                <tr v-for="(val,key) in time_log" :key="key">
+                <tr v-for="(val,key) in time_log" :key="key" class="even:bg-gray-50">
                     <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{ val.id }}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.name }}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">#{{ val.week_no }}</td>

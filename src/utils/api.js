@@ -3,17 +3,20 @@ import axios from 'axios';
 
 // Create an instance of axios with custom configurations if needed
 const instance = axios.create({
-  baseURL: 'https://osbaseleaf-api.andolasoft.co.in/v1/',
+  // baseURL: 'https://osbaseleaf-api.andolasoft.co.in/v1/',
+  baseURL: 'http://ossiba.com:8084/v1/',
   timeout: 1000, // Set a timeout for requests
 });
 
 const time_instance = axios.create({
-  baseURL: 'https://osbaseleaf-timelog.andolasoft.co.in/logtimesapi/',
+  // baseURL: 'https://osbaseleaf-timelog.andolasoft.co.in/logtimesapi/',
+  baseURL: 'http://ossiba.com:8084/v1/',
   timeout: 1000, // Set a timeout for requests
 });
 
 const resource_instance = axios.create({
-  baseURL: 'https://osbaseleaf-timelog.andolasoft.co.in/resourceapi/',
+  // baseURL: 'https://osbaseleaf-timelog.andolasoft.co.in/resourceapi/',
+  baseURL: 'http://ossiba.com:8084/v1/',
   timeout: 1000, // Set a timeout for requests
 });
 // Define functions for making API requests

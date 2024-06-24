@@ -79,19 +79,17 @@
         },
       };
     },
+    mounted() {
+        // this.getAllResources(98);        
+        // this.isLoading = true;
+        // setTimeout(() => {
+            // }, 500);
+                this.isLoading = false;
+    },
     methods:{
         addResource(){
             this.$router.push({ path: '/create-resource'});
         },
-    },
-    mounted() {
-        this.getAllResources(98);        
-        // this.isLoading = true;
-        // setTimeout(() => {
-        //     this.isLoading = false;
-        // }, 500);
-    },
-    methods:{
         async getAllResources(page) {
             this.paginationData.current_page = page;
             this.error = null;
