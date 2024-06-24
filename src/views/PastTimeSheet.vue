@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import { getAllTimeLogs } from '../utils/api.js';
+import { getAllTimeLogs } from '../utils/timelog.js';
 import PaginationTemplate from '../components/common/PaginationTemplate.vue';
 import ModalPopup from '../components/common/ModalPopup.vue';
 export default {

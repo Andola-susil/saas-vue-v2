@@ -230,7 +230,7 @@ const is_admin = ref(false);
 const is_approver = ref(false);
 const is_resource = ref(false);
 onMounted(() => {
-    console.log(userStore);
+    // console.log(userStore);
   is_admin.value = localStorage.getItem('is_admin');
   if(is_admin.value == 'true'){
     navigation.value = navigation_for_admin;
@@ -254,6 +254,7 @@ const manageLogOut = async (item) => {
       await signOut()
       localStorage.removeItem('accessToken')
       localStorage.removeItem('layout')
+      localStorage.removeItem('tenant_id')
       delete axios.defaults.headers.common['Authorization']
       toast("Logout Successfully!!", {
           "theme": "colored",

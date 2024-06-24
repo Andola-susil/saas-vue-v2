@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { getAllTimeLogs } from '../utils/api.js';
+import { getAllTimeLogs } from '../utils/timelog.js';
 import { EllipsisVerticalIcon } from '@heroicons/vue/20/solid'
 export default {
     name: 'TimeSheet Reports',

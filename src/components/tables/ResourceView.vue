@@ -50,7 +50,7 @@
 </template>
   <script>
   import Loader from '../../components/Loader.vue';
-  import { getResourceList } from '../../utils/api.js';
+  import { getResourceList } from '../../utils/resource.js';
   
   
   export default {

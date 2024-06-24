@@ -46,6 +46,9 @@
 
 <script>
 import { loginUser } from '../../utils/api.js';
+import { getTenantsList,getUserProfile,getCurrentTenant } from '../../utils/user.js';
+import { getSubscription } from '../../utils/tenants.js';
+
 import Loader from '../../components/Loader.vue';
 import axios from 'axios';
 import { useUserStore } from '../../stores/userInfo.js';
@@ -90,6 +93,22 @@ export default {
         localStorage.setItem('is_approver', false); 
         localStorage.setItem('is_resource', false); 
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`; // Set the token in the headers
+        
+        //Response for tenant list
+        const usersapi_response = await getTenantsList();
+
+        if(usersapi_response.tenants[0].id){
+          localStorage.setItem('tenant_id', usersapi_response.tenants[0].id); // Store the usersapi_response
+        }
+
+        const current_tenant_info = await getCurrentTenant();
+        const user_profile_info = await getUserProfile();
+        const subscription_info = await getSubscription();
+        
+        console.warn(current_tenant_info);
+        console.warn(user_profile_info);
+        console.warn(subscription_info);
+
         const data = [{
           'accessToken': token,
           'layout': 'Admin',

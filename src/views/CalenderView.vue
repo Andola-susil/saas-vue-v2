@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { getAllTimeLogs } from '../utils/api.js';
+import { getAllTimeLogs } from '../utils/timelog.js';
 import CalenderView from '../components/common/CalenderView.vue';
 export default {
     name: 'Calender',
