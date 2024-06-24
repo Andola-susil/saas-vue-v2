@@ -12,8 +12,11 @@ function apiLogin(a, p) {
 
 export const useUserStore = defineStore('user', {
   state: () => ({
-    name: '',
-    isAdmin: false,
+    'accessToken': '',
+    'layout': '',
+    'is_admin': false,
+    'is_approver': false,
+    'is_resource': false,
   }),
 
   actions: {
@@ -44,7 +47,12 @@ export const useUserStore = defineStore('user', {
      * Set user data
      */
     setUser(data) {
-      this.$patch(data);
+      this.state.accessToken = data[0].accessToken;
+      this.state.layout = data[0].layout;
+      this.state.is_admin = data[0].is_admin;
+      this.state.is_approver = data[0].is_approver;
+      this.state.is_resource = data[0].is_resource;
+      console.log(this.state, 'gfgfdf');
     },
   },
 });
