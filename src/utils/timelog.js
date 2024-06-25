@@ -9,6 +9,18 @@ const instance = axios.create({
   timeout: 1000, // Set a timeout for requests
 });
 
+const time_sheet_instance = axios.create({
+  baseURL: 'https://osbaseleaf-timelog.andolasoft.co.in/timesheetdetailsapi/',
+  // baseURL: 'http://ossiba.com:8085/timesheetdetailsapi/',
+  timeout: 1000, // Set a timeout for requests
+});
+
+const time_sheet_fetch_instance = axios.create({
+  baseURL: 'https://osbaseleaf-timelog.andolasoft.co.in/timesheetsapi/',
+  // baseURL: 'http://ossiba.com:8085/timesheetsapi/',
+  timeout: 1000, // Set a timeout for requests
+});
+
 //Get Time logs
 
 export const getAllTimeLogs = async (page) => {
@@ -25,3 +37,55 @@ export const getAllTimeLogs = async (page) => {
       throw error;
     }
   };
+
+  // Submit time sheet
+export const submitTimeSheet = async (time_log) => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    const response = await time_sheet_instance.post('/timesheetdetails/', time_log, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'x-tenant-id ': '171',
+        'Content-Type': 'application/json'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Get time sheet details by id
+export const getTimeSheet = async (time_log_id) => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    
+    const response = await time_sheet_instance.get(`/timesheetdetails/${time_log_id}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'x-tenant-id': '171',
+      }
+    });
+    return response.data; // return the response data
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getWeekTimeSheetForWeek = async (week_number) => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    
+    const response = await time_sheet_fetch_instance.get('/timesheets/', {
+      params: { 'week_number': week_number },
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'x-tenant-id': '171',
+      }
+    });
+    
+    return response.data; // return the response data
+  } catch (error) {
+    throw error;
+  }
+};

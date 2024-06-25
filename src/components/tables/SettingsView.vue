@@ -11,12 +11,12 @@
             </div> -->
             <div class="col-span-full">
               <SwitchGroup as="div" class="flex items-center">
-                <span class="flex flex-grow flex-col">
+                <div class="flex flex-grow flex-col">
                   <SwitchLabel as="span" class="text-sm font-medium leading-6 text-gray-900" passive>Available to hire</SwitchLabel>
                   <Switch v-model="enabled" :class="[enabled ? 'bg-indigo-600' : 'bg-gray-200', 'relative inline-flex h-4 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2']">
                     <span aria-hidden="true" :class="[enabled ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']" />
                   </Switch>
-                </span>
+                </div>
                 
               </SwitchGroup>
             </div>
@@ -77,6 +77,24 @@
                   <p class="block text-sm font-medium leading-6 text-gray-900 pl-2">Mark 2nd and 4th Saturday as holiday</p>
                 </div>
               </div>
+              <div class="col-span-full">
+                <p class="text-gray-500 text-sm">Set the holiday list for 2024</p>
+                  <ul role="list" class="divide-y divide-gray-100">
+                    <li v-for="holiday in holidays" :key="holiday.id" class="flex justify-between gap-x-6 py-5">
+                      <div class="flex w-2/4 gap-x-4">
+                        <div class="min-w-0 flex-auto">
+                          <p class="text-sm leading-6 text-gray-900">{{ holiday.name }}</p>
+                        </div>
+                      </div>
+                      <div class="hidden w-1/4 shrink-0 sm:flex sm:flex-col sm:items-end">
+                        <p class="text-sm leading-6 text-gray-900">{{ holiday.date }}</p>
+                      </div>
+                      <div class="hidden w-1/4 shrink-0 sm:flex sm:flex-col sm:items-end">
+                        <span class="text-sm leading-6 text-gray-900">Remove</span>
+                      </div>
+                    </li>
+                  </ul>
+              </div>
             </div>
           </div>
         </div>
@@ -103,6 +121,33 @@
       return {
         isLoading: true,
         enabled: true,
+        holidays: [
+          {
+            name: 'New year',
+            date: '01/01/2024',
+            id: 1,
+          },
+          {
+            name: 'Republic Day',
+            date: '26/01/2024',
+            id: 2,
+          },
+          {
+            name: 'Panchayatiraj Divas',
+            date: '04/03/2024',
+            id: 3,
+          },
+          {
+            name: 'Maha Shivaratri',
+            date: '08/03/2024',
+            id: 4,
+          },
+          {
+            name: 'Holi',
+            date: '25/03/2024',
+            id: 5,
+          },
+        ],
       };
     },
     method:{

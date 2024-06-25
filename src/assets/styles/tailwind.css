@@ -7,3 +7,6 @@
 .lg\:pl-72 {
     padding-left: 15rem !important;
 }
+.week-input:focus-visible {
+    outline: none !important;
+  }

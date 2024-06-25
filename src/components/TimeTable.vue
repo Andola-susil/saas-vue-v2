@@ -1,34 +1,37 @@
 <script>
   import {TabulatorFull as Tabulator} from 'tabulator-tables'; //import Tabulator library
-  import { PlusIcon } from '@heroicons/vue/20/solid'
+  import { PlusIcon,BarsArrowUpIcon, UsersIcon } from '@heroicons/vue/20/solid'
   import Loader from '../components/Loader.vue';
   import { useRoute } from 'vue-router';
   import ModalPopup from '../components/common/ModalPopup.vue';
   import { toast } from 'vue3-toastify';
+  import { submitTimeSheet,getTimeSheet,getWeekTimeSheetForWeek } from '../utils/timelog.js';
+  import axios from 'axios';
+  import moment from 'moment';
+
   export default {
     data() {
       return {
         tabulator: null, //variable to hold your table
         id_count : 1,
+        table_columns: [],
         tableData: [
             { 
               id: 1,
-              project: "",
+              project_name: "",
               project_id: 0,
-              task: "",
+              task_name: "",
               task_id: 0,
-              time_log_date: "2024-06-18T08:30:00",
-              task_start_time: "2024-06-18T09:00:00",
-              task_end_time: "2024-06-18T17:00:00",
-              col1: 0.0,
-              col2: 0.0,
-              col3: 0.0,
-              col4: 0.0,
-              col5: 0.0,
-              col6: 0.0,
-              col7: 0.0,
+              date_logged: "2024-06-25",
+              monday: 0.0,
+              tuesday: 0.0,
+              wednesday: 0.0,
+              thursday: 0.0,
+              friday: 0.0,
+              saturday: 0.0,
+              sunday: 0.0,
               total: 0.0 ,
-              is_approved:"",
+              rejection_reason:"",
             }
           ],//data for table to display
         isLoading:false,
@@ -43,6 +46,9 @@
         },
         timeSheetId : null,
         isModalOpen :false,
+        currentWeekNumber: null,
+        weekStartDate: null,
+        weekEndDate: null,
       }
     },
     props: {
@@ -63,7 +69,7 @@
         row.update({ total: total });
       },
       totalHrscustomMutator(value, data, type, params, component) {
-        return parseFloat(data.col1) + parseFloat(data.col2) + parseFloat(data.col3) + parseFloat(data.col4) + parseFloat(data.col5) + parseFloat(data.col6) + parseFloat(data.col7);
+        return parseFloat(data.monday) + parseFloat(data.tuesday) + parseFloat(data.wednesday) + parseFloat(data.thursday) + parseFloat(data.friday) + parseFloat(data.saturday) + parseFloat(data.sunday);
       },
       deleteIcon(cell, formatterParams, onRendered) {
         return '<img src="/src/assets/images/trash-can.svg" alt="" class="h-5 w-5">';
@@ -73,7 +79,7 @@
       },
       addRowToTable() {
         this.id_count ++;
-        this.tabulator.addRow({ id:this.id_count,project: "", task: "", col1: 0.0, col2: 0.0, col3: 0.0, col4: 0.0, col5: 0.0, col6: 0.0, col7: 0.0, total: 0.0 , action:""})
+        this.tabulator.addRow({ id:this.id_count,project: "", task: "", monday: 0.0, tuesday: 0.0, wednesday: 0.0, thursday: 0.0, friday: 0.0, saturday: 0.0, sunday: 0.0, total: 0.0 , action:""})
           .then((row) => {
             // row - the row component for the row updated or added
             // run code after data has been updated
@@ -121,6 +127,14 @@
         this.isLoading = true;
         const allData = this.tabulator.getData();
         const logEntry = this.generateLogEntry(allData);
+        const response = submitTimeSheet(logEntry)
+        .then(data => {
+          this.tableData = data.lineitems;
+        })
+        .catch(error => {
+          console.error('Error fetching timesheet details:', error);
+        });
+       this.updateTable();
         
         setTimeout(() => {
           this.isLoading = false;
@@ -135,17 +149,19 @@
         }, 1000);
       },
       generateLogEntry(allData) {
+        const tenant_id = localStorage.getItem('tenant_id');
           return {
-            id: 1,
-            tenant_id: 101,
-            project_id: 202,
-            resource_type: "developer",
             resource_id: 303,
-            task_id: 404,
-            is_from_timer: 0,  // 0 for manual entry
             approver_id: 505,
-            approval_status: "PENDING",
-            lineitem_details: allData
+            week_number: 26,
+            // start_date: this.weekStartDate,
+            // end_date: this.weekEndDate,
+            start_date: '2024-06-24',
+            end_date: '2024-06-30',
+            tenant_id: tenant_id,
+            status: "pending",
+            rejection_reason: "",
+            lineitems: allData,
           };
         },
       reviewTimeSheet(e, cell) {
@@ -252,33 +268,101 @@
         }, 1000);
         
         this.isModalOpen = false;
-        console.log('Confirmed with input:', inputValue)
       },
+      getTimeLogData(id){
+        const log_data = getTimeSheet(id)
+        .then((data) => {
+          this.tableData = data.lineitems;
+          this.updateTable();
+        })
+        .catch((error) => {
+
+        });
+      },
+      getTimeSheetId(){
+        const res = getWeekTimeSheetForWeek(this.currentWeekNumber)
+        .then((data) => {
+          const timeSheetId = data.items[0].id;
+          this.getTimeLogData(timeSheetId);
+        })
+        .catch((error) => {
+        });
+      },
+      getWeekInfo(dateString) {
+        // const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        // const dayNum = d.getUTCDay() || 7;
+        // d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+        // const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+        // const weekNumber = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        // return weekNumber;
+        const date = moment(dateString);
+        const startOfWeek = date.startOf('isoWeek').isoWeekday(1).format('YYYY-MM-DD');
+        const endOfWeek = moment(startOfWeek).endOf('isoWeek').format('YYYY-MM-DD');
+        const weekNumber = moment(startOfWeek).isoWeek();
+
+        return {
+          weekNumber,
+          startOfWeek,
+          endOfWeek
+        };
+       
+      },
+      updateTable(){
+        this.tabulator = new Tabulator(this.$refs.table, {
+          data: this.tableData, //link data to table
+          height:"100%",
+          width:"100%",
+          layout:"fitDataTable",
+          reactiveData:true, //turn on data reactivity
+          columnCalcs:"true",
+          validationMode:"blocking",
+          columns: this.table_columns, //Set columns
+        });
+      },
+      formatDate(dateString) {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+        const year = date.getFullYear();
+
+        return `${year}-${month}-${day}`;
+      }
+    
     },
     mounted() {
+      const currentDate = new Date();
+      const { weekNumber, weekStartDate, weekEndDate } = this.getWeekInfo(currentDate);
+      // console.log(weekStartDate);
+      // this.currentWeekNumber = this.getWeekNumber(currentDate);
       this.isLoading = true;
       //instantiate Tabulator when element is mounted
       const today = new Date(); 
       const startOfWeek = new Date(today); 
-      const endOfWeek = new Date(today);
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setUTCDate(startOfWeek.getUTCDate() + 6);
+      // const endOfWeek = new Date(today);
+      // console.log(startOfWeek);
+      this.weekStartDate = this.formatDate(startOfWeek);
+      this.weekEndDate = this.formatDate(endOfWeek);
+      
       startOfWeek.setDate(today.getDate() - today.getDay());
       endOfWeek.setDate(today.getDate() - today.getDay() + 6);
       const columns = [
           {title:"Id", field:"id", visible:false, htmlOutput:true},
-          {title:"Project", field:"project", width:'16%', editor:"input", headerSort:false},
-          {title:"Task", field:"task", width:'15%', editor:"input", headerSort:false},
-          {title:`SUN<br>(${startOfWeek.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col1", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
-          {title:`MON<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col2", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["float","required", "min:0","max:9","maxLength:1"], formatter: function(cell) {
+          {title:"Project", field:"project_name", width:'16%', editor:"input", headerSort:false},
+          {title:"Task", field:"task_name", width:'15%', editor:"input", headerSort:false},
+          {title:`SUN<br>(${startOfWeek.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"monday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9","maxLength:1"]},
+          {title:`MON<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"tuesday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["float","required", "min:0","max:9","maxLength:1"], formatter: function(cell) {
                         return cell.getValue().toFixed(2);}},
-          {title:`TUE<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col3", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["float","required", "min:0","max:9","maxLength:1"], formatter: function(cell) {
+          {title:`TUE<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"wednesday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["float","required", "min:0","max:9","maxLength:1"], formatter: function(cell) {
                         return cell.getValue().toFixed(2);}},
-          {title:`WED<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col4", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["float","required", "min:0","max:9","maxLength:1"], formatter: function(cell) {
+          {title:`WED<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"thursday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["float","required", "min:0","max:9","maxLength:1"], formatter: function(cell) {
                         return cell.getValue().toFixed(2);}},
-          {title:`THU<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col5", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["float","required", "min:0","max:9","maxLength:1"], formatter: function(cell) {
+          {title:`THU<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"friday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["float","required", "min:0","max:9","maxLength:1"], formatter: function(cell) {
                         return cell.getValue().toFixed(2);}},
-          {title:`FRI<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col6", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["float","required", "min:0","max:9","maxLength:1"], formatter: function(cell) {
+          {title:`FRI<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"saturday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["float","required", "min:0","max:9","maxLength:1"], formatter: function(cell) {
                         return cell.getValue().toFixed(2);}},
-          {title:`SAT<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"col7", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["float","required", "min:0","max:9","maxLength:1"], formatter: function(cell) {
+          {title:`SAT<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"sunday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["float","required", "min:0","max:9","maxLength:1"], formatter: function(cell) {
                         return cell.getValue().toFixed(2);}},
           {title:"Total", field:"total", hozAlign:"center", width:'8%', headerSort:false, bottomCalc:"sum", bottomCalcParams:{precision:2}, mutator: this.totalHrscustomMutator, formatter: this.totalHoursFormatter },
           
@@ -301,9 +385,11 @@
         validationMode:"blocking",
         columns: columns, //Set columns
       });
+      this.table_columns = columns;
       setTimeout(() => {
         this.isLoading = false;
       }, 500);
+      this.getTimeSheetId();
     },
     computed: {
       
@@ -312,6 +398,26 @@
 </script>
   <template>
     <div>
+      <div class="sm:flex-auto py-4">
+        <h1 class="text-base font-semibold leading-6 text-gray-900">TimeSheet</h1>
+      </div>
+      <div>
+        
+        <div class="mt-2 w-1/4 flex rounded-md shadow-sm float-right py-4">
+          <div class="relative flex flex-grow items-stretch focus-within:z-10">
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <img src="/src/assets/images/calendar.svg" alt="" class="h-5 w-5">
+            </div>
+            <input class="week-input block w-full rounded-none rounded-l-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6" placeholder="" />
+          </div>
+          <button type="button" class="relative -ml-px inline-flex items-center gap-x-1.5  px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+            <img src="/src/assets/images/angle-left.svg" alt="" class="h-5 w-5">
+          </button>
+          <button type="button" class="relative -ml-px inline-flex items-center gap-x-1.5 rounded-r-md px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+            <img src="/src/assets/images/angle-right.svg" alt="" class="h-5 w-5">
+          </button>
+        </div>
+      </div>
       <nav class="flex float-right" v-if="timeSheetId != null">
         <div class="hidden py-2 md:flex md:items-center">
           <Menu as="div" class="relative">
@@ -345,7 +451,7 @@
         </div>
       </div>
       <div ref="json">
-        <pre>{{json_output}}</pre>
+        <!-- <pre>{{json_output}}</pre> -->
       </div>
       <div v-if="showPopup">
         <ModalPopup  
