@@ -5,10 +5,12 @@
   import { useRoute } from 'vue-router';
   import ModalPopup from '../components/common/ModalPopup.vue';
   import { toast } from 'vue3-toastify';
-  import { submitTimeSheet,getTimeSheet,getWeekTimeSheetForWeek } from '../utils/timelog.js';
+  import { submitTimeSheet,getTimeSheet,getWeekTimeSheetForWeek,reviewTimeSheet } from '../utils/timelog.js';
   import axios from 'axios';
   import moment from 'moment';
-
+  import WeekFilter from '../components/common/WeekFilter.vue';
+  import Datepicker from '@vuepic/vue-datepicker';
+  import '@vuepic/vue-datepicker/dist/main.css';
   export default {
     data() {
       return {
@@ -59,7 +61,9 @@
     },
     components: {
         Loader,
-        ModalPopup
+        ModalPopup,
+        WeekFilter,
+        Datepicker
     },
     methods: {
       cellEditedCallback(cell) {
@@ -153,11 +157,11 @@
           return {
             resource_id: 303,
             approver_id: 505,
-            week_number: 26,
+            week_number: 27,
             // start_date: this.weekStartDate,
             // end_date: this.weekEndDate,
-            start_date: '2024-06-24',
-            end_date: '2024-06-30',
+            start_date: '2024-07-01',
+            end_date: '2024-07-07',
             tenant_id: tenant_id,
             status: "pending",
             rejection_reason: "",
@@ -198,6 +202,7 @@
         } else {
             // Handle unexpected click (if needed)
         }
+        
       },
       approveTimeSheet(){
         this.tabulator.getRows().forEach(row => {
@@ -257,7 +262,7 @@
       },
       handleConfirmation(inputValue){
         this.isLoading = true;
-        setTimeout(() => {
+        const res = reviewTimeSheet(this.timeSheetId,'approve').then((data) => {
           this.isLoading = false;
           toast("Timesheet reviewed successfully!", {
             "theme": "colored",
@@ -265,7 +270,11 @@
             "hideProgressBar": true,
             "dangerouslyHTMLString": true
           })
-        }, 1000);
+          // this.updateTable();
+        })
+        .catch((error) => {
+
+        });
         
         this.isModalOpen = false;
       },
@@ -282,19 +291,18 @@
       getTimeSheetId(){
         const res = getWeekTimeSheetForWeek(this.currentWeekNumber)
         .then((data) => {
-          const timeSheetId = data.items[0].id;
-          this.getTimeLogData(timeSheetId);
+          const time_sheet_id = data.items[0].id;
+          if(this.timeSheetId){
+            this.getTimeLogData(this.timeSheetId);
+          }else{
+            this.getTimeLogData(time_sheet_id);
+          }
         })
         .catch((error) => {
         });
+        
       },
       getWeekInfo(dateString) {
-        // const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-        // const dayNum = d.getUTCDay() || 7;
-        // d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-        // const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-        // const weekNumber = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-        // return weekNumber;
         const date = moment(dateString);
         const startOfWeek = date.startOf('isoWeek').isoWeekday(1).format('YYYY-MM-DD');
         const endOfWeek = moment(startOfWeek).endOf('isoWeek').format('YYYY-MM-DD');
@@ -398,58 +406,43 @@
 </script>
   <template>
     <div>
+      
       <div class="sm:flex-auto py-4">
         <h1 class="text-base font-semibold leading-6 text-gray-900">TimeSheet</h1>
       </div>
-      <div>
-        
-        <div class="mt-2 w-1/4 flex rounded-md shadow-sm float-right py-4">
-          <div class="relative flex flex-grow items-stretch focus-within:z-10">
-            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <img src="/src/assets/images/calendar.svg" alt="" class="h-5 w-5">
-            </div>
-            <input class="week-input block w-full rounded-none rounded-l-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6" placeholder="" />
-          </div>
-          <button type="button" class="relative -ml-px inline-flex items-center gap-x-1.5  px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-            <img src="/src/assets/images/angle-left.svg" alt="" class="h-5 w-5">
-          </button>
-          <button type="button" class="relative -ml-px inline-flex items-center gap-x-1.5 rounded-r-md px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-            <img src="/src/assets/images/angle-right.svg" alt="" class="h-5 w-5">
-          </button>
-        </div>
-      </div>
-      <nav class="flex float-right" v-if="timeSheetId != null">
+     
+      <nav class="flex float-right">
         <div class="hidden py-2 md:flex md:items-center">
-          <Menu as="div" class="relative">
+          <Menu as="div" class="relative" v-if="timeSheetId != null">
             <button @click="approveTimeSheet()" type="button" class="inline-flex items-center gap-x-1.5 rounded-md bg-green-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
               Approve TimeSheet
             </button>
           </Menu>
-          <Menu as="div" class="relative pl-3.5">
+          <Menu as="div" class="relative pl-3.5" v-if="timeSheetId != null">
             <button @click="rejectTimeSheet()" type="button" class="inline-flex items-center gap-x-1.5 rounded-md bg-red-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
               Reject TimeSheet
             </button>
           </Menu>
+          <WeekFilter />
         </div>
       </nav>
       <div class="w-full" ref="table"></div>
       <Loader :loading="isLoading" />
       <!-- <div class="flex float-right" v-if="timeSheetId == null"> -->
-        <div class="flex float-right">
-        <div class="pl-4 pr-3">
-          <div>
-            <button type="button" class="rounded-md bg-indigo-500 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" @click="submitTimesheet">Submit</button>
-          </div>
-        </div>
-        <div class="">
+        <div class="flex float-right" v-if="timeSheetId == null">
           <div class="pl-4 pr-3">
-            <!-- <button type="button" class="rounded-md bg-indigo-500 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" @click="addRowToTable"><PlusIcon class="h-5 w-5" aria-hidden="true" /></button> -->
-            <button type="button" class="rounded-full bg-indigo-600 p-1.5 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" @click="addRowToTable">
-              <img src="/src/assets/images/plus.svg" alt="" class="h-5 w-5">
-            </button>
+            <div>
+              <button type="button" class="rounded-md bg-indigo-500 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" @click="submitTimesheet">Submit</button>
+            </div>
+          </div>
+          <div class="">
+            <div class="pl-4 pr-3">
+              <button type="button" class="rounded-full bg-indigo-600 p-1.5 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" @click="addRowToTable">
+                <img src="/src/assets/images/plus.svg" alt="" class="h-5 w-5">
+              </button>
+            </div>
           </div>
         </div>
-      </div>
       <div ref="json">
         <!-- <pre>{{json_output}}</pre> -->
       </div>

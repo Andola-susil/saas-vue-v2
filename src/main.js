@@ -7,6 +7,8 @@ import './assets/styles/font-awesome-all.css';
 import '../node_modules/tabulator-tables/dist/css/tabulator_bootstrap5.min.css';
 import moment from 'moment';
 import { createPinia } from 'pinia'
+// import 'vue-multiselect/dist/vue-multiselect.min.css';
+
 const app = createApp(App);
 
 // Make moment globally available through Vue's prototype

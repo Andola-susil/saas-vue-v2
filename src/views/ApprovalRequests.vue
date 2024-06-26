@@ -4,51 +4,61 @@
     <div class="sm:flex sm:items-center">
       <div class="sm:flex-auto">
         <h1 class="text-base font-semibold leading-6 text-gray-900">TimeSheet Approval Requests</h1>
-        <!-- <p class="mt-2 text-sm text-gray-700">A list of all the users in your account including their name, title, email and role.</p> -->
       </div>
-      <!-- <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-        <button type="button" @click="showPopUp()" class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Add Time Log</button>
-      </div> -->
+      <nav class="flex float-right" v-if="selectedRows.length > 0">
+        <div class="hidden py-2 md:flex md:items-center">
+          <Menu as="div" class="relative">
+            <button @click="approveTimeSheet()" type="button" class="inline-flex items-center gap-x-1.5 rounded-md bg-green-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+              Approve TimeSheet
+            </button>
+          </Menu>
+          <Menu as="div" class="relative pl-3.5">
+            <button @click="rejectTimeSheet()" type="button" class="inline-flex items-center gap-x-1.5 rounded-md bg-red-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+              Reject TimeSheet
+            </button>
+          </Menu>
+          <WeekFilter />
+        </div>
+      </nav>
     </div>
+    
     <div class="mt-8 flow-root">
       <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+            
           <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-            <table class="min-w-full divide-y divide-gray-300">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">SL NO.</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Resource Name</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Week No.</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Start Date</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">End Date</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
-                  <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                    
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-200 bg-white">
-                <tr v-for="(val,key) in time_log" :key="key">
+             <table class="min-w-full divide-y divide-gray-300">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                      <input type="checkbox" v-model="selectAll" @change="toggleSelectAll">
+                    </th>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">SL NO.</th>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Resource Name</th>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Week No.</th>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Start Date</th>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">End Date</th>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 bg-white">
+                  <tr v-for="(val, key) in time_log" :key="key">
+                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                      <input type="checkbox" v-model="selectedRows" :value="val.id" @click="selectTimeSheet(val.id)">
+                    </td>
                     <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{ val.id }}</td>
-                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.name }}</td>
+                    <td @click="viewTimeSheetDetails(val)" class="cursor-pointer underline underline-offset-1 whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.name }}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">#{{ val.week_no }}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.start_date }}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.end_date }}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        <img v-if="val.status == 'Pending'" src="/src/assets/images/pending.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Pending">
-                        <img v-else-if="val.status == 'Reject'" src="/src/assets/images/ban.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Rejected">
-                        <img v-else src="/src/assets/images/circle-check.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Approved">
+                      <img v-if="val.status == 'Pending'" src="/src/assets/images/pending.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Pending">
+                      <img v-else-if="val.status == 'Reject'" src="/src/assets/images/ban.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Rejected">
+                      <img v-else src="/src/assets/images/circle-check.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Approved">
                     </td>
-                    <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                        <!-- <a href="#" class="text-indigo-600 hover:text-indigo-900"
-                        >Edit<span class="sr-only">, {{ val.id }}</span></a
-                        > -->
-                        <button class="rounded-md bg-indigo-50 px-2.5 py-1.5 text-sm font-semibold text-indigo-400 shadow-sm hover:bg-indigo-100"><img src="/src/assets/images/eye.svg" alt="" class="h-5 w-5" @click="viewTimeSheetDetails(val)" v-b-tooltip.hover title="view"></button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  </tr>
+                </tbody>
+              </table>
             <PaginationTemplate :paginationData="meta_data" @page-changed="getTimeLogs"/>
           </div>
         </div>
@@ -88,6 +98,8 @@ export default {
         current_page: 1,
       },
       showPopup : false,
+      selectedRows: [],
+      selectAll: false,
     }
   },
   methods: {
@@ -114,6 +126,46 @@ export default {
         });
       }
       return mockData;
+    },
+    toggleSelectAll() {
+      if (this.selectAll) {
+        // Select all rows
+        this.selectedRows = this.time_log.map(val => val.id);
+      } else {
+        // Deselect all rows
+        this.selectedRows = [];
+      }
+    },
+    selectTimeSheet(id){
+      const index = this.selectedRows.indexOf(id);
+      if (index === -1) {
+        this.selectedRows.push(id);
+      } else {
+        this.selectedRows.splice(index, 1);
+      }
+      if(this.time_log.length == this.selectedRows.length){
+        this.selectAll = true;
+      }else{
+        this.selectAll = false;
+      }
+    },
+    approveTimeSheet(id){
+      // this.isLoading = true;
+      // const res = reviewTimeSheet(id,'approve').then((data) => {
+      //   this.isLoading = false;
+      //   toast("Timesheet reviewed successfully!", {
+      //     "theme": "colored",
+      //     "type": "success",
+      //     "hideProgressBar": true,
+      //     "dangerouslyHTMLString": true
+      //   })
+      //   // this.updateTable();
+      // })
+      // .catch((error) => {
+
+      // });
+      
+      // this.isModalOpen = false;
     },
     async getTimeLogs(page) {
     //   this.paginationData.current_page = page;

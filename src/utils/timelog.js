@@ -89,3 +89,24 @@ export const getWeekTimeSheetForWeek = async (week_number) => {
     throw error;
   }
 };
+
+
+
+
+export const reviewTimeSheet = async (id, status) => {
+  try {
+    const token = localStorage.getItem('accessToken');
+
+    const response = await time_sheet_fetch_instance.get(`/timesheets/${id}`, {
+      params: { status: status }, // Correctly pass parameters
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'x-tenant-id': '171',
+      }
+    });
+
+    return response.data; // Return the response data
+  } catch (error) {
+    throw error;
+  }
+};
