@@ -5,7 +5,6 @@ import { warn } from 'vue';
 const instance = axios.create({
     // baseURL: 'https://osbaseleaf-timelog.andolasoft.co.in/resourceapi/',
     baseURL: 'http://timelog.ossiba.com/resourceapi/',
-    timeout: 1000, // Set a timeout for requests
   });
 
 //Get all list of all Users
@@ -13,11 +12,14 @@ const instance = axios.create({
 export const getResourceList = async (page) => {
   try {
     const token = localStorage.getItem('accessToken');
+    const tenant_id = localStorage.getItem('tenant_id');
+    
     const response = await instance.get('/resources', {
-      params: { 'x-tenant-id': page },
+      params: { },
       headers: {
         'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'x-tenant-id': tenant_id,
       }
     });
     return response.data;
@@ -29,11 +31,13 @@ export const getResourceList = async (page) => {
 export const getResourceInfoById = async (id) => {
   try {
     const token = localStorage.getItem('accessToken');
+    const tenant_id = localStorage.getItem('tenant_id');
+
     const response = await instance.get(`/resources/${id}`, {
       params: {},
       headers: {
         'Authorization': `Bearer ${token}`,
-        'x-tenant-id': '171',
+        'x-tenant-id': tenant_id,
       }
     });
     return response.data;

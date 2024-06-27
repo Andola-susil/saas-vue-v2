@@ -2,9 +2,9 @@
 import axios from 'axios';
 
 const instance = axios.create({
-    baseURL: 'https://osbaseleaf-timelog.andolasoft.co.in/usersapi/',
+    baseURL: 'http://baseleaf.ossiba.com/usersapi/',
+    // baseURL: 'https://osbaseleaf-api.andolasoft.co.in/usersapi/',
     // baseURL: 'http://ossiba.com:8084/v1/',
-    timeout: 1000, // Set a timeout for requests
   });
 
   
@@ -33,10 +33,11 @@ export const getTenantsList = async () => {
       const token = localStorage.getItem('accessToken');
       const tenant_id = localStorage.getItem('tenant_id');
       const response = await instance.get('/users/tenant', {
-        params: {'x-tenant-id' : tenant_id },
+        params: {},
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'x-tenant-id': tenant_id,
         }
       });
       return response.data;

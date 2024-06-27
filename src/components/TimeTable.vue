@@ -89,7 +89,7 @@
       },
       addRowToTable() {
         this.id_count ++;
-        this.tabulator.addRow({ id:this.id_count,project: "", task: "", monday: 0.0, tuesday: 0.0, wednesday: 0.0, thursday: 0.0, friday: 0.0, saturday: 0.0, sunday: 0.0, total: 0.0 , action:""})
+        this.tabulator.addRow({ id:this.id_count,project_name: "", task_name: "", monday: 0.0, tuesday: 0.0, wednesday: 0.0, thursday: 0.0, friday: 0.0, saturday: 0.0, sunday: 0.0, total: 0.0 , action:""})
           .then((row) => {
             // row - the row component for the row updated or added
             // run code after data has been updated
@@ -146,17 +146,14 @@
         });
        this.updateTable();
         
-        setTimeout(() => {
-          this.isLoading = false;
-          this.json_output = logEntry;
-          toast("Timesheet submitted successfully!", {
-            "theme": "colored",
-            "type": "success",
-            "hideProgressBar": true,
-            "dangerouslyHTMLString": true
-          });
-          
-        }, 1000);
+       this.isLoading = false;
+
+       toast("Timesheet submitted successfully!", {
+         "theme": "colored",
+         "type": "success",
+         "hideProgressBar": true,
+         "dangerouslyHTMLString": true
+       });
       },
       generateLogEntry(allData) {
         const tenant_id = localStorage.getItem('tenant_id');
@@ -382,18 +379,12 @@
           {title:"Id", field:"id", visible:false, htmlOutput:true},
           {title:"Project", field:"project_name", width:'16%', editor:"input", headerSort:false},
           {title:"Task", field:"task_name", width:'15%', editor:"input", headerSort:false},
-          {title:`MON<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"monday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {
-                        return cell.getValue().toFixed(2);}},
-          {title:`TUE<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"tuesday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {
-                        return cell.getValue().toFixed(2);}},
-          {title:`WED<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"wednesday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {
-                        return cell.getValue().toFixed(2);}},
-          {title:`THU<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"thursday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {
-                        return cell.getValue().toFixed(2);}},
-          {title:`FRI<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"friday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {
-                        return cell.getValue().toFixed(2);}},
-          {title:`SAT<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"saturday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {
-                        return cell.getValue().toFixed(2);}},
+          {title:`MON<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"monday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {return cell.getValue().toFixed(2);}},
+          {title:`TUE<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"tuesday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {return cell.getValue().toFixed(2);}},
+          {title:`WED<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"wednesday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {return cell.getValue().toFixed(2);}},
+          {title:`THU<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"thursday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {return cell.getValue().toFixed(2);}},
+          {title:`FRI<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"friday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {return cell.getValue().toFixed(2);}},
+          {title:`SAT<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"saturday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {return cell.getValue().toFixed(2);}},
           {title:`SUN<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"sunday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9"]},
           {title:"Total", field:"total", hozAlign:"center", width:'8%', headerSort:false, bottomCalc:"sum", bottomCalcParams:{precision:2}, mutator: this.totalHrscustomMutator, formatter: this.totalHoursFormatter },
           
