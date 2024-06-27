@@ -1,12 +1,14 @@
 <template>
   <div class="w-1/2 flex rounded-md shadow-sm float-right py-4 pl-4">
     <div class="relative flex flex-grow items-stretch">
-      <Datepicker
-        v-model="selectedWeek"
-        :model-value="selectedDate"
+      <DateRangePicker
+        v-model="selectedWeekRange"
+        :model-value="selectedDateRange"
         format="yyyy-MM-dd"
+        range
+        :numberOfMonths="2"
         class="week-input block w-full rounded-none rounded-l-md border-0 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6"
-        @input="handleDateChange"
+        @input="handleDateRangeChange"
       />
     </div>
     <button type="button" @click="prevWeek" class="relative -ml-px inline-flex items-center gap-x-1.5 px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
@@ -19,75 +21,75 @@
 </template>
 
 <script>
-import Datepicker from '@vuepic/vue-datepicker';
+import DateRangePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
 export default {
   components: {
-    Datepicker
+    DateRangePicker
   },
   data() {
     return {
-      selectedDate: new Date(),
-      selectedWeek: [] // Array to store selected week dates
+      selectedDateRange: [new Date(), new Date()], // Initialize with current date range
+      selectedWeekRange: [] // Array to store selected week dates
     };
   },
   mounted() {
-    // Initialize selectedWeek with current week's dates
-    this.initializeSelectedWeek();
+    // Initialize selectedWeekRange with current week's dates
+    this.initializeSelectedWeekRange();
   },
   methods: {
-    handleDateChange(selectedDates) {
-      // Update selectedWeek when date is manually changed
-      if (selectedDates.length === 7) {
-        this.selectedWeek = selectedDates;
+    handleDateRangeChange(selectedDates) {
+      // Update selectedWeekRange when date range is manually changed
+      if (selectedDates.length === 2) {
+        this.selectedWeekRange = this.getWeekRange(selectedDates[0], selectedDates[1]);
       }
     },
-    initializeSelectedWeek() {
-      // Initialize selectedWeek with current week's dates
-      let currentDate = new Date(this.selectedDate);
-      let dayOfWeek = currentDate.getDay(); // 0 (Sunday) to 6 (Saturday)
+    initializeSelectedWeekRange() {
+      // Initialize selectedWeekRange with current week's dates starting from Monday
+      let currentDate = new Date();
       let startOfWeek = new Date(currentDate);
-      startOfWeek.setDate(startOfWeek.getDate() - dayOfWeek); // Start of the current week
+      startOfWeek.setDate(startOfWeek.getDate() - (currentDate.getDay() + 6) % 7); // Start of the current week (Monday)
       let endOfWeek = new Date(startOfWeek);
-      endOfWeek.setDate(endOfWeek.getDate() + 6); // End of the current week
+      endOfWeek.setDate(endOfWeek.getDate() + 6); // End of the current week (Sunday)
       
-      let dates = [];
-      for (let d = new Date(startOfWeek); d <= endOfWeek; d.setDate(d.getDate() + 1)) {
-        dates.push(new Date(d));
-      }
-      
-      this.selectedWeek = dates;
+      this.selectedWeekRange = this.getWeekRange(startOfWeek, endOfWeek);
+      this.selectedDateRange = [startOfWeek, endOfWeek];
     },
     prevWeek() {
-        const today = new Date(this.selectedDate)
-        const day = today.getDay(); 
-        const diff = today.getDate() - day + (day == 0 ? -6 : 1); 
-        const startOfWeek = new Date(today.setDate(diff));
-        let newDate = new Date(startOfWeek);
-        newDate.setDate(newDate.getDate() - 7);
-        this.selectedDate = newDate;
-        this.initializeSelectedWeek();
+      let startOfWeek = new Date(this.selectedDateRange[0]);
+      startOfWeek.setDate(startOfWeek.getDate() - 7);
+      let endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(endOfWeek.getDate() + 6);
+      
+      this.selectedDateRange = [startOfWeek, endOfWeek];
+      this.selectedWeekRange = this.getWeekRange(startOfWeek, endOfWeek);
     },
     nextWeek() {
-        const today = new Date(this.selectedDate)
-        const day = today.getDay(); 
-        const diff = today.getDate() - day + (day == 0 ? -6 : 1); 
-        const startOfWeek = new Date(today.setDate(diff));
-        let newDate = new Date(startOfWeek);
-        newDate.setDate(newDate.getDate() + 7);
-        this.selectedDate = newDate;
-        this.initializeSelectedWeek();
+      let startOfWeek = new Date(this.selectedDateRange[0]);
+      startOfWeek.setDate(startOfWeek.getDate() + 7);
+      let endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(endOfWeek.getDate() + 6);
+      
+      this.selectedDateRange = [startOfWeek, endOfWeek];
+      this.selectedWeekRange = this.getWeekRange(startOfWeek, endOfWeek);
+    },
+    getWeekRange(startDate, endDate) {
+      let dates = [];
+      for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+        dates.push(new Date(d));
+      }
+      return dates;
     },
     isCurrentWeek(date) {
       // Check if date is in the current selected week
-      return this.selectedWeek.some(selectedDate => selectedDate.getTime() === date.getTime());
+      return this.selectedWeekRange.some(selectedDate => selectedDate.getTime() === date.getTime());
     }
   },
   computed: {
     highlightedDates() {
       // Returns an array of dates to highlight in the current week
-      return this.selectedWeek.filter(date => this.isCurrentWeek(date));
+      return this.selectedWeekRange.filter(date => this.isCurrentWeek(date));
     }
   }
 };
@@ -97,5 +99,14 @@ export default {
 /* Add any additional styling here */
 .highlighted {
   background-color: rgb(11, 144, 189); /* Example highlight color */
+}
+/* Hide the time button in the date picker */
+.dp__action_row {
+  display: none !important;
+}
+
+/* Hide the cancel select button in the date picker */
+.dp--tp-wrap {
+  display: none !important;
 }
 </style>
