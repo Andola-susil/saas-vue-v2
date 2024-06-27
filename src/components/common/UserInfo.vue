@@ -8,7 +8,7 @@
       </div>
       <div class="min-w-0 flex-1">
         <p class="text-sm font-semibold text-gray-900">
-          <a href="#" class="">{{ name }}(#{{ id }})</a>
+          <a href="#" class="">{{ name }}({{ id }})</a>
         </p>
         <p class="text-sm text-gray-500">
           <a href="#" class="">{{ role }}</a>

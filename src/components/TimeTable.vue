@@ -267,8 +267,14 @@
         this.isModalOpen = false;
       },
       handleConfirmation(inputValue){
+        // console.log(inputValue); return false;
+        if(inputValue != ''){
+          var timesheet_status = 'reject';
+        }else{
+          var timesheet_status = 'approve';
+        }
         this.isLoading = true;
-        const res = reviewTimeSheet(this.timeSheetId,'approve').then((data) => {
+        const res = reviewTimeSheet(this.timeSheetId,timesheet_status,inputValue).then((data) => {
           this.isLoading = false;
           toast("Timesheet reviewed successfully!", {
             "theme": "colored",
@@ -444,7 +450,10 @@
               Reject TimeSheet
             </button>
           </Menu>
-          <WeekFilter />
+          <Menu as="div" class="relative">
+            <WeekFilter />
+          </Menu>
+          
         </div>
       </nav>
       <div class="w-full" ref="table"></div>
