@@ -34,10 +34,11 @@ export const getTenantsList = async () => {
       const token = localStorage.getItem('accessToken');
       const tenant_id = localStorage.getItem('tenant_id');
       const response = await instance.get('/users/tenant', {
-        params: {'x-tenant-id' : tenant_id },
+        params: {},
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'x-tenant-id': tenant_id,
         }
       });
       return response.data;
