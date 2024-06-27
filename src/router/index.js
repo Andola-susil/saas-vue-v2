@@ -12,6 +12,7 @@ import CalenderView from '../views/CalenderView.vue';
 import Resource from '../components/tables/ResourceView.vue';
 import Settings from '../components/tables/SettingsView.vue';
 import CreateResource from '../views/Resource/CreateResource.vue';
+import AllTimeSheets from '../views/AllTimeSheets.vue';
 
 const routes = [
   { path: '/dashboard', name: 'Dashboard', component: Dashboard, meta: { path: '/' }},
@@ -25,6 +26,7 @@ const routes = [
   { path: '/past-time-sheet', name: 'Past Time-sheet', component: PastTimeSheet, meta: { path: '/past-time-sheet'}},
   { path: '/time-sheet-reports', name: 'Time-sheet Reports', component: Reports, meta: { path: '/time-sheet-reports'}},
   { path: '/calender-view', name: 'Calender', component: CalenderView, meta: { path: '/calender-view'}},
+  { path: '/all-time-sheets', name: 'All TimeSheets', component: AllTimeSheets, meta: { path: '/all-time-sheets'}},
   
   //Settings
   { path: '/resource', name: 'Resource Management', component: Resource, meta: { path: '/resource'}},

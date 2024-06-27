@@ -196,6 +196,7 @@ const navigation_for_admin = [
   { name: 'Past Time Sheet', href: '/past-time-sheet', icon: DocumentDuplicateIcon, current: false },
   { name: 'Approvals', href: '/time-sheet-approvals', icon: FolderIcon, current: false },
   { name: 'Reports', href: '/time-sheet-reports', icon: ChartPieIcon, current: false },
+  { name: 'All TimeSheets', href: '/all-time-sheets', icon: ChartPieIcon, current: false },
 ]
 const navigation_for_resource = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, current: false },
