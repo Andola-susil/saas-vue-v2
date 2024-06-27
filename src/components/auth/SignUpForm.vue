@@ -35,12 +35,14 @@
         <RouterLink to="/sign-in" class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Sign In</RouterLink>
       </p>
     </div>
+    <Loader :loading="isLoading" />
   </div>
   
 </template>
 
 <script>
 import { createUser } from '../../utils/api.js';
+import Loader from '../../components/Loader.vue';
 import { toast } from 'vue3-toastify';
 import '../../../node_modules/vue3-toastify/dist/index.css';
 
@@ -52,41 +54,43 @@ export default {
       user_email: '',
       password: '',
       error: null,
-      errorMessages: []
+      errorMessages: [],
+      isLoading: false,
     }
   },
   components:{
+    Loader,
     toast
   },
   methods: {
     async register() {
+      this.isLoading = true;
       this.error = null;
       try {
         const user_data = {
           email: this.user_email,
           password: this.password,
           first_name: '',
-          last_name: '',
-          agree_term: null,
-          is_active: true,
-          is_superuser: false,
-          is_verified: false,
+          last_name: ''
         }
         const response = await createUser(user_data);
-        const token = response.access_token;
-        localStorage.setItem('accessToken', token); // Store the token
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`; // Set the token in the headers
-        toast("Registered Successfully!!", {
-          "theme": "colored",
-          "type": "success",
-          "hideProgressBar": true,
-          "dangerouslyHTMLString": true,
-          "autoClose": 3000
-        })
-        this.$router.push('/sign-in'); // Redirect to another page
+        
+        if(response.email){
+          this.isLoading = false;
+          toast("Registered Successfully!!", {
+            "theme": "colored",
+            "type": "success",
+            "hideProgressBar": true,
+            "dangerouslyHTMLString": true,
+            "autoClose": 3000
+          })
+          this.$router.push('/sign-in'); // Redirect to another page
+        }
       } catch (error) {
         // Handle login errors
         this.error = 'An error occurred. Please try again.';
+      } finally {
+        this.isLoading = false;
       }
     },
   },

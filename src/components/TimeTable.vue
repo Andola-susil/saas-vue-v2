@@ -91,7 +91,7 @@
       },
       addRowToTable() {
         this.id_count ++;
-        this.tabulator.addRow({ id:this.id_count,project_name: "", task_name: "", monday: 0.0, tuesday: 0.0, wednesday: 0.0, thursday: 0.0, friday: 0.0, saturday: 0.0, sunday: 0.0, total: 0.0 , action:""})
+        this.tabulator.addRow({ id:this.id_count,project_id: 0,project_name: "", task_id: 0, task_name: "", monday: 0.0, tuesday: 0.0, wednesday: 0.0, thursday: 0.0, friday: 0.0, saturday: 0.0, sunday: 0.0, total: 0.0 , action:""})
           .then((row) => {
             // row - the row component for the row updated or added
             // run code after data has been updated
@@ -142,20 +142,22 @@
         const response = submitTimeSheet(logEntry)
         .then(data => {
           this.tableData = data.lineitems;
+          
+          this.updateTable();
+        
+          this.isLoading = false;
+
+          toast("Timesheet submitted successfully!", {
+            "theme": "colored",
+            "type": "success",
+            "hideProgressBar": true,
+            "dangerouslyHTMLString": true
+          });
         })
         .catch(error => {
           console.error('Error fetching timesheet details:', error);
         });
-       this.updateTable();
-        
-       this.isLoading = false;
-
-       toast("Timesheet submitted successfully!", {
-         "theme": "colored",
-         "type": "success",
-         "hideProgressBar": true,
-         "dangerouslyHTMLString": true
-       });
+      
       },
       generateLogEntry(allData) {
         const tenant_id = localStorage.getItem('tenant_id');
@@ -425,9 +427,7 @@
         columns: this.columns, //Set columns
       });
       this.table_columns = this.columns;
-      setTimeout(() => {
-        this.isLoading = false;
-      }, 500);
+      this.isLoading = false;
       this.getTimeSheetId();
     },
     computed: {

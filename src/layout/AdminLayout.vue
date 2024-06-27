@@ -256,6 +256,11 @@ const manageLogOut = async (item) => {
       localStorage.removeItem('accessToken')
       localStorage.removeItem('layout')
       localStorage.removeItem('tenant_id')
+
+      localStorage.removeItem('is_admin')
+      localStorage.removeItem('is_resource')
+      localStorage.removeItem('is_approver')
+
       delete axios.defaults.headers.common['Authorization']
       toast("Logout Successfully!!", {
           "theme": "colored",
