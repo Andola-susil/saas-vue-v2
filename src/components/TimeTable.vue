@@ -55,6 +55,8 @@
         weekStartDate: null,
         weekEndDate: null,
         resource_id : null,
+        startDateOfWeek: null,
+        columns: [],
       }
     },
     props: {
@@ -264,7 +266,6 @@
         this.isModalOpen = false;
       },
       handleConfirmation(inputValue){
-        // console.log(inputValue); return false;
         if(inputValue != ''){
           var timesheet_status = 'reject';
         }else{
@@ -354,49 +355,65 @@
         const year = date.getFullYear();
 
         return `${year}-${month}-${day}`;
+      },
+      handleWeekChange(input){
+        this.startDateOfWeek = input;
+        this.createTableColumns();
+        this.updateTable();
+      },
+      createTableColumns(){
+        if(this.startDateOfWeek != null){
+          var today = new Date(this.startDateOfWeek);
+        }else{
+          var today = new Date();
+        }
+        console.log(today);  
+        const startOfWeek = new Date(today); 
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setUTCDate(startOfWeek.getUTCDate() + 6);
+        // const endOfWeek = new Date(today);
+        // console.log(startOfWeek);
+        this.weekStartDate = this.formatDate(startOfWeek);
+        this.weekEndDate = this.formatDate(endOfWeek);
+        
+        startOfWeek.setDate(today.getDate() - today.getDay());
+        endOfWeek.setDate(today.getDate() - today.getDay() + 6);
+        this.columns = [
+            {title:"Id", field:"id", visible:false, htmlOutput:true},
+            {title:"Project", field:"project_name", width:'16%', editor:"input", headerSort:false},
+            {title:"Task", field:"task_name", width:'15%', editor:"input", headerSort:false},
+            {title:`MON<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"monday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {return cell.getValue().toFixed(2);}},
+            {title:`TUE<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"tuesday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {return cell.getValue().toFixed(2);}},
+            {title:`WED<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"wednesday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {return cell.getValue().toFixed(2);}},
+            {title:`THU<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"thursday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {return cell.getValue().toFixed(2);}},
+            {title:`FRI<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"friday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {return cell.getValue().toFixed(2);}},
+            {title:`SAT<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"saturday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {return cell.getValue().toFixed(2);}},
+            {title:`SUN<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"sunday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9"]},
+            {title:"Total", field:"total", hozAlign:"center", width:'8%', headerSort:false, bottomCalc:"sum", bottomCalcParams:{precision:2}, mutator: this.totalHrscustomMutator, formatter: this.totalHoursFormatter },
+            
+        ];
+        if(this.timeSheetId){
+          this.columns.push({title:"Action", field:"action", hozAlign:"center", formatter:this.approvalActions, width:'10%', headerSort:false, cellClick:this.reviewTimeSheet,resizable: false});
+        }else{
+          this.columns.push({title:"", field:"action", hozAlign:"center", formatter:this.deleteIcon, width:'5%', headerSort:false, cellClick:this.removeBottomRow,resizable: false});
+        }
+        this.table_columns = this.columns;
       }
-    
     },
     mounted() {
       const currentDate = new Date();
       const { weekNumber, weekStartDate, weekEndDate } = this.getWeekInfo(currentDate);
-      // console.log(weekStartDate);
       // this.currentWeekNumber = this.getWeekNumber(currentDate);
       this.isLoading = true;
       //instantiate Tabulator when element is mounted
-      const today = new Date(); 
-      const startOfWeek = new Date(today); 
-      const endOfWeek = new Date(startOfWeek);
-      endOfWeek.setUTCDate(startOfWeek.getUTCDate() + 6);
-      // const endOfWeek = new Date(today);
-      // console.log(startOfWeek);
-      this.weekStartDate = this.formatDate(startOfWeek);
-      this.weekEndDate = this.formatDate(endOfWeek);
+      var route = useRoute();
+        if(route.query.id){
+          this.timeSheetId = route.query.id;
+        }else{
+          this.timeSheetId = null;
+        }
+      this.createTableColumns();
       
-      startOfWeek.setDate(today.getDate() - today.getDay());
-      endOfWeek.setDate(today.getDate() - today.getDay() + 6);
-      const columns = [
-          {title:"Id", field:"id", visible:false, htmlOutput:true},
-          {title:"Project", field:"project_name", width:'16%', editor:"input", headerSort:false},
-          {title:"Task", field:"task_name", width:'15%', editor:"input", headerSort:false},
-          {title:`MON<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"monday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {return cell.getValue().toFixed(2);}},
-          {title:`TUE<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"tuesday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {return cell.getValue().toFixed(2);}},
-          {title:`WED<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"wednesday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {return cell.getValue().toFixed(2);}},
-          {title:`THU<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"thursday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {return cell.getValue().toFixed(2);}},
-          {title:`FRI<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"friday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {return cell.getValue().toFixed(2);}},
-          {title:`SAT<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"saturday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {return cell.getValue().toFixed(2);}},
-          {title:`SUN<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"sunday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9"]},
-          {title:"Total", field:"total", hozAlign:"center", width:'8%', headerSort:false, bottomCalc:"sum", bottomCalcParams:{precision:2}, mutator: this.totalHrscustomMutator, formatter: this.totalHoursFormatter },
-          
-      ];
-
-      const route = useRoute();
-      if(route.query.id){
-        this.timeSheetId = route.query.id;
-        columns.push({title:"Action", field:"action", hozAlign:"center", formatter:this.approvalActions, width:'10%', headerSort:false, cellClick:this.reviewTimeSheet,resizable: false});
-      }else{
-        columns.push({title:"", field:"action", hozAlign:"center", formatter:this.deleteIcon, width:'5%', headerSort:false, cellClick:this.removeBottomRow,resizable: false});
-      }
       this.tabulator = new Tabulator(this.$refs.table, {
         data: this.tableData, //link data to table
         height:"100%",
@@ -405,9 +422,9 @@
         reactiveData:true, //turn on data reactivity
         columnCalcs:"true",
         validationMode:"blocking",
-        columns: columns, //Set columns
+        columns: this.columns, //Set columns
       });
-      this.table_columns = columns;
+      this.table_columns = this.columns;
       setTimeout(() => {
         this.isLoading = false;
       }, 500);
@@ -442,7 +459,7 @@
             </button>
           </Menu>
           <Menu as="div" class="relative">
-            <WeekFilter />
+            <WeekFilter @handleWeekChange=handleWeekChange />
           </Menu>
           
         </div>

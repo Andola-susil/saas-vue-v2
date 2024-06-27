@@ -40,6 +40,7 @@ export default {
   },
   methods: {
     handleDateRangeChange(selectedDates) {
+    
       // Update selectedWeekRange when date range is manually changed
       if (selectedDates.length === 2) {
         this.selectedWeekRange = this.getWeekRange(selectedDates[0], selectedDates[1]);
@@ -64,6 +65,7 @@ export default {
       
       this.selectedDateRange = [startOfWeek, endOfWeek];
       this.selectedWeekRange = this.getWeekRange(startOfWeek, endOfWeek);
+      this.$emit('handleWeekChange', startOfWeek);
     },
     nextWeek() {
       let startOfWeek = new Date(this.selectedDateRange[0]);
@@ -73,6 +75,7 @@ export default {
       
       this.selectedDateRange = [startOfWeek, endOfWeek];
       this.selectedWeekRange = this.getWeekRange(startOfWeek, endOfWeek);
+      this.$emit('handleWeekChange', startOfWeek);
     },
     getWeekRange(startDate, endDate) {
       let dates = [];
