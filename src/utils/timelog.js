@@ -95,13 +95,13 @@ export const getWeekTimeSheetForWeek = async (week_number) => {
 
 
 
-export const reviewTimeSheet = async (id, status) => {
+export const reviewTimeSheet = async (id, status,reason) => {
   try {
     const token = localStorage.getItem('accessToken');
     const tenant_id = localStorage.getItem('tenant_id');
 
     const response = await time_sheet_fetch_instance.get(`/timesheets/${id}`, {
-      params: { status: status }, 
+      params: { status: status,rejection_reason: reason}, 
       headers: {
         'Authorization': `Bearer ${token}`,
         'x-tenant-id': tenant_id,
