@@ -5,7 +5,6 @@ import { warn } from 'vue';
 const instance = axios.create({
     // baseURL: 'https://osbaseleaf-timelog.andolasoft.co.in/resourceapi/',
     baseURL: 'http://timelog.ossiba.com/resourceapi/',
-    timeout: 1000, // Set a timeout for requests
   });
 
 //Get all list of all Users

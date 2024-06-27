@@ -83,7 +83,7 @@ export default {
           "dangerouslyHTMLString": true,
           "autoClose": 3000
         })
-        this.$router.push('/signin'); // Redirect to another page
+        this.$router.push('/sign-in'); // Redirect to another page
       } catch (error) {
         // Handle login errors
         this.error = 'An error occurred. Please try again.';

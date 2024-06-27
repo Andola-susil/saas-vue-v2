@@ -7,7 +7,6 @@ const instance = axios.create({
     // baseURL: 'https://osbaseleaf-api.andolasoft.co.in/tenantsapi/',
     baseURL: 'http://baseleaf.ossiba.com/tenantsapi/',
     // baseURL: 'http://ossiba.com:8084/v1/',
-    timeout: 1000, // Set a timeout for requests
   });
 
 //Get Time logs

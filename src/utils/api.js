@@ -7,7 +7,6 @@ const auth_instance = axios.create({
   baseURL: 'http://baseleaf.ossiba.com/v1/auth/',
   // baseURL: 'https://osbaseleaf-api.andolasoft.co.in/v1/auth/jwt/',
   // baseURL: 'http://ossiba.com:8084/v1/',
-  timeout: 1000, // Set a timeout for requests
 });
 
 
