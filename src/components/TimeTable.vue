@@ -10,6 +10,7 @@
   import moment from 'moment';
   import WeekFilter from '../components/common/WeekFilter.vue';
   import DateRangePicker from 'vue2-daterange-picker'
+  import { DateTime } from 'luxon'; // Import Luxon DateTime
   export default {
     data() {
       return {
@@ -72,7 +73,20 @@
         row.update({ total: total });
       },
       totalHrscustomMutator(value, data, type, params, component) {
-        return parseFloat(data.monday) + parseFloat(data.tuesday) + parseFloat(data.wednesday) + parseFloat(data.thursday) + parseFloat(data.friday) + parseFloat(data.saturday) + parseFloat(data.sunday);
+          // Ensure to parse each day's value to a float before summing
+          const monday = parseFloat(data.monday);
+          const tuesday = parseFloat(data.tuesday);
+          const wednesday = parseFloat(data.wednesday);
+          const thursday = parseFloat(data.thursday);
+          const friday = parseFloat(data.friday);
+          const saturday = parseFloat(data.saturday);
+          const sunday = parseFloat(data.sunday);
+
+          // Sum all days
+          const total = monday + tuesday + wednesday + thursday + friday + saturday + sunday;
+
+          // Return the calculated total
+          return total;
       },
       deleteIcon(cell, formatterParams, onRendered) {
         return '<img src="/src/assets/images/trash-can.svg" alt="" class="h-5 w-5">';
@@ -94,33 +108,49 @@
           });
       },
       dateEditor(cell, onRendered, success, cancel) {
-        // Create and style input
-        var cellValue = DateTime.fromFormat(cell.getValue(), "dd/MM/yyyy").toFormat("yyyy-MM-dd");
-        var input = document.createElement("input");
+          // Create and style input
+          var input = document.createElement("input");
+          input.setAttribute("type", "text"); // Use type="text" for flexible input handling
+          input.style.padding = "4px";
+          input.style.width = "100%";
+          input.style.boxSizing = "border-box";
+          input.value = this.formatTimeForInput(cell.getValue()); // Format initial value
 
-        input.setAttribute("type", "date");
-        input.style.padding = "4px";
-        input.style.width = "100%";
-        input.style.boxSizing = "border-box";
-        input.value = cellValue;
+          onRendered(function () {
+              input.focus();
+              input.style.height = "100%";
+          });
 
-        onRendered(function () {
-          input.focus();
-          input.style.height = "100%";
-        });
+          const self = this; // Preserve component context
 
-        function onChange() {
-          if (input.value !== cellValue) {
-            success(DateTime.fromFormat(input.value, "yyyy-MM-dd").toFormat("dd/MM/yyyy"));
-          } else {
-            cancel();
+          function onChange() {
+              let value = input.value.trim();
+
+              // Check if the value is in hh:mm format or a valid number
+              const isValidFormat = /^(\d+(\.\d*)?|\.\d+)$/.test(value); // Allows digits with optional decimal
+
+              if (!isValidFormat) {
+                  // Handle invalid input
+                  toast('Invalid time format. Please enter a valid number (e.g., 1.5, 10.25).', {
+                      "theme": "colored",
+                      "type": "error",
+                      "hideProgressBar": true,
+                      "dangerouslyHTMLString": true
+                  });
+                  input.value = self.formatTimeForInput(cell.getValue()); // Reset to original value or clear
+                  input.focus();
+                  return;
+              }
+
+              // Pass the value to Tabulator
+              success(value);
           }
-        }
 
-        // Submit new value on blur or change
-        input.addEventListener("blur", onChange);
+          // Bind onChange function to input events
+          input.addEventListener("blur", onChange);
+          input.addEventListener("input", onChange);
 
-        return input;
+          return input;
       },
       removeBottomRow(e,cell) {
         const row = cell.getRow();
@@ -333,7 +363,48 @@
         const year = date.getFullYear();
 
         return `${year}-${month}-${day}`;
-      }
+      },
+      formatTimeForInput(value) {
+          // Format value to hh:mm format
+          if (!value) return value; // Handle empty value case
+          
+          const [hours, minutes] = value.split(':').map(part => parseInt(part, 10));
+          const formattedHours = hours < 10 ? `0${hours}` : hours;
+          const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+
+          return `${formattedHours}:${formattedMinutes}`;
+      },
+      timeValidator(value, cell) {
+          // Regular expression to match hh:mm format
+          const regex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+          
+          // Check if the value matches the regex
+          if (!regex.test(value)) {
+              toast("Invalid time format. Please use HH:MM format (e.g., 09:30)", {
+                "theme": "colored",
+                "type": "error",
+                "hideProgressBar": true,
+                "dangerouslyHTMLString": true
+              });
+              return false;
+          }
+
+          // If valid, return true
+          return true;
+      },
+      formatTime(value) {
+        if (!value || typeof value !== 'string') {
+          return value; // Return as is if value is empty or not a string
+        }
+
+        const [hours, minutes] = value.split(':').map(Number);
+        if (isNaN(hours) || isNaN(minutes)) {
+          return value; // Return original value if split result is not valid
+        }
+
+        const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+        return formattedTime;
+      },
     
     },
     mounted() {
@@ -352,27 +423,20 @@
       this.weekStartDate = this.formatDate(startOfWeek);
       this.weekEndDate = this.formatDate(endOfWeek);
       
-      startOfWeek.setDate(today.getDate() - today.getDay());
+      startOfWeek.setDate(today.getDate() - today.getDay());  
       endOfWeek.setDate(today.getDate() - today.getDay() + 6);
       const columns = [
-          {title:"Id", field:"id", visible:false, htmlOutput:true},
-          {title:"Project", field:"project_name", width:'16%', editor:"input", headerSort:false},
-          {title:"Task", field:"task_name", width:'15%', editor:"input", headerSort:false},
-          {title:`MON<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"monday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {
-                        return cell.getValue().toFixed(2);}},
-          {title:`TUE<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"tuesday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {
-                        return cell.getValue().toFixed(2);}},
-          {title:`WED<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"wednesday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {
-                        return cell.getValue().toFixed(2);}},
-          {title:`THU<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"thursday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {
-                        return cell.getValue().toFixed(2);}},
-          {title:`FRI<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"friday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {
-                        return cell.getValue().toFixed(2);}},
-          {title:`SAT<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"saturday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: function(cell) {
-                        return cell.getValue().toFixed(2);}},
-          {title:`SUN<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"sunday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9"]},
-          {title:"Total", field:"total", hozAlign:"center", width:'8%', headerSort:false, bottomCalc:"sum", bottomCalcParams:{precision:2}, mutator: this.totalHrscustomMutator, formatter: this.totalHoursFormatter },
-          
+          { title: "Id", field: "id", visible: false, htmlOutput: true },
+          { title: "Project", field: "project_name", width: '16%', editor: "input", headerSort: false },
+          { title: "Task", field: "task_name", width: '15%', editor: "input", headerSort: false },
+          { title: `MON<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field: "monday", hozAlign: "center", width: '8%', editor: (cell, onRendered, success, cancel) => this.dateEditor(cell, onRendered, success, cancel), headerSort: false, bottomCalc: "sum", bottomCalcFormatter: (cell) => this.formatTime(cell.getValue()), cellEdited: (cell) => this.cellEditedCallback(cell), validator: [(value, cell) => this.timeValidator(value, cell)] },
+          { title: `TUE<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field: "tuesday", hozAlign: "center", width: '8%', editor: (cell, onRendered, success, cancel) => this.dateEditor(cell, onRendered, success, cancel), headerSort: false, bottomCalc: "sum", bottomCalcFormatter: (cell) => this.formatTime(cell.getValue()), cellEdited: (cell) => this.cellEditedCallback(cell), validator: [(value, cell) => this.timeValidator(value, cell)] },
+          { title: `WED<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field: "wednesday", hozAlign: "center", width: '8%', editor: (cell, onRendered, success, cancel) => this.dateEditor(cell, onRendered, success, cancel), headerSort: false, bottomCalc: "sum", bottomCalcFormatter: (cell) => this.formatTime(cell.getValue()), cellEdited: (cell) => this.cellEditedCallback(cell), validator: [(value, cell) => this.timeValidator(value, cell)] },
+          { title: `THU<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field: "thursday", hozAlign: "center", width: '8%', editor: (cell, onRendered, success, cancel) => this.dateEditor(cell, onRendered, success, cancel), headerSort: false, bottomCalc: "sum", bottomCalcFormatter: (cell) => this.formatTime(cell.getValue()), cellEdited: (cell) => this.cellEditedCallback(cell), validator: [(value, cell) => this.timeValidator(value, cell)] },
+          { title: `FRI<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field: "friday", hozAlign: "center", width: '8%', editor: (cell, onRendered, success, cancel) => this.dateEditor(cell, onRendered, success, cancel), headerSort: false, bottomCalc: "sum", bottomCalcFormatter: (cell) => this.formatTime(cell.getValue()), cellEdited: (cell) => this.cellEditedCallback(cell), validator: [(value, cell) => this.timeValidator(value, cell)] },
+          { title: `SAT<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field: "saturday", hozAlign: "center", width: '8%', editor: (cell, onRendered, success, cancel) => this.dateEditor(cell, onRendered, success, cancel), headerSort: false, bottomCalc: "sum", bottomCalcFormatter: (cell) => this.formatTime(cell.getValue()), cellEdited: (cell) => this.cellEditedCallback(cell), validator: [(value, cell) => this.timeValidator(value, cell)] },
+          { title: `SUN<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field: "sunday", hozAlign: "center", width: '8%', editor: (cell, onRendered, success, cancel) => this.dateEditor(cell, onRendered, success, cancel), headerSort: false, bottomCalc: "sum", bottomCalcFormatter: (cell) => this.formatTime(cell.getValue()), cellEdited: (cell) => this.cellEditedCallback(cell), validator: [(value, cell) => this.timeValidator(value, cell)] },
+          { title: "Total", field: "total", hozAlign: "center", width: '8%', headerSort: false, bottomCalc: "sum", bottomCalcParams: { precision: 2 }, mutator: this.totalHrscustomMutator, formatter: this.totalHoursFormatter },
       ];
 
       const route = useRoute();
