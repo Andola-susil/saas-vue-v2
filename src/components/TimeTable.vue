@@ -6,11 +6,13 @@
   import ModalPopup from '../components/common/ModalPopup.vue';
   import { toast } from 'vue3-toastify';
   import { submitTimeSheet,getTimeSheet,getWeekTimeSheetForWeek,reviewTimeSheet } from '../utils/timelog.js';
+  import { getResourceInfoById } from '../utils/resource.js';
   import axios from 'axios';
   import moment from 'moment';
   import WeekFilter from '../components/common/WeekFilter.vue';
   import Datepicker from '@vuepic/vue-datepicker';
   import '@vuepic/vue-datepicker/dist/main.css';
+  import UserInfo from '../components/common/UserInfo.vue';
   export default {
     data() {
       return {
@@ -51,6 +53,7 @@
         currentWeekNumber: null,
         weekStartDate: null,
         weekEndDate: null,
+        resource_id : null,
       }
     },
     props: {
@@ -63,7 +66,8 @@
         Loader,
         ModalPopup,
         WeekFilter,
-        Datepicker
+        Datepicker,
+        UserInfo
     },
     methods: {
       cellEditedCallback(cell) {
@@ -292,6 +296,8 @@
         const res = getWeekTimeSheetForWeek(this.currentWeekNumber)
         .then((data) => {
           const time_sheet_id = data.items[0].id;
+          this.resource_id = data.items[0].resource_id;
+          this.getUserInfo(data.items[0].resource_id);
           if(this.timeSheetId){
             this.getTimeLogData(this.timeSheetId);
           }else{
@@ -301,6 +307,15 @@
         .catch((error) => {
         });
         
+      },
+      getUserInfo(resource_id){
+        console.log(resource_id);
+        const res = getResourceInfoById(resource_id)
+        .then((data) => {
+          
+        })
+        .catch((error) => {
+        });
       },
       getWeekInfo(dateString) {
         const date = moment(dateString);
@@ -410,7 +425,11 @@
       <div class="sm:flex-auto py-4">
         <h1 class="text-base font-semibold leading-6 text-gray-900">TimeSheet</h1>
       </div>
-     
+      <UserInfo 
+        name="Tom Cook"
+        id="56756"
+        role="Software Developer" 
+      />
       <nav class="flex float-right">
         <div class="hidden py-2 md:flex md:items-center">
           <Menu as="div" class="relative" v-if="timeSheetId != null">

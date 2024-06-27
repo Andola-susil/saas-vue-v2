@@ -16,8 +16,8 @@ const time_sheet_instance = axios.create({
 });
 
 const time_sheet_fetch_instance = axios.create({
-  baseURL: 'https://osbaseleaf-timelog.andolasoft.co.in/timesheetsapi/',
-  // baseURL: 'http://ossiba.com:8085/timesheetsapi/',
+  // baseURL: 'https://osbaseleaf-timelog.andolasoft.co.in/timesheetsapi/',
+  baseURL: 'http://timelog.ossiba.com/timesheetsapi/',
   timeout: 1000, // Set a timeout for requests
 });
 
@@ -98,14 +98,33 @@ export const reviewTimeSheet = async (id, status) => {
     const token = localStorage.getItem('accessToken');
 
     const response = await time_sheet_fetch_instance.get(`/timesheets/${id}`, {
-      params: { status: status }, // Correctly pass parameters
+      params: { status: status }, 
       headers: {
         'Authorization': `Bearer ${token}`,
         'x-tenant-id': '171',
       }
     });
 
-    return response.data; // Return the response data
+    return response.data; 
+  } catch (error) {
+    throw error;
+  }
+};
+
+//Get all timesheets
+export const getAllTimeSheets = async () => {
+  try {
+    const token = localStorage.getItem('accessToken');
+
+    const response = await time_sheet_fetch_instance.get(`/timesheets/`, {
+      params: {  }, 
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'x-tenant-id': '171',
+      }
+    });
+
+    return response.data; 
   } catch (error) {
     throw error;
   }
