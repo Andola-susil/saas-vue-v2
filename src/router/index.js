@@ -41,7 +41,7 @@ const router = createRouter({
 
 
 const isAuthenticated = () => {
-  return !!localStorage.getItem('accessToken');
+  return localStorage.getItem('accessToken');
 };
 
 router.beforeEach((to, from, next) => {
