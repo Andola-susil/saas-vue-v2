@@ -101,8 +101,8 @@ export const reviewTimeSheet = async (id, status,reason) => {
     const token = localStorage.getItem('accessToken');
     const tenant_id = localStorage.getItem('tenant_id');
 
-    const response = await time_sheet_fetch_instance.get(`/timesheets/${id}`, {
-      params: { status: status,rejection_reason: reason}, 
+    const response = await time_sheet_fetch_instance.put(`/timesheets/${id}`,{ status: status,rejection_reason: reason},{
+      params: {}, 
       headers: {
         'Authorization': `Bearer ${token}`,
         'x-tenant-id': tenant_id,

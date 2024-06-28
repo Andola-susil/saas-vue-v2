@@ -1,5 +1,5 @@
 <template>
-  <div class="w-5/6 flex rounded-md shadow-sm float-right py-4 pl-4">
+  <div class="w-full flex rounded-md shadow-sm float-right py-4 pl-4">
     <div class="relative flex flex-grow items-stretch">
       <DateRangePicker
         v-model="selectedWeekRange"

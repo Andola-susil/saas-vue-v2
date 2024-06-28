@@ -68,7 +68,7 @@ const modalProps = defineProps({
 
 const emit = defineEmits(['openPopup', 'closePopup', 'confirmPopup'])
 
-const inputValue = ref('')  // Reactive state to store input value
+const inputValue = ref(null)  // Reactive state to store input value
 
 const closePopup = () => {
   emit('closePopup')

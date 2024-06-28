@@ -266,10 +266,10 @@
         this.isModalOpen = false;
       },
       handleConfirmation(inputValue){
-        if(inputValue != ''){
-          var timesheet_status = 'reject';
+        if(inputValue != null){
+          var timesheet_status = 'rejected';
         }else{
-          var timesheet_status = 'approve';
+          var timesheet_status = 'approved';
         }
         this.isLoading = true;
         const res = reviewTimeSheet(this.timeSheetId,timesheet_status,inputValue).then((data) => {

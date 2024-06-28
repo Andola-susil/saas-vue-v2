@@ -2,12 +2,24 @@
 <template>    
   <div class="px-4 sm:px-6 lg:px-8">
     <div class="sm:flex sm:items-center">
-      <div class="sm:flex-auto">
+      <div class="sm:flex-auto pb-8">
         <h1 class="text-base font-semibold leading-6 text-gray-900">All Employee TimeSheets</h1>
       </div>
     </div>
-    <div class="w-full">
-      <div class="float-right">
+    
+    <div class="w-full flex rounded border border-gray-200">
+      <div class="w-2/6 pt-3.5 pl-2">
+        <div class="relative mt-2 rounded-md shadow-sm">
+          <input type="text" name="account-number" id="account-number" class="block w-full rounded-md border-0 py-1.5 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Search" />
+          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+            <QuestionMarkCircleIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+          </div>
+        </div>
+      </div>
+      <div class="w-2/6 pl-6 pt-3.5 ">
+        <SelectInput :options="status_list" placeholder="Select status" :initialSelected="initialSelected" />
+      </div>
+      <div class="w-2/5 pt-2 pr-2">
         <WeekFilter />
       </div>
     </div>
@@ -61,6 +73,9 @@ import PaginationTemplate from '../components/common/PaginationTemplate.vue';
 import ModalPopup from '../components/common/ModalPopup.vue';
 import WeekFilter from '../components/common/WeekFilter.vue';
 import Loader from '../components/Loader.vue';
+import SelectInput from '../components/common/SelectInput.vue';
+
+
 export default {
     name: 'AllTimeSheets',
     path: '/all-time-sheets',
@@ -68,7 +83,8 @@ export default {
     PaginationTemplate,
     ModalPopup,
     WeekFilter,
-    Loader
+    Loader,
+    SelectInput
   },
   mounted() {
     this.getTimeLogs(this.paginationData.current_page);
@@ -89,6 +105,12 @@ export default {
       selectedRows: [],
       selectAll: false,
       isLoading : false,
+      status_list :[
+        { id: 1, name: 'Pending' },
+        { id: 2, name: 'Approved' },
+        { id: 3, name: 'Rejected' },
+      ],
+      initialSelected : 3,
     }
   },
   methods: {
