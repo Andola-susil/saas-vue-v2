@@ -31,7 +31,7 @@
                 <thead class="bg-gray-50">
                   <tr>
                     <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
-                      <input type="checkbox" v-model="selectAll" @change="toggleSelectAll">
+                      <input type="checkbox" class="cursor-pointer" v-model="selectAll" @change="toggleSelectAll">
                     </th>
                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">SL NO.</th>
                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Resource Name</th>
@@ -44,16 +44,16 @@
                 <tbody class="divide-y divide-gray-200 bg-white">
                   <tr v-for="(val, key) in time_log" :key="key">
                     <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                      <input type="checkbox" v-model="selectedRows" :value="val.id" @click="selectTimeSheet(val.id)">
+                      <input type="checkbox" class="cursor-pointer" v-model="selectedRows" :value="val.id" @click="selectTimeSheet(val.id)">
                     </td>
-                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{ val.id }}</td>
-                    <td @click="viewTimeSheetDetails(val)" class="cursor-pointer underline underline-offset-1 whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.name }}</td>
-                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">#{{ val.week_no }}</td>
+                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{ key+1 }}</td>
+                    <td @click="viewTimeSheetDetails(val)" class="cursor-pointer underline underline-offset-1 whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.resource_name }}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">#{{ val.week_number }}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.start_date }}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.end_date }}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      <img v-if="val.status == 'Pending'" src="/src/assets/images/pending.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Pending">
-                      <img v-else-if="val.status == 'Reject'" src="/src/assets/images/ban.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Rejected">
+                      <img v-if="val.status == 'pending'" src="/src/assets/images/pending.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Pending">
+                      <img v-else-if="val.status == 'reject'" src="/src/assets/images/ban.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Rejected">
                       <img v-else src="/src/assets/images/circle-check.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Approved">
                     </td>
                   </tr>
@@ -64,23 +64,35 @@
         </div>
       </div>
     </div>
+    <Loader :loading="isLoading" />
     <div v-if="showPopup">
-    <ModalPopup />
+    <ModalPopup  
+      :open="isModalOpen"
+      :title="modalContent.title"
+      :description="modalContent.description"
+      :confirmLabel="modalContent.confirmLabel"
+      :cancelLabel="modalContent.cancelLabel"
+      :showInputField="modalContent.showInputField"
+      @closePopup="handleClosePopup"
+      @confirmPopup="handleConfirmation"
+    />
     </div>
   </div>
   
 </template>
 
 <script>
-import { getAllTimeLogs } from '../utils/timelog.js';
+import { getAllTimeSheets,reviewTimeSheet } from '../utils/timelog.js';
 import PaginationTemplate from '../components/common/PaginationTemplate.vue';
 import ModalPopup from '../components/common/ModalPopup.vue';
+import Loader from '../components/Loader.vue';
 export default {
     name: 'Approvals',
     path: '/time-sheet-approvals',
   components: {
     PaginationTemplate,
-    ModalPopup
+    ModalPopup,
+    Loader
   },
   mounted() {
     this.getTimeLogs(this.paginationData.current_page);
@@ -100,6 +112,15 @@ export default {
       showPopup : false,
       selectedRows: [],
       selectAll: false,
+      isLoading: false,
+      isModalOpen: false,
+      modalContent: {
+        title : '',
+        description: '',
+        confirmLabel: '',
+        cancelLabel: '',
+        showInputField: false,
+      },
     }
   },
   methods: {
@@ -149,35 +170,18 @@ export default {
         this.selectAll = false;
       }
     },
-    approveTimeSheet(id){
-      // this.isLoading = true;
-      // const res = reviewTimeSheet(id,'approve').then((data) => {
-      //   this.isLoading = false;
-      //   toast("Timesheet reviewed successfully!", {
-      //     "theme": "colored",
-      //     "type": "success",
-      //     "hideProgressBar": true,
-      //     "dangerouslyHTMLString": true
-      //   })
-      //   // this.updateTable();
-      // })
-      // .catch((error) => {
-
-      // });
-      
-      // this.isModalOpen = false;
-    },
     async getTimeLogs(page) {
-    //   this.paginationData.current_page = page;
-    //   this.error = null;
-    //   try {
-    //     const response = await getAllTimeLogs(page);
-    //     this.time_log = response.items;
-    //     this.meta_data = response.meta;
-    //   } catch (error) {
-    //     this.error = 'An error occurred. Please try again.';
-    //   }
-    this.time_log = this.generateMockData(10);
+      this.paginationData.current_page = page;
+      this.error = null;
+      this.isLoading = true;
+      try {
+        const response = await getAllTimeSheets(page);
+        this.time_log = response.items;
+        this.meta_data = response.meta;
+        this.isLoading = false;
+      } catch (error) {
+        this.error = 'An error occurred. Please try again.';
+      }
     },
     async showPopUp(){
       this.showPopup = true;
@@ -185,7 +189,55 @@ export default {
     async viewTimeSheetDetails(val){
         var id = val.id;
         this.$router.push({ path: '/time-sheet', query: { id } });
-    }
+    },
+    approveTimeSheet(){
+      this.modalContent.title="Are you sure? You want to approve the selected ("+ this.selectedRows.length +") timeSheets!";
+      this.modalContent.description="";
+      this.modalContent.confirmLabel="Yes";
+      this.modalContent.cancelLabel="No";
+      this.modalContent.showInputField = false;
+      this.showPopup = true;
+      this.openPopup();
+    },
+    rejectTimeSheet(){
+      this.modalContent.title="Are you sure? You want to reject the selected ("+ this.selectedRows.length +") timeSheets!";
+      this.modalContent.description="";
+      this.modalContent.confirmLabel="Yes";
+      this.modalContent.cancelLabel="No";
+      this.modalContent.showInputField = false;
+      this.showPopup = true;
+      this.openPopup();
+    },
+    openPopup(){
+      this.isModalOpen = true;
+    },
+    handleClosePopup(){
+      this.isModalOpen = false;
+      this.selectedRows = [];
+      this.selectAll = false;
+    },
+    handleConfirmation(inputValue){
+      if(inputValue != ''){
+        var timesheet_status = 'reject';
+      }else{
+        var timesheet_status = 'approve';
+      }
+      this.isLoading = true;
+      const res = reviewTimeSheet(this.timeSheetId,timesheet_status,inputValue).then((data) => {
+        this.isLoading = false;
+        toast("Timesheet reviewed successfully!", {
+          "theme": "colored",
+          "type": "success",
+          "hideProgressBar": true,
+          "dangerouslyHTMLString": true
+        })
+      })
+      .catch((error) => {
+
+      });
+      
+      this.isModalOpen = false;
+    },
   },
   
 };

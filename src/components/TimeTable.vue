@@ -23,8 +23,8 @@
         tableData: [
             { 
               id: 1,
-              project_name: "",
               project_id: 0,
+              project_name: "",
               task_name: "",
               task_id: 0,
               date_logged: "2024-06-25",
@@ -57,6 +57,10 @@
         resource_id : null,
         startDateOfWeek: null,
         columns: [],
+        week_number : null,
+        start_of_week : null,
+        end_of_week: null,
+        show_submit_btn: true,
       }
     },
     props: {
@@ -164,11 +168,11 @@
           return {
             resource_id: 303,
             approver_id: 505,
-            week_number: 27,
-            // start_date: this.weekStartDate,
-            // end_date: this.weekEndDate,
-            start_date: '2024-07-01',
-            end_date: '2024-07-07',
+            week_number: this.week_number,
+            start_date: this.start_of_week,
+            end_date: this.end_of_week,
+            // start_date: '2024-07-01',
+            // end_date: '2024-07-07',
             tenant_id: tenant_id,
             status: "pending",
             rejection_reason: "",
@@ -199,12 +203,6 @@
                   img.src = "/src/assets/images/circle-check-blank.svg";
                 }
             });
-            // this.modalContent = {
-            //   title: 'Are you sure? You want to reject this time line.',
-            //   description: '',
-            //   confirmLabel: 'Yes',
-            //   cancelLabel: 'No'
-            // }
             
         } else {
             // Handle unexpected click (if needed)
@@ -295,29 +293,58 @@
         .then((data) => {
           this.tableData = data.lineitems;
           this.updateTable();
+          this.isLoading = false;
         })
         .catch((error) => {
 
         });
       },
       getTimeSheetId(){
-        const res = getWeekTimeSheetForWeek(this.currentWeekNumber)
-        .then((data) => {
-          const time_sheet_id = data.items[0].id;
-          this.resource_id = data.items[0].resource_id;
-          this.getUserInfo(data.items[0].resource_id);
-          if(this.timeSheetId){
-            this.getTimeLogData(this.timeSheetId);
-          }else{
-            this.getTimeLogData(time_sheet_id);
-          }
-        })
-        .catch((error) => {
-        });
+        this.isLoading = true;
+        if(this.timeSheetId){
+          this.getTimeLogData(this.timeSheetId);
+        }else{
+          const res = getWeekTimeSheetForWeek(this.week_number)
+          .then((data) => {
+            if(data.items.length > 0){
+              const time_sheet_id = data.items[0].id;
+              this.resource_id = data.items[0].resource_id;
+              this.getUserInfo(data.items[0].resource_id);
+              this.getTimeLogData(time_sheet_id);
+              this.show_submit_btn = false;
+            }else{
+              this.tableData = [
+                { 
+                  id: 1,
+                  project_id: 0,
+                  project_name: "",
+                  task_name: "",
+                  task_id: 0,
+                  date_logged: "2024-06-25",
+                  monday: 0.0,
+                  tuesday: 0.0,
+                  wednesday: 0.0,
+                  thursday: 0.0,
+                  friday: 0.0,
+                  saturday: 0.0,
+                  sunday: 0.0,
+                  total: 0.0 ,
+                  rejection_reason:"",
+                }
+              ];
+              this.updateTable();
+              this.show_submit_btn = true;
+              this.isLoading = false;
+            }
+            
+          })
+          .catch((error) => {
+          });
+        }
+        
         
       },
       getUserInfo(resource_id){
-        console.log(resource_id);
         const res = getResourceInfoById(resource_id)
         .then((data) => {
           
@@ -328,15 +355,9 @@
       getWeekInfo(dateString) {
         const date = moment(dateString);
         const startOfWeek = date.startOf('isoWeek').isoWeekday(1).format('YYYY-MM-DD');
-        const endOfWeek = moment(startOfWeek).endOf('isoWeek').format('YYYY-MM-DD');
-        const weekNumber = moment(startOfWeek).isoWeek();
-
-        return {
-          weekNumber,
-          startOfWeek,
-          endOfWeek
-        };
-       
+        this.start_of_week = startOfWeek;
+        this.end_of_week = moment(startOfWeek).endOf('isoWeek').format('YYYY-MM-DD');
+        this.week_number = moment(startOfWeek).isoWeek();
       },
       updateTable(){
         this.tabulator = new Tabulator(this.$refs.table, {
@@ -360,6 +381,8 @@
       },
       handleWeekChange(input){
         this.startDateOfWeek = input;
+        this.getWeekInfo(input);
+        this.getTimeSheetId();
         this.createTableColumns();
         this.updateTable();
       },
@@ -368,13 +391,10 @@
           var today = new Date(this.startDateOfWeek);
         }else{
           var today = new Date();
-        }
-        console.log(today);  
+        } 
         const startOfWeek = new Date(today); 
         const endOfWeek = new Date(startOfWeek);
         endOfWeek.setUTCDate(startOfWeek.getUTCDate() + 6);
-        // const endOfWeek = new Date(today);
-        // console.log(startOfWeek);
         this.weekStartDate = this.formatDate(startOfWeek);
         this.weekEndDate = this.formatDate(endOfWeek);
         
@@ -404,10 +424,8 @@
     },
     mounted() {
       const currentDate = new Date();
-      const { weekNumber, weekStartDate, weekEndDate } = this.getWeekInfo(currentDate);
-      // this.currentWeekNumber = this.getWeekNumber(currentDate);
+      this.getWeekInfo(currentDate);
       this.isLoading = true;
-      //instantiate Tabulator when element is mounted
       var route = useRoute();
         if(route.query.id){
           this.timeSheetId = route.query.id;
@@ -461,19 +479,18 @@
           <Menu as="div" class="relative">
             <WeekFilter @handleWeekChange=handleWeekChange />
           </Menu>
-          
         </div>
       </nav>
       <div class="w-full" ref="table"></div>
       <Loader :loading="isLoading" />
       <!-- <div class="flex float-right" v-if="timeSheetId == null"> -->
         <div class="flex float-right" v-if="timeSheetId == null">
-          <div class="pl-4 pr-3">
+          <div class="pl-4 pr-3" v-if="show_submit_btn == true">
             <div>
               <button type="button" class="rounded-md bg-indigo-500 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" @click="submitTimesheet">Submit</button>
             </div>
           </div>
-          <div class="">
+          <div class="" v-if="show_submit_btn == true">
             <div class="pl-4 pr-3">
               <button type="button" class="rounded-full bg-indigo-600 p-1.5 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" @click="addRowToTable">
                 <img src="/src/assets/images/plus.svg" alt="" class="h-5 w-5">
