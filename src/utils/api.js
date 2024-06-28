@@ -4,8 +4,8 @@ import { warn } from 'vue';
 
 // Create an instance of axios with custom configurations if needed
 const auth_instance = axios.create({
-  baseURL: 'http://baseleaf.ossiba.com/v1/auth/',
-  // baseURL: 'https://osbaseleaf-api.andolasoft.co.in/v1/auth/jwt/',
+  // baseURL: 'http://baseleaf.ossiba.com/v1/auth/',
+  baseURL: 'https://osbaseleaf-api.andolasoft.co.in/v1/',
   // baseURL: 'http://ossiba.com:8084/v1/',
 });
 
@@ -17,7 +17,7 @@ const auth_instance = axios.create({
 
 export const loginUser = async (username, password) => {
   try {
-    const response = await auth_instance.post('/jwt/login', {username,password},
+    const response = await auth_instance.post('auth/jwt/login', {username,password},
     {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -50,7 +50,7 @@ export const createUser = async (user_data) => {
 export const signOut = async (user_data) => {
   try {
     const token = localStorage.getItem('accessToken');
-    const response = await auth_instance.post('/jwt/logout', {}, {
+    const response = await auth_instance.post('auth/jwt/logout', {}, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'

@@ -4,19 +4,20 @@ import { warn } from 'vue';
 
 // Create an instance of axios with custom configurations if needed
 const instance = axios.create({
-  baseURL: 'http://timelog.ossiba.com/',
-  // baseURL: 'https://osbaseleaf-timelog.andolasoft.co.in/logtimesapi/',
+  // baseURL: 'http://timelog.ossiba.com/',
+  baseURL: 'https://osbaseleaf-timelog.andolasoft.co.in/logtimesapi/',
   // baseURL: 'http://ossiba.com:8084/v1/',
 });
 
 const time_sheet_instance = axios.create({
-  baseURL: 'http://timelog.ossiba.com/timesheetdetailsapi/',
+  // baseURL: 'http://timelog.ossiba.com/timesheetdetailsapi/',
+  baseURL: 'https://osbaseleaf-timelog.andolasoft.co.in/timesheetdetailsapi/',
   // baseURL: 'http://ossiba.com:8085/timesheetdetailsapi/',
 });
 
 const time_sheet_fetch_instance = axios.create({
-  // baseURL: 'https://osbaseleaf-timelog.andolasoft.co.in/timesheetsapi/',
-  baseURL: 'http://timelog.ossiba.com/timesheetsapi/',
+  baseURL: 'https://osbaseleaf-timelog.andolasoft.co.in/timesheetsapi/',
+  // baseURL: 'http://timelog.ossiba.com/timesheetsapi/',
 });
 
 //Get Time logs

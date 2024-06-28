@@ -2,8 +2,8 @@
 import axios from 'axios';
 
 const instance = axios.create({
-    baseURL: 'http://baseleaf.ossiba.com/usersapi/',
-    // baseURL: 'https://osbaseleaf-api.andolasoft.co.in/usersapi/',
+    // baseURL: 'http://baseleaf.ossiba.com/usersapi/',
+    baseURL: 'https://osbaseleaf-api.andolasoft.co.in/usersapi/',
     // baseURL: 'http://ossiba.com:8084/v1/',
   });
 

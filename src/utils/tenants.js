@@ -4,8 +4,8 @@ import { warn } from 'vue';
 
 // Create an instance of axios with custom configurations if needed
 const instance = axios.create({
-    // baseURL: 'https://osbaseleaf-api.andolasoft.co.in/tenantsapi/',
-    baseURL: 'http://baseleaf.ossiba.com/tenantsapi/',
+    baseURL: 'https://osbaseleaf-api.andolasoft.co.in/tenantsapi/',
+    // baseURL: 'http://baseleaf.ossiba.com/tenantsapi/',
     // baseURL: 'http://ossiba.com:8084/v1/',
   });
 

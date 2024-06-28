@@ -3,8 +3,8 @@ import axios from 'axios';
 import { warn } from 'vue';
 
 const instance = axios.create({
-    // baseURL: 'https://osbaseleaf-timelog.andolasoft.co.in/resourceapi/',
-    baseURL: 'http://timelog.ossiba.com/resourceapi/',
+    baseURL: 'https://osbaseleaf-timelog.andolasoft.co.in/resourceapi/',
+    // baseURL: 'http://timelog.ossiba.com/resourceapi/',
   });
 
 //Get all list of all Users
