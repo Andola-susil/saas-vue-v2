@@ -3,6 +3,8 @@ import Dashboard from '../views/Dashboard.vue';
 import CurrentTimesheet from '../components/CurrentTimesheet.vue';
 import SignIn from '../views/SignIn.vue';
 import SignUp from '../views/SignUp.vue';
+import ForgetPassword from '../views/ForgetPassword.vue';
+import ResetPassword from '../views/ResetPassword.vue';
 import TimeTable from '../components/TimeTable.vue';
 import TreeTable from '../components/tables/TreeTable.vue';
 import ApprovalRequests from '../views/ApprovalRequests.vue';
@@ -20,6 +22,8 @@ const routes = [
   { path: '/current-timesheet', name: 'Current Timesheet', component: CurrentTimesheet, meta: { path: '/current-timesheet' }},
   { path: '/sign-in', name: 'SignIn', component: SignIn, meta: { hideSidebar: true }},
   { path: '/signup', name: 'SignUp', component: SignUp, meta: { hideSidebar: true }},
+  { path: '/forgot_password', name: 'ForgetPassword', component: ForgetPassword, meta: { hideSidebar: true }},
+  { path: '/resetpassword', name: 'ResetPassword', component: ResetPassword, meta: { hideSidebar: true }},
   { path: '/time-sheet', name: 'TimeSheet', component: TimeTable,props: route => ({ id: route.query.id }), meta: { path: '/time-sheet' }},
   // { path: '/time-table', name: 'TimeTable', component: TimeTable, meta: { path: '/time-table' }},
   { path: '/time-sheet-approvals', name: 'Time-sheet approvals', component: ApprovalRequests, meta: { path: '/time-sheet-approvals' }},
@@ -54,7 +58,7 @@ router.beforeEach((to, from, next) => {
     }
   } else {
     // User is not authenticated
-    if (to.path === '/sign-in' || to.path === '/signup') {
+    if (to.path === '/sign-in' || to.path === '/signup' || to.path === '/forgot_password' || to.path === '/resetpassword') {
       next();
     } else {
       next('/sign-in');

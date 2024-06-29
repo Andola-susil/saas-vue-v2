@@ -9,4 +9,9 @@
 }
 .week-input:focus-visible {
     outline: none !important;
-  }
+}
+@media (min-width: 640px) {
+    .sm\:max-w-sm {
+        max-width: 40rem !important;
+    }
+}

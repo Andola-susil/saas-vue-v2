@@ -61,3 +61,33 @@ export const signOut = async (user_data) => {
     throw error;
   }
 };
+
+//Forget password API
+
+export const forgetPassword = async (email) => {
+  try {
+    const response = await auth_instance.post('auth/forgot-password', email, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+//Reset Forget password API
+
+export const resetPassword = async (email) => {
+  try {
+    const response = await auth_instance.post('auth/reset-password', email, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
