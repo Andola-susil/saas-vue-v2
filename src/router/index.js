@@ -15,6 +15,7 @@ import Resource from '../components/tables/ResourceView.vue';
 import Settings from '../components/tables/SettingsView.vue';
 import CreateResource from '../views/Resource/CreateResource.vue';
 import AllTimeSheets from '../views/AllTimeSheets.vue';
+import YourProfile from '../views/YourProfile.vue';
 
 const routes = [
   { path: '/dashboard', name: 'Dashboard', component: Dashboard, meta: { path: '/' }},
@@ -36,6 +37,10 @@ const routes = [
   { path: '/resource', name: 'Resource Management', component: Resource, meta: { path: '/resource'}},
   { path: '/time-sheet-rules', name: 'Timesheet Rules', component: Settings, meta: { path: '/time-sheet-rules'}},
   { path: '/create-resource', name: 'Create Resource', component: CreateResource, meta: { path: '/create-resource'}},
+
+  //profile
+  { path: '/your-profile', name: 'Your Profile', component: YourProfile, meta: { path: '/your-profile'}},
+
 ];
 
 const router = createRouter({

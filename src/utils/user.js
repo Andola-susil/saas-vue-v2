@@ -7,6 +7,12 @@ const instance = axios.create({
     // baseURL: 'http://ossiba.com:8084/v1/',
   });
 
+const file_instance = axios.create({
+    // baseURL: 'http://baseleaf.ossiba.com/usersapi/',
+    baseURL: 'https://osbaseleaf-api.andolasoft.co.in/filemetasapi/',
+    // baseURL: 'http://ossiba.com:8084/v1/',
+  });
+
   
 //Get all tenantslist of all Users
 
@@ -63,3 +69,94 @@ export const getTenantsList = async () => {
       throw error;
     }
   };
+
+
+  export const getUserDetails = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await instance.get('/users/profile', {
+        params: {},
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  export const uploadProfileImage = async (profileImage) => {
+    try {
+      const token = localStorage.getItem('accessToken'); 
+      const formData = new FormData();
+      formData.append('file', profileImage);
+      const response = await instance.post('/users/profilephoto', formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data', 
+        }
+      });
+  
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  export const getUserProfilePhoto  = async (file_id) => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const tenant_id = localStorage.getItem('tenant_id');
+
+      const response = await file_instance.get(`/files/${file_id}/`, {
+        params: {},
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'x-tenant-id': tenant_id
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+
+  
+  export const updateUserDetails = async (user_data) => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await instance.put('/users/profile',user_data, {
+        params: {},
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  export const getTimeZone = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await instance.get('/users/timezones', {
+        params: {},
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+
+   

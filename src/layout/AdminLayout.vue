@@ -218,7 +218,7 @@ const settings_resource = [
   { id: 2, name: 'TimeSheet rules', href: '/time-sheet', initial: 'T', current: false },
 ]
 const userNavigation = [
-  { name: 'Your profile', href: '#' },
+  { name: 'Your profile', href: '/your-profile' },
   { name: 'Sign out', href: '#' },
 ]
 
