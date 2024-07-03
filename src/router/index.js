@@ -16,6 +16,7 @@ import Settings from '../components/tables/SettingsView.vue';
 import CreateResource from '../views/Resource/CreateResource.vue';
 import AllTimeSheets from '../views/AllTimeSheets.vue';
 import YourProfile from '../views/YourProfile.vue';
+import AddEvent from '../components/common/AddEvent.vue';
 
 const routes = [
   { path: '/dashboard', name: 'Dashboard', component: Dashboard, meta: { path: '/' }},
@@ -40,6 +41,10 @@ const routes = [
 
   //profile
   { path: '/your-profile', name: 'Your Profile', component: YourProfile, meta: { path: '/your-profile'}},
+
+
+  
+  { path: '/your-event', name: 'Your Event', component: AddEvent, meta: { path: '/your-event'}},
 
 ];
 
