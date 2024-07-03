@@ -1,5 +1,5 @@
 <template>
-    <div class="flex justify-center items-center bg-gray-100">
+    <div class="flex justify-center items-center bg-gray-100 min-h-screen">
       <div class="w-full max-w-lg p-6 bg-white rounded-lg shadow-lg">
         <h3 class="text-lg font-semibold mb-4">Add Event</h3>
         <form @submit.prevent="submitForm">
@@ -21,6 +21,8 @@
   </template>
   
   <script>
+  import { useRouter } from 'vue-router';
+  
   export default {
     data() {
       return {
@@ -30,20 +32,25 @@
     },
     methods: {
       submitForm() {
-         
         const event = {
-          holidayName: this.holidayName,
-          holidayDate: this.holidayDate
+          start: this.holidayDate,
+          end: this.holidayDate,
+          title: this.holidayName
         };
-        localStorage.setItem('event', JSON.stringify(event)); 
-        this.holidayName = '';
-        this.holidayDate = ''; 
-      },
-      cancelForm() { 
+        // Save to localStorage
+        let events = JSON.parse(localStorage.getItem('events')) || [];
+        events.push(event);
+        localStorage.setItem('events', JSON.stringify(events));
+        // Clear form fields
         this.holidayName = '';
         this.holidayDate = '';
-  
-        
+        // Navigate back to calendar
+        this.$router.push('/calender-view');
+      },
+      cancelForm() {
+        this.holidayName = '';
+        this.holidayDate = '';
+        this.$router.push('/calender-view');
       }
     }
   };

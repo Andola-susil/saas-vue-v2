@@ -3,7 +3,6 @@
     <header class="flex items-center justify-between border-b border-gray-200 px-6 py-4 lg:flex-none">
       <h1 class="text-base font-semibold leading-6 text-gray-900">
         <time :datetime="currentMonth">{{ formattedMonth }}</time>
-        
       </h1>
       <div class="flex items-center">
         <div class="relative flex items-center rounded-md bg-white shadow-sm md:items-stretch">
@@ -45,8 +44,7 @@
             </transition>
           </Menu>
           <div class="ml-6 h-6 w-px bg-gray-300" />
-          <button @click="openModal()" type="button" class="ml-6 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Add event</button> 
-          
+          <button @click="openModal" type="button" class="ml-6 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Add holiday</button>
         </div>
         <Menu as="div" class="relative ml-6 md:hidden">
           <MenuButton class="-mx-2 flex items-center rounded-full border border-transparent p-2 text-gray-400 hover:text-gray-500">
@@ -85,13 +83,12 @@
         </Menu>
       </div>
     </header>
-    <vue-cal :events="events" :view="currentView" />
-    <Modal v-if="state.isModalVisible" @close="closeModal" @save-event="saveEvent" />
+    <vue-cal class="custom-vue-cal" :events="events" :view="currentView" />
   </div>
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import {
   ChevronDownIcon,
@@ -105,17 +102,10 @@ import 'vue-cal/dist/vuecal.css'
  
 const router = useRouter(); 
 
-const events = ref([
-  { start: '2024-07-07 10:00', end: '2024-07-08 12:00', title: 'Design review' },
-  { start: '2022-01-03 14:00', end: '2022-01-03 15:00', title: 'Sales meeting' },
-  { start: '2022-01-07 18:00', end: '2022-01-07 19:00', title: 'Date night' },
-  { start: '2022-01-12 14:00', end: '2022-01-12 15:00', title: "Sam's birthday party" },
-  { start: '2022-01-22 15:00', end: '2022-01-22 16:00', title: 'Project deadline' },
-])
+const events = ref([]);
 
 const state = reactive({
   currentMonth: new Date().toISOString().substr(0, 7),
-  isModalVisible: false,
   viewMode: 'month', // Define viewMode here if you're using it in state
 });
 
@@ -143,23 +133,31 @@ const setViewMode = (mode) => {
   state.viewMode = mode
 }
 
-// const openModal = () => {
-//   state.isModalVisible = true
-// }
-
-const closeModal = () => {
-  state.isModalVisible = false
-}
-
-const saveEvent = (event) => {
-  events.value.push(event)
-  closeModal()
-}
 const openModal = () => {
-  router.push({ path: '/your-event ' });
- 
+  router.push({ path: '/add-event' });
 }
  
-</script>
+const loadEvents = () => {
+  const storedEvents = JSON.parse(localStorage.getItem('events')) || [];
+  events.value = storedEvents;
+}
 
- 
+onMounted(() => {
+  loadEvents();
+});
+</script>
+<style>
+.vuecal__cell-date{
+  height: 100px;
+  text-align: left;
+  padding: 10px;
+}
+.vuecal__cell-events-count {
+    background-color: #4f46e5;
+    display: flex;
+    padding: 8px;
+    height: 20px;
+    width: 20px;
+    align-items: center;
+}
+</style>

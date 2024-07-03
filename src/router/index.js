@@ -44,7 +44,7 @@ const routes = [
 
 
   
-  { path: '/your-event', name: 'Your Event', component: AddEvent, meta: { path: '/your-event'}},
+  { path: '/add-event', name: 'Your Event', component: AddEvent, meta: { path: '/add-event'}},
 
 ];
 
