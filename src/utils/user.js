@@ -159,4 +159,21 @@ export const getTenantsList = async () => {
   };
 
 
-   
+  export const createResourceInfo = async (resourceData) => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const tenant_id = localStorage.getItem('tenant_id');
+  
+      const response = await instance.post( 'users/invite',resourceData,{
+        params: {},
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'x-tenant-id': tenant_id,
+          'Content-Type': 'application/json',
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };

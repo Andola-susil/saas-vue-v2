@@ -105,6 +105,8 @@ export default {
         console.warn(user_profile_info);
         console.warn(subscription_info);
 
+        localStorage.setItem('loggedin_user_id', user_profile_info.id);
+
         const data = [{
           'accessToken': token,
           'layout': 'Admin',

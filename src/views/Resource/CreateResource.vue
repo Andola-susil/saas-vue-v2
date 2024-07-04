@@ -32,12 +32,13 @@
                 <label for="country" class="block text-sm font-medium leading-6 text-gray-900">Access Level</label>
                 <div class="mt-2">
                     <select v-model="user_info.role" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
-                    <option>User</option>
-                    <option>Super admin</option>
-                    <option>Admin</option>
+                    <option>admin</option>
                     </select>
                 </div>
             </div>
+
+             
+
             <div class="sm:col-span-3">
                 <div class="relative flex items-start pt-8">
                     <div class="flex h-6 items-center">
@@ -89,40 +90,112 @@
   </div>
 </template>
 
-<script setup>
+<script>
+import { createResourceInfo } from '../../utils/user.js' ;
 import { ref } from 'vue';
 import Loader from '../../components/Loader.vue';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue3-toastify'; 
 
-const isLoading = ref(false);
-const user_info = ref({
-  first_name: '',
-  last_name: '',
-  email: '',
-  is_timesheet_approver: false,
-  role: '',
-});
 
-const clearForm = () => {
-  user_info.value.first_name = '';
-  user_info.value.last_name = '';
-  user_info.value.email = '';
-  user_info.value.is_timesheet_approver = false;
-  user_info.value.role = '';
+export default {
+  name: 'CreateResource',
+  components: {
+    Loader,
+  },
+  setup() {
+    const user_info = ref({
+      first_name: '',
+      last_name: '',
+      email: '',
+      role: 'admin',
+      is_timesheet_approver: false, 
+    });
+
+    const isLoading = ref(false);
+
+    const saveResource = async () => {
+      isLoading.value = true;
+      try {
+        // const resource_name = `${user_info.value.first_name} ${user_info.value.last_name}`;
+
+        const data = {
+          invite_email: user_info.value.email,
+          invite_role:  user_info.value.role,
+          invite_first_name: user_info.value.first_name,
+          invite_last_name: user_info.value.last_name,
+          tenant_id: localStorage.getItem('tenant_id'),
+           
+        };
+
+        const response = await createResourceInfo(data);
+        toast("Resource created successfully", {
+          theme: "colored",
+          type: "success",
+          hideProgressBar: true,
+          dangerouslyHTMLString: true,
+        });
+
+        clearForm();
+      } catch (error) {
+        console.error('Error while saving resource:', error);
+        toast("An error occurred. Please try again.", {
+          theme: "colored",
+          type: "error",
+          hideProgressBar: true,
+          dangerouslyHTMLString: true,
+        });
+      } finally {
+        isLoading.value = false;
+      }
+    };
+
+    const clearForm = () => {
+      user_info.value.first_name = '';
+      user_info.value.last_name = '';
+      user_info.value.email = '';
+      user_info.value.role = '';
+      user_info.value.is_timesheet_approver = false;
+    };
+
+    
+    return {
+      user_info,
+      saveResource,
+      clearForm,
+      isLoading,
+     
+    };
+  },
 };
+// const isLoading = ref(false);
+// const user_info = ref({
+//   first_name: '',
+//   last_name: '',
+//   email: '',
+//   is_timesheet_approver: false,
+//   role: '',
+// });
 
-const saveResource = () => {
-    isLoading.value = true;
-    setTimeout(() => {
-          isLoading.value = false;
-          toast("Resource submitted successfully!", {
-            "theme": "colored",
-            "type": "success",
-            "hideProgressBar": true,
-            "dangerouslyHTMLString": true
-          });
+// const clearForm = () => {
+//   user_info.value.first_name = '';
+//   user_info.value.last_name = '';
+//   user_info.value.email = '';
+//   user_info.value.is_timesheet_approver = false;
+//   user_info.value.role = '';
+// };
+
+// const saveResource = () => {
+//     isLoading.value = true;
+//     setTimeout(() => {
+//           isLoading.value = false;
+//           toast("Resource submitted successfully!", {
+//             "theme": "colored",
+//             "type": "success",
+//             "hideProgressBar": true,
+//             "dangerouslyHTMLString": true
+//           });
           
-        }, 1000);
-  console.log(user_info.value, 'here');
-};
+//         }, 1000);
+//   console.log(user_info.value, 'here');
+// };
 </script>

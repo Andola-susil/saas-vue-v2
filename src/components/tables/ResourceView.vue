@@ -28,17 +28,20 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 bg-white">
-                    <tr v-for="person in people" :key="person.email">
-                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{ person.name }}</td>
-                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ person.access_levels }}</td>
-                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ person.skills }}</td>
-                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ person.status == "Active" ? "Active" : "Inactive" }}</td>
-                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ person.date_added }}</td>
-                        <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                            <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit<span class="sr-only">, {{ person.name }}</span></a>
-                        </td>
-                    </tr>
-                </tbody>
+                                <tr v-for="person in people" :key="person.invite_email">
+                                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{ person.invite_first_name }} {{ person.invite_last_name }}</td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ person.invite_role }}</td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{  }}</td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ person.invite_status == "accepted" ? "Accepted" : "Pending" }}</td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        {{ new Date(person.created_at).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) }}
+                                    </td>
+
+                                    <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                        <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit<span class="sr-only">, {{ person.invite_first_name }} {{ person.invite_last_name }}</span></a>
+                                    </td>
+                                </tr>
+                    </tbody>
                 </table>
             </div>
             </div>
@@ -50,8 +53,8 @@
 </template>
   <script>
   import Loader from '../../components/Loader.vue';
-  import { getResourceList } from '../../utils/resource.js';
-  
+  import { getResourceInfo } from '../../utils/resource.js' ;
+  import { ref } from 'vue'; 
   
   export default {
     name: 'Resource',
@@ -60,33 +63,18 @@
         Loader,
     },
     data() {
-      return {
-        people: [
-                    {"name": "Oliver Smith", "access_levels": "Member", "skills": "Full-stack Developer", "email": "oliver.smith@example.com", "date_added": "05/01/2024", "status": "Active"},
-                    {"name": "Sophia Johnson", "access_levels": "Member", "skills": "UX Designer", "email": "sophia.johnson@example.com", "date_added": "06/01/2024","status": "InActive"},
-                    {"name": "Mason Williams", "access_levels": "Admin", "skills": "Back-end Developer", "email": "mason.williams@example.com", "date_added": "07/01/2024","status": "Active"},
-                    {"name": "Isabella Brown", "access_levels": "Member", "skills": "Product Manager", "email": "isabella.brown@example.com", "date_added": "08/01/2024","status": "InActive"},
-                    {"name": "Liam Jones", "access_levels": "Member", "skills": "QA Engineer", "email": "liam.jones@example.com", "date_added": "09/01/2024","status": "Active"},
-                    {"name": "Amelia Garcia", "access_levels": "Admin", "skills": "Data Scientist", "email": "amelia.garcia@example.com", "date_added": "10/01/2024","status": "InActive"},
-                    {"name": "Noah Martinez", "access_levels": "Member", "skills": "DevOps Engineer", "email": "noah.martinez@example.com", "date_added": "11/01/2024","status": "Active"},
-                    {"name": "Mia Davis", "access_levels": "Member", "skills": "Technical Writer", "email": "mia.davis@example.com", "date_added": "12/01/2024","status": "InActive"},
-                    {"name": "Ethan Rodriguez", "access_levels": "Admin", "skills": "Software Engineer", "email": "ethan.rodriguez@example.com", "date_added": "01/02/2024","status": "Active"},
-                    {"name": "Ava Wilson", "access_levels": "Member", "skills": "System Administrator", "email": "ava.wilson@example.com", "date_added": "02/02/2024","status": "InActive"}
-                ],
-        isLoading: true,
-        paginationData: {
-          total_items: 0,
-          items_per_page: 10,
-          current_page: 1,
-        },
-      };
+        return {
+            people: [],
+            isLoading: true,
+            paginationData: {
+                total_items: 0,
+                items_per_page: 10,
+                current_page: 1,
+            },
+        };
     },
     mounted() {
-        // this.getAllResources(98);        
-        // this.isLoading = true;
-        // setTimeout(() => {
-            // }, 500);
-                this.isLoading = false;
+        this.getAllResources(this.paginationData.current_page);
     },
     methods:{
         addResource(){
@@ -94,21 +82,30 @@
         },
         async getAllResources(page) {
             this.paginationData.current_page = page;
-            this.error = null;
+            this.isLoading = true;
             try {
-                const response = await getResourceList(page);
+                const response = await getResourceInfo(page);
                 console.warn(response);
+                this.people = response.items.map(item => ({
+                    invite_first_name: item.invite_first_name,
+                    invite_last_name: item.invite_last_name,
+                    invite_email: item.invite_email,
+                    invite_role: item.invite_role,
+                    invite_status: item.invite_status,
+                    created_at: item.created_at
+                }));
+                this.isLoading = false;
             } catch (error) {
                 this.error = 'An error occurred. Please try again.';
+                this.isLoading = false;
             }
         },
     },    
-  };
-  </script>
-  
-  <style scoped>
-  #example-table {
+};
+</script>
+
+<style scoped>
+#example-table {
     margin: 20px;
-  }
-  </style>
-  
+}
+</style>
