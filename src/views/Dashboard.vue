@@ -39,19 +39,53 @@
       </div>
     </dl>
     </div>
+    <div class="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
+       
+    
+    <ChartOne />
+  
+
+    <BarChat />
+  
+ 
+    <BarChat />
+  
+ 
+    <BarChat />
+  
+ 
+    <PieChat />
+  
+ 
+    <BarChat />
+ 
+
+    <PieChat />
+   
+ 
+      
+ 
+       
+    </div>
   </div>
 </template>
 
 <script>
 import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/vue/20/solid'
 import { CursorArrowRaysIcon, EnvelopeOpenIcon, UsersIcon } from '@heroicons/vue/24/outline'
+import  ChartOne  from '../views/Charts/ChartOne.vue'
+import BarChat from './Charts/BarChat.vue';
+import PieChat from './Charts/PieChat.vue';
+
 // import AdminLayout from '../layout/AdminLayout.vue';
 export default {
     name: 'Dashboard',
     path: '/dashboard',
     components: {
-      // AdminLayout
-    },
+      ChartOne,
+      BarChat,
+      PieChat
+  },
     data() {
       return {
         stats : [
@@ -61,11 +95,6 @@ export default {
         ],
       }
     },
-    computed: {
-      
-    },
-    created() {
-      
-    },
+    
 };
 </script>
