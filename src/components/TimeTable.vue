@@ -14,6 +14,10 @@
   import '@vuepic/vue-datepicker/dist/main.css';
   import UserInfo from '../components/common/UserInfo.vue';
   import DateRangePicker from 'vue2-daterange-picker'
+  import { getProjectList,createProject } from '../utils/project.js';
+  import { geTaskList ,createTask} from '../utils/task.js';
+  import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
+
   export default {
     data() {
       return {
@@ -63,6 +67,11 @@
         show_submit_btn: true,
         display_approve_btns: false,
         disable_table: false,
+        project_list :[],
+        task_list: [],
+        showCreateProjectPopup: false,
+        project_id: 0,
+        showCreateTaskPopup: false,
       }
     },
     props: {
@@ -77,7 +86,7 @@
         WeekFilter,
         Datepicker,
         UserInfo,
-        DateRangePicker
+        DateRangePicker,
     },
     methods: {
       cellEditedCallback(cell) {
@@ -422,8 +431,44 @@
         endOfWeek.setDate(today.getDate() - today.getDay() + 6);
         this.columns = [
             {title:"Id", field:"id", visible:false, htmlOutput:true},
-            {title:"Project", field:"project_name", width:'16%', editor:"input", headerSort:false},
-            {title:"Task", field:"task_name", width:'15%', editor:"input", headerSort:false},
+            {
+              title: "Project",
+              field: "project_name",
+              width: '16%',
+              editor: "list",
+              verticalNavigation:"hybrid",
+              editorParams: {
+                values: this.project_list,
+                valuesLookup: "active",
+                valuesLookupField: "color",
+                clearable: true,
+                itemFormatter: function(label, value, item, element) {
+                  return  label;
+                },
+              },
+              headerSort: false,
+              cellClick:this.handleSelectedProject,
+              resizable: false,
+            },
+            {
+              title: "Task",
+              field: "task_name",
+              width: '16%',
+              editor: "list",
+              verticalNavigation:"hybrid",
+              editorParams: {
+                values: this.task_list,
+                valuesLookup: "active",
+                valuesLookupField: "color",
+                clearable: true,
+                itemFormatter: function(label, value, item, element) {
+                  return  label;
+                },
+              },
+              headerSort: false,
+              cellClick: this.handleSelectedTask,
+              resizable: false,
+            },
             {title:`MON<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"monday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: this.timeFormater},
             {title:`TUE<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"tuesday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: this.timeFormater},
             {title:`WED<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"wednesday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: this.timeFormater},
@@ -467,14 +512,98 @@
         return `${formattedHours}:${formattedMinutes}`;
       },
       disableTableIfDataExists() {
-        
         if (this.disable_table) {
-          // document.getElementById("overlay").style.display = "block"; // Show overlay
           document.getElementById("timesheet-table").classList.add("disabled"); // Optional: Add disabled class for visual indication
         } else {
-          // document.getElementById("overlay").style.display = "none"; // Hide overlay
           document.getElementById("timesheet-table").classList.remove("disabled"); // Remove disabled class
         }
+      },
+      getProjectList(){
+        this.project_list.push({label: "<strong>Create new project</strong>", value: -1, id: "create_new"});
+        const res = getProjectList().then((data) => {
+          if(data.items.length > 0){
+            data.items.forEach(pobj => {
+              this.project_list.push({label:pobj.project_name, value: pobj.id, id: pobj.id});
+            });
+          }
+        })
+        .catch((error) => {
+
+        });
+      },
+      getTaskList(){
+        const res = geTaskList(this.project_id).then((data) => {
+          if(data.items.length > 0){
+            data.items.forEach(task => {
+              this.task_list.push({label:task.task_title, value: task.id, id: task.id});
+            });
+          }
+          this.task_list.push({label: "<strong>Create new task</strong>", value: -1, id: ""});
+        })
+        .catch((error) => {
+
+        });
+      },
+      handleSelectedProject(e,cell){
+        this.project_id = cell._cell.value;
+        this.getTaskList();
+        if(cell._cell.value == -1){
+          this.modalContent.title="Enter project name";
+          this.modalContent.description="";
+          this.modalContent.confirmLabel="Submit";
+          this.modalContent.cancelLabel="Cancel";
+          this.modalContent.showInputField = true;
+          this.showCreateProjectPopup = true;
+          this.openPopup();
+        }
+      },
+      handleSelectedTask(e,cell){
+        this.project_id = cell._cell.value;
+        if(cell._cell.value == -1){
+          this.modalContent.title="Enter task name";
+          this.modalContent.description="";
+          this.modalContent.confirmLabel="Submit";
+          this.modalContent.cancelLabel="Cancel";
+          this.modalContent.showInputField = true;
+          this.showCreateTaskPopup = true;
+          this.openPopup();
+        }
+      },
+      createProject(input){
+        this.isLoading = true;
+        const res = createProject(input).then((data) => {
+          this.isLoading = false;
+          toast("Project created successfully!", {
+            "theme": "colored",
+            "type": "success",
+            "hideProgressBar": true,
+            "dangerouslyHTMLString": true
+          })
+          this.getProjectList();
+        })
+        .catch((error) => {
+
+        });
+        
+        this.isModalOpen = false;
+      },
+      createTask(input){
+        this.isLoading = true;
+        const res = createTask(input, this.project_id).then((data) => {
+          this.isLoading = false;
+          toast("Project created successfully!", {
+            "theme": "colored",
+            "type": "success",
+            "hideProgressBar": true,
+            "dangerouslyHTMLString": true
+          })
+          this.getTaskList();
+        })
+        .catch((error) => {
+
+        });
+        
+        this.isModalOpen = false;
       }
 
     },
@@ -505,6 +634,7 @@
       this.table_columns = this.columns;
       this.isLoading = false;
       this.getTimeSheetId();
+      this.getProjectList();
     },
     computed: {
       
@@ -569,6 +699,30 @@
           :showInputField="modalContent.showInputField"
           @closePopup="handleClosePopup"
           @confirmPopup="handleConfirmation"
+        />
+      </div>
+      <div v-if="showCreateProjectPopup">
+        <ModalPopup  
+          :open="isModalOpen"
+          :title="modalContent.title"
+          :description="modalContent.description"
+          :confirmLabel="modalContent.confirmLabel"
+          :cancelLabel="modalContent.cancelLabel"
+          :showInputField="modalContent.showInputField"
+          @closePopup="handleClosePopup"
+          @confirmPopup="createProject"
+        />
+      </div>
+      <div v-if="showCreateTaskPopup">
+        <ModalPopup  
+          :open="isModalOpen"
+          :title="modalContent.title"
+          :description="modalContent.description"
+          :confirmLabel="modalContent.confirmLabel"
+          :cancelLabel="modalContent.cancelLabel"
+          :showInputField="modalContent.showInputField"
+          @closePopup="handleClosePopup"
+          @confirmPopup="createTask"
         />
       </div>
     </div>
