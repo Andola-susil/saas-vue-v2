@@ -17,10 +17,10 @@
         </div>
       </div>
       <div class="w-2/6 pl-6 pt-3.5 ">
-        <SelectInput :options="status_list" placeholder="Select status" :initialSelected="initialSelected" />
+        <SelectInput :options="status_list" placeholder="Select status" :initialSelected="initialSelected" @handleSelector="getSelectedValue"/>
       </div>
       <div class="w-2/5 pt-2 pr-2">
-        <WeekFilter />
+        <WeekFilter @handleWeekChange=handleWeekChange />
       </div>
     </div>
     <div class="mt-8 flow-root w-full">
@@ -48,7 +48,7 @@
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.end_date }}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       <img v-if="val.status == 'pending'" src="/src/assets/images/pending.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Pending">
-                      <img v-else-if="val.status == 'reject'" src="/src/assets/images/ban.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Rejected">
+                      <img v-else-if="val.status == 'rejected'" src="/src/assets/images/ban.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Rejected">
                       <img v-else src="/src/assets/images/circle-check.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Approved">
                     </td>
                   </tr>
@@ -74,7 +74,7 @@ import ModalPopup from '../components/common/ModalPopup.vue';
 import WeekFilter from '../components/common/WeekFilter.vue';
 import Loader from '../components/Loader.vue';
 import SelectInput from '../components/common/SelectInput.vue';
-
+import moment from 'moment';
 
 export default {
     name: 'AllTimeSheets',
@@ -87,6 +87,8 @@ export default {
     SelectInput
   },
   mounted() {
+    const currentDate = new Date();
+    this.getWeekInfo(currentDate);
     this.getTimeLogs(this.paginationData.current_page);
   },
   created() {
@@ -106,11 +108,15 @@ export default {
       selectAll: false,
       isLoading : false,
       status_list :[
-        { id: 1, name: 'Pending' },
-        { id: 2, name: 'Approved' },
-        { id: 3, name: 'Rejected' },
+        { id: 'pending', name: 'Pending' },
+        { id: 'approved', name: 'Approved' },
+        { id: 'rejected', name: 'Rejected' },
       ],
       initialSelected : 3,
+      week_number : null,
+      start_of_week: null,
+      end_of_week: null,
+      status: null,
     }
   },
   methods: {
@@ -143,8 +149,9 @@ export default {
       this.error = null;
       this.isLoading = true;
       try {
-        const response = await getAllTimeSheets(page);
+        const response = await getAllTimeSheets(page,this.week_number, this.status);
         this.time_log = response.items;
+        
         this.meta_data = response.meta;
         this.isLoading = false;
       } catch (error) {
@@ -158,6 +165,22 @@ export default {
     async viewTimeSheetDetails(val){
         var id = val.id;
         this.$router.push({ path: '/time-sheet', query: { id } });
+    },
+    getWeekInfo(dateString) {
+      const date = moment(dateString);
+      const startOfWeek = date.startOf('isoWeek').isoWeekday(1).format('YYYY-MM-DD');
+      this.start_of_week = startOfWeek;
+      this.end_of_week = moment(startOfWeek).endOf('isoWeek').format('YYYY-MM-DD');
+      this.week_number = moment(startOfWeek).isoWeek();
+    },
+    handleWeekChange(input){
+      console.log(input);
+      this.getWeekInfo(input);
+      this.getTimeLogs(this.paginationData.current_page);
+    },
+    getSelectedValue(val){
+      this.status = val;
+      this.getTimeLogs(this.paginationData.current_page);
     }
   },
   

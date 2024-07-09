@@ -20,6 +20,8 @@
                     <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Name</th>
                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Access Levels</th>
                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Skills</th>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Approver</th>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">is Approver</th>
                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Date Added</th>
                     <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
@@ -31,6 +33,8 @@
                                 <tr v-for="person in people" :key="person.invite_email">
                                     <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{ person.invite_first_name }} {{ person.invite_last_name }}</td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ person.invite_role }}</td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{  }}</td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{  }}</td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{  }}</td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ person.invite_status == "accepted" ? "Accepted" : "Pending" }}</td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">

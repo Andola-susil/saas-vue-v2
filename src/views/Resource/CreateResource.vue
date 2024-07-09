@@ -32,12 +32,19 @@
                 <label for="country" class="block text-sm font-medium leading-6 text-gray-900">Access Level</label>
                 <div class="mt-2">
                     <select v-model="user_info.role" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
-                    <option>admin</option>
+                      <div v-for="(role,rk) in user_roles" :key="rk"><option>admin</option></div>
                     </select>
                 </div>
             </div>
 
-             
+             <div class="sm:col-span-3">
+                <label for="country" class="block text-sm font-medium leading-6 text-gray-900">Select approver</label>
+                <div class="mt-2">
+                    <select v-model="user_info.approver" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
+                      <div v-for="(approver,ak) in approver_list" :key="ak"><option>admin</option></div>
+                    </select>
+                </div>
+            </div>
 
             <div class="sm:col-span-3">
                 <div class="relative flex items-start pt-8">
@@ -91,7 +98,7 @@
 </template>
 
 <script>
-import { createResourceInfo } from '../../utils/user.js' ;
+import { createResourceInfo,getApproverList,getUserRoles } from '../../utils/user.js' ;
 import { ref } from 'vue';
 import Loader from '../../components/Loader.vue';
 import { toast } from 'vue3-toastify'; 
@@ -108,9 +115,11 @@ export default {
       last_name: '',
       email: '',
       role: 'admin',
-      is_timesheet_approver: false, 
+      is_timesheet_approver: false,
+      approver: '', 
     });
-
+    const approver_list = ref([]);
+    const user_roles = ref([]);
     const isLoading = ref(false);
 
     const saveResource = async () => {
@@ -157,6 +166,26 @@ export default {
       user_info.value.is_timesheet_approver = false;
     };
 
+
+    const getApproverList = async () => {
+      try {
+        const response = await getApproverList(data);
+      
+      } catch (error) {
+        
+      } finally {
+      }
+    };
+
+    const getUserRoles = async () => {
+      try {
+        const response = await getUserRoles(data);
+      
+      } catch (error) {
+        
+      } finally {
+      }
+    };
     
     return {
       user_info,

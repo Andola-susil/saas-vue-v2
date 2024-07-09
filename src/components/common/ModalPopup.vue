@@ -71,6 +71,7 @@ const emit = defineEmits(['openPopup', 'closePopup', 'confirmPopup'])
 const inputValue = ref(null)  // Reactive state to store input value
 
 const closePopup = () => {
+  inputValue.value = null;
   emit('closePopup')
 }
 

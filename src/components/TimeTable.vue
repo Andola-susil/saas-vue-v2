@@ -413,7 +413,6 @@
         this.getTimeSheetId();
         this.createTableColumns();
         this.updateTable();
-        
       },
       createTableColumns(){
         if(this.startDateOfWeek != null){
@@ -436,20 +435,27 @@
               field: "project_name",
               width: '16%',
               editor: "list",
-              verticalNavigation:"hybrid",
+              verticalNavigation: "hybrid",
               editorParams: {
                 values: this.project_list,
                 valuesLookup: "active",
                 valuesLookupField: "color",
                 clearable: true,
                 itemFormatter: function(label, value, item, element) {
-                  return  label;
+                  return label;
                 },
               },
+              formatter: (cell, formatterParams, onRendered) => {
+                const cellValue = cell.getValue();
+                const project = this.project_list.find(p => p.value === cellValue);
+                return project ? project.label : cellValue;
+              },
               headerSort: false,
-              cellClick:this.handleSelectedProject,
+              cellClick: (e, cell) => {
+                this.handleSelectedProject(e, cell);
+              },
               resizable: false,
-            },
+            },       
             {
               title: "Task",
               field: "task_name",
@@ -464,6 +470,11 @@
                 itemFormatter: function(label, value, item, element) {
                   return  label;
                 },
+              },
+              formatter: (cell, formatterParams, onRendered) => {
+                const cellValue = cell.getValue();
+                const project = this.task_list.find(p => p.value === cellValue);
+                return project ? project.label : cellValue;
               },
               headerSort: false,
               cellClick: this.handleSelectedTask,
@@ -532,17 +543,17 @@
         });
       },
       getTaskList(){
-        const res = geTaskList(this.project_id).then((data) => {
-          if(data.items.length > 0){
+        try {
+          const data = geTaskList(this.project_id);
+          if (data.items && data.items.length > 0) {
             data.items.forEach(task => {
-              this.task_list.push({label:task.task_title, value: task.id, id: task.id});
+              this.task_list.push({ label: task.task_title, value: task.id, id: task.id });
             });
           }
-          this.task_list.push({label: "<strong>Create new task</strong>", value: -1, id: ""});
-        })
-        .catch((error) => {
-
-        });
+          this.task_list.push({ label: "<strong>Create new task</strong>", value: -1, id: "" });
+        } catch (error) {
+          console.error("Error fetching task list:", error);
+        }
       },
       handleSelectedProject(e,cell){
         this.project_id = cell._cell.value;
