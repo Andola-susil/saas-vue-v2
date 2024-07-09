@@ -17,6 +17,8 @@ import CreateResource from '../views/Resource/CreateResource.vue';
 import AllTimeSheets from '../views/AllTimeSheets.vue';
 import YourProfile from '../views/YourProfile.vue';
 import AddEvent from '../components/common/AddEvent.vue';
+import TimeTracker from '../views/TimeTracker.vue';
+
 
 const routes = [
   { path: '/dashboard', name: 'Dashboard', component: Dashboard, meta: { path: '/' }},
@@ -45,6 +47,7 @@ const routes = [
 
   
   { path: '/add-event', name: 'Your Event', component: AddEvent, meta: { path: '/add-event'}},
+  { path: '/time-tracker', name: 'Time Tracker', component: TimeTracker, meta: { path: '/time-tracker'}},
 
 ];
 

@@ -193,6 +193,7 @@ const userStore = useUserStore();
 const navigation_for_admin = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, current: false },
   { name: 'Time Sheet', href: '/time-sheet', icon: DocumentDuplicateIcon, current: false },
+  { name: 'Time Tracker', href: '/time-tracker', icon: DocumentDuplicateIcon, current: false },
   { name: 'Past Time Sheet', href: '/past-time-sheet', icon: DocumentDuplicateIcon, current: false },
   { name: 'Approvals', href: '/time-sheet-approvals', icon: FolderIcon, current: false },
   { name: 'Reports', href: '/time-sheet-reports', icon: ChartPieIcon, current: false },
