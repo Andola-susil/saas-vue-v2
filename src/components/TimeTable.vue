@@ -452,7 +452,9 @@
               },
               headerSort: false,
               cellClick: (e, cell) => {
-                this.handleSelectedProject(e, cell);
+                if(cell._cell.value != ""){
+                  this.handleSelectedProject(e, cell);
+                }
               },
               resizable: false,
             },       
