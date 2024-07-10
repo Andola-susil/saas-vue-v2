@@ -177,3 +177,35 @@ export const getTenantsList = async () => {
       throw error;
     }
   };
+
+  export const getUserRoles = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await instance.get('/User-Management/get_all_role_users_role_get', {
+        params: {},
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  export const getApproverList = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await instance.get('/User-Management/get_all_role_users_role_get', {
+        params: {},
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };

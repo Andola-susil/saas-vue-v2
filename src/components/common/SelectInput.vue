@@ -1,5 +1,5 @@
 <template>
-  <Listbox as="div" v-model="selectedValue">
+  <Listbox as="div" v-model="selectedValue" @click="handleSelector">
     <div class="relative mt-2 w-full">
       <ListboxButton class="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
         <span class="block truncate">{{ selectedValue?.name || placeholder }}</span>
@@ -44,7 +44,10 @@ const props = defineProps({
     default: 'Select'
   }
 })
-
+const emit = defineEmits(['openPopup', 'closePopup', 'confirmPopup'])
 const { options, initialSelected, placeholder} = toRefs(props)
 const selectedValue = ref(initialSelected.value)
+const handleSelector = () => {
+  emit('handleSelector', selectedValue.value.name)
+}
 </script>
