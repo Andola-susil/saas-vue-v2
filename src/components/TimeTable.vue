@@ -455,7 +455,6 @@
                 this.task_list.push({ label: "<strong>Create new task</strong>", value: 0, id: "" });
                 console.log(this.task_list, 1);
                 this.getTaskList();
-                console.log(this.task_list, 2);
                 const project = this.project_list.find(p => p.value === cellValue);
                 return project ? project.label : cellValue;
               },
