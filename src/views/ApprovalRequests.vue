@@ -21,7 +21,22 @@
         </div>
       </nav>
     </div>
-    
+    <div class="w-full flex rounded border border-gray-200">
+      <div class="w-2/6 pt-3.5 pl-2">
+        <div class="relative mt-2 rounded-md shadow-sm">
+          <input type="text" name="account-number" id="account-number" class="block w-full rounded-md border-0 py-1.5 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Search" />
+          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+            <QuestionMarkCircleIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+          </div>
+        </div>
+      </div>
+      <div class="w-2/6 pl-6 pt-3.5 ">
+        <SelectInput :options="status_list" placeholder="Select status" :initialSelected="initialSelected" @handleSelector="getSelectedValue"/>
+      </div>
+      <div class="w-2/5 pt-2 pr-2">
+        <WeekFilter @handleWeekChange=handleWeekChange />
+      </div>
+    </div>
     <div class="mt-8 flow-root">
       <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
@@ -32,12 +47,27 @@
                   <tr>
                     <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
                       <input type="checkbox" class="cursor-pointer" v-model="selectAll" @change="toggleSelectAll">
+                    </th> 
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                      SL NO.
                     </th>
-                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">SL NO.</th>
-                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Resource Name</th>
-                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Week No.</th>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 ">
+                      <span @click="sort('resource_name')" class="cursor-pointer">Resource Name
+                        <img v-if="sortBy === 'resource_name'" :src="sortDirection === 'asc' ? '/src/assets/images/angle-down.svg' : '/src/assets/images/angle-up.svg'" alt="Sort Icon" class="inline ml-2 h-4 w-4">
+                      </span>
+                    </th>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                      <span @click="sort('week_number')" class="cursor-pointer">Week No.
+                        <img v-if="sortBy === 'week_number'" :src="sortDirection === 'asc' ? '/src/assets/images/angle-down.svg' : '/src/assets/images/angle-up.svg'" alt="Sort Icon" class="inline ml-2 h-4 w-4">
+                      </span>
+                    </th>
                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Start Date</th>
                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">End Date</th>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    <span @click="sort('total_time_spent')" class="cursor-pointer">Total Hours
+                      <img v-if="sortBy === 'total_time_spent'" :src="sortDirection === 'asc' ? '/src/assets/images/angle-down.svg' : '/src/assets/images/angle-up.svg'" alt="Sort Icon" class="inline ml-2 h-4 w-4">
+                    </span>
+                  </th>
                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
                   </tr>
                 </thead>
@@ -51,6 +81,7 @@
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">#{{ val.week_number }}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.start_date }}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.end_date }}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.total_time_spent }}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       <img v-if="val.status == 'pending'" src="/src/assets/images/pending.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Pending">
                       <img v-else-if="val.status == 'reject'" src="/src/assets/images/ban.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Rejected">
@@ -85,23 +116,43 @@
 import { getAllTimeSheets,reviewTimeSheet } from '../utils/timelog.js';
 import PaginationTemplate from '../components/common/PaginationTemplate.vue';
 import ModalPopup from '../components/common/ModalPopup.vue';
-import Loader from '../components/Loader.vue';
+import Loader from '../components/Loader.vue'; 
+import SelectInput from '../components/common/SelectInput.vue';
+import WeekFilter from '../components/common/WeekFilter.vue';
+import moment from 'moment';
 export default {
     name: 'Approvals',
     path: '/time-sheet-approvals',
   components: {
     PaginationTemplate,
     ModalPopup,
-    Loader
+    Loader,
+    SelectInput,
+    WeekFilter,
   },
   mounted() {
+    const currentDate = new Date();
+    this.getWeekInfo(currentDate);
     this.getTimeLogs(this.paginationData.current_page);
+    
   },
   created() {
     
   },
   data() {
     return {
+      sortBy: '',
+      sortDirection: 'asc',
+      status_list :[
+        { id: 'pending', name: 'Pending' },
+        { id: 'approved', name: 'Approved' },
+        { id: 'rejected', name: 'Rejected' },
+      ],
+      initialSelected : 3,
+      week_number : null,
+      start_of_week: null,
+      end_of_week: null,
+      status: null,
       time_log : [],
       meta_data : [],
       paginationData: {
@@ -175,13 +226,22 @@ export default {
       this.error = null;
       this.isLoading = true;
       try {
-        const response = await getAllTimeSheets(page);
+        const response = await getAllTimeSheets(page, this.week_number, this.status, this.sortBy, this.sortDirection);
         this.time_log = response.items;
         this.meta_data = response.meta;
         this.isLoading = false;
       } catch (error) {
         this.error = 'An error occurred. Please try again.';
       }
+    },
+    sort(field) {
+      if (this.sortBy === field) {
+        this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        this.sortBy = field;
+        this.sortDirection = 'asc';
+      }
+      this.getTimeLogs(this.paginationData.current_page);
     },
     async showPopUp(){
       this.showPopup = true;
@@ -237,6 +297,23 @@ export default {
       });
       
       this.isModalOpen = false;
+    },
+    getWeekInfo(dateString) {
+      const date = moment(dateString);
+      const startOfWeek = date.startOf('isoWeek').isoWeekday(1).format('YYYY-MM-DD');
+      this.start_of_week = startOfWeek;
+      this.end_of_week = moment(startOfWeek).endOf('isoWeek').format('YYYY-MM-DD');
+      this.week_number = moment(startOfWeek).isoWeek();
+    },
+    
+    handleWeekChange(input){
+      console.log(input);
+      this.getWeekInfo(input);
+      this.getTimeLogs(this.paginationData.current_page);
+    },
+    getSelectedValue(val){ 
+      this.status = val; 
+      this.getTimeLogs(this.paginationData.current_page);
     },
   },
   
