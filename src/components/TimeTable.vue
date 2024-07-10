@@ -342,7 +342,7 @@
               this.tableData = [
                 { 
                   id: 1,
-                  project_id: 0,
+                  project_id: "",
                   project_name: "",
                   task_name: "",
                   task_id: 0,
@@ -432,7 +432,7 @@
             {title:"Id", field:"id", visible:false, htmlOutput:true},
             {
               title: "Project",
-              field: "project_name",
+              field: "project_id",
               width: '16%',
               editor: "list",
               verticalNavigation: "hybrid",
@@ -447,15 +447,19 @@
               },
               formatter: (cell, formatterParams, onRendered) => {
                 const cellValue = cell.getValue();
+                this.project_id = cellValue;
+                if (cellValue === -1) {
+                  this.handleSelectedProject();
+                }
+                this.task_list = [];
+                this.task_list.push({ label: "<strong>Create new task</strong>", value: 0, id: "" });
+                console.log(this.task_list, 1);
+                this.getTaskList();
+                console.log(this.task_list, 2);
                 const project = this.project_list.find(p => p.value === cellValue);
                 return project ? project.label : cellValue;
               },
               headerSort: false,
-              cellClick: (e, cell) => {
-                if(cell._cell.value != ""){
-                  this.handleSelectedProject(e, cell);
-                }
-              },
               resizable: false,
             },       
             {
@@ -475,11 +479,13 @@
               },
               formatter: (cell, formatterParams, onRendered) => {
                 const cellValue = cell.getValue();
+                if (cellValue === -1) {
+                  this.handleSelectedTask();
+                }
                 const project = this.task_list.find(p => p.value === cellValue);
                 return project ? project.label : cellValue;
               },
               headerSort: false,
-              cellClick: this.handleSelectedTask,
               resizable: false,
             },
             {title:`MON<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"monday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: this.timeFormater},
@@ -546,41 +552,42 @@
       },
       getTaskList(){
         try {
-          const data = geTaskList(this.project_id);
-          if (data.items && data.items.length > 0) {
-            data.items.forEach(task => {
-              this.task_list.push({ label: task.task_title, value: task.id, id: task.id });
-            });
-          }
-          this.task_list.push({ label: "<strong>Create new task</strong>", value: -1, id: "" });
+          const data = geTaskList(this.project_id).then((data) => {
+            if (data.items && data.items.length > 0) {
+              data.items.forEach(task => {
+                this.task_list.push({ label: task.task_title, value: task.id, id: task.id });
+              });
+              table.updateColumnDefinition("task_name", {
+                editorParams: {
+                  values: taskList.value,
+                }
+              });
+            }
+          })
+          .catch((error) => {
+
+          });
         } catch (error) {
           console.error("Error fetching task list:", error);
         }
       },
-      handleSelectedProject(e,cell){
-        this.project_id = cell._cell.value;
-        this.getTaskList();
-        if(cell._cell.value == -1){
-          this.modalContent.title="Enter project name";
-          this.modalContent.description="";
-          this.modalContent.confirmLabel="Submit";
-          this.modalContent.cancelLabel="Cancel";
-          this.modalContent.showInputField = true;
-          this.showCreateProjectPopup = true;
-          this.openPopup();
-        }
+      handleSelectedProject(){
+        this.modalContent.title="Enter project name";
+        this.modalContent.description="";
+        this.modalContent.confirmLabel="Submit";
+        this.modalContent.cancelLabel="Cancel";
+        this.modalContent.showInputField = true;
+        this.showCreateProjectPopup = true;
+        this.openPopup();
       },
       handleSelectedTask(e,cell){
-        this.project_id = cell._cell.value;
-        if(cell._cell.value == -1){
-          this.modalContent.title="Enter task name";
-          this.modalContent.description="";
-          this.modalContent.confirmLabel="Submit";
-          this.modalContent.cancelLabel="Cancel";
-          this.modalContent.showInputField = true;
-          this.showCreateTaskPopup = true;
-          this.openPopup();
-        }
+        this.modalContent.title="Enter task name";
+        this.modalContent.description="";
+        this.modalContent.confirmLabel="Submit";
+        this.modalContent.cancelLabel="Cancel";
+        this.modalContent.showInputField = true;
+        this.showCreateTaskPopup = true;
+        this.openPopup();
       },
       createProject(input){
         this.isLoading = true;
@@ -610,6 +617,7 @@
             "hideProgressBar": true,
             "dangerouslyHTMLString": true
           })
+          
           this.getTaskList();
         })
         .catch((error) => {

@@ -32,7 +32,7 @@
                 <label for="country" class="block text-sm font-medium leading-6 text-gray-900">Access Level</label>
                 <div class="mt-2">
                     <select v-model="user_info.role" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
-                      <div v-for="(role,rk) in user_roles" :key="rk"><option>admin</option></div>
+                      <option v-for="(role, index) in user_roles" :key="index">{{ role.role_name }}</option>
                     </select>
                 </div>
             </div>
@@ -41,7 +41,7 @@
                 <label for="country" class="block text-sm font-medium leading-6 text-gray-900">Select approver</label>
                 <div class="mt-2">
                     <select v-model="user_info.approver" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
-                      <div v-for="(approver,ak) in approver_list" :key="ak"><option>admin</option></div>
+                      <div v-for="(approver,ak) in approver_list" :key="ak"><option>{{approver}}</option></div>
                     </select>
                 </div>
             </div>
@@ -98,8 +98,9 @@
 </template>
 
 <script>
-import { createResourceInfo,getApproverList,getUserRoles } from '../../utils/user.js' ;
-import { ref } from 'vue';
+import { createResourceInfo,getUserRoles } from '../../utils/user.js' ;
+import { getApproverList } from '../../utils/resource.js' ;
+import { ref,onMounted } from 'vue';
 import Loader from '../../components/Loader.vue';
 import { toast } from 'vue3-toastify'; 
 
@@ -133,7 +134,7 @@ export default {
           invite_first_name: user_info.value.first_name,
           invite_last_name: user_info.value.last_name,
           tenant_id: localStorage.getItem('tenant_id'),
-           
+          approver_id : user_info.value.is_timesheet_approver,
         };
 
         const response = await createResourceInfo(data);
@@ -167,64 +168,40 @@ export default {
     };
 
 
-    const getApproverList = async () => {
+    const fetchApproverList = async () => {
       try {
-        const response = await getApproverList(data);
-      
+        const response = await getApproverList();
+        approver_list.value = response.items;
       } catch (error) {
         
       } finally {
       }
     };
 
-    const getUserRoles = async () => {
+    const fetchUserRoles = async () => {
       try {
-        const response = await getUserRoles(data);
-      
+        const response = await getUserRoles(); // Assuming getUserRoles returns a promise with data
+        if (response.items && response.items.length > 0) {
+          user_roles.value = response.items; 
+          console.log(user_roles, 13);
+        }
       } catch (error) {
-        
-      } finally {
+        console.error('Error fetching user roles:', error);
+        // Handle error if needed
       }
     };
-    
+    onMounted(() => {
+      fetchUserRoles();
+      fetchApproverList();
+    });
     return {
       user_info,
       saveResource,
       clearForm,
       isLoading,
-     
+      user_roles,
+      approver_list
     };
   },
 };
-// const isLoading = ref(false);
-// const user_info = ref({
-//   first_name: '',
-//   last_name: '',
-//   email: '',
-//   is_timesheet_approver: false,
-//   role: '',
-// });
-
-// const clearForm = () => {
-//   user_info.value.first_name = '';
-//   user_info.value.last_name = '';
-//   user_info.value.email = '';
-//   user_info.value.is_timesheet_approver = false;
-//   user_info.value.role = '';
-// };
-
-// const saveResource = () => {
-//     isLoading.value = true;
-//     setTimeout(() => {
-//           isLoading.value = false;
-//           toast("Resource submitted successfully!", {
-//             "theme": "colored",
-//             "type": "success",
-//             "hideProgressBar": true,
-//             "dangerouslyHTMLString": true
-//           });
-          
-//         }, 1000);
-//   console.log(user_info.value, 'here');
-// };
 </script>

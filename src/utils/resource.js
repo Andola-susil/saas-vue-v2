@@ -69,3 +69,21 @@ export const getResourceInfo = async (page) => {
     throw error;
   }
 };
+
+export const getApproverList = async () => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    const tenant_id = localStorage.getItem('tenant_id');
+    const response = await instance.get('/resources/', {
+      params: {'is_approver' : 1},
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'x-tenant-id': tenant_id,
+      }
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
