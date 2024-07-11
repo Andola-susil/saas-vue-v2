@@ -42,12 +42,12 @@ const props = defineProps({
   placeholder: {
     type: String,
     default: 'Select'
-  }
+  },
 })
 const emit = defineEmits(['openPopup', 'closePopup', 'confirmPopup'])
 const { options, initialSelected, placeholder} = toRefs(props)
 const selectedValue = ref(initialSelected.value)
 const handleSelector = () => {
-  emit('handleSelector', selectedValue.value.name)
+  emit('handleSelector', selectedValue.value)
 }
 </script>

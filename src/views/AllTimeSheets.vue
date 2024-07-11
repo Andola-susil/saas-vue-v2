@@ -174,12 +174,11 @@ export default {
       this.week_number = moment(startOfWeek).isoWeek();
     },
     handleWeekChange(input){
-      console.log(input);
       this.getWeekInfo(input);
       this.getTimeLogs(this.paginationData.current_page);
     },
     getSelectedValue(val){
-      this.status = val;
+      this.status = val.name;
       this.getTimeLogs(this.paginationData.current_page);
     }
   },

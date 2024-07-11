@@ -135,3 +135,43 @@ export const getAllTimeSheets = async (page,week_number,status,sortBy, sortDirec
     throw error;
   }
 };
+
+//Save daily time sheet
+export const saveTimelog = async (data) => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    const tenant_id = localStorage.getItem('tenant_id');
+
+    const response = await instance.post(`/log_times/`,data, {
+      params: {}, 
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'x-tenant-id': tenant_id,
+      }
+    });
+
+    return response.data; 
+  } catch (error) {
+    throw error;
+  }
+};
+//Get all today time logs
+export const fetchTodayTimeLogs = async () => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    const tenant_id = localStorage.getItem('tenant_id');
+
+    const response = await instance.get(`/log_times/`, {
+      params: { 'order_by' :'-id'}, 
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'x-tenant-id': tenant_id,
+      }
+    });
+
+    return response.data; 
+  } catch (error) {
+    throw error;
+  }
+};

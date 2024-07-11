@@ -12,7 +12,11 @@ const file_instance = axios.create({
     baseURL: 'https://osbaseleaf-api.andolasoft.co.in/filemetasapi/',
     // baseURL: 'http://ossiba.com:8084/v1/',
   });
-
+const time_log_instance = axios.create({
+  // baseURL: 'http://baseleaf.ossiba.com/usersapi/',
+  baseURL: 'https://osbaseleaf-timelog.andolasoft.co.in/usersapi/',
+  // baseURL: 'http://ossiba.com:8084/v1/',
+});
   
 //Get all tenantslist of all Users
 
@@ -164,7 +168,7 @@ export const getTenantsList = async () => {
       const token = localStorage.getItem('accessToken');
       const tenant_id = localStorage.getItem('tenant_id');
   
-      const response = await instance.post( 'users/invite',resourceData,{
+      const response = await time_log_instance.post( 'users/invite',resourceData,{
         params: {},
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -181,7 +185,7 @@ export const getTenantsList = async () => {
   export const getUserRoles = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await instance.get('/User-Management/get_all_role_users_role_get', {
+      const response = await instance.get('/users/role', {
         params: {},
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -194,18 +198,4 @@ export const getTenantsList = async () => {
     }
   };
 
-  export const getApproverList = async () => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      const response = await instance.get('/User-Management/get_all_role_users_role_get', {
-        params: {},
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  };
+  
