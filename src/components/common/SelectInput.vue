@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-import { ref, toRefs } from 'vue'
+import { ref, toRefs,onMounted,watch } from 'vue'
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/vue'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid'
 
@@ -50,4 +50,12 @@ const selectedValue = ref(initialSelected.value)
 const handleSelector = () => {
   emit('handleSelector', selectedValue.value)
 }
+watch(initialSelected, (newValue) => {
+  selectedValue.value = newValue;
+});
+onMounted(() => {
+  selectedValue.value = props.initialSelected;
+});
+
+// export { selectedValue };
 </script>

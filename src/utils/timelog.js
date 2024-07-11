@@ -161,9 +161,9 @@ export const fetchTodayTimeLogs = async () => {
   try {
     const token = localStorage.getItem('accessToken');
     const tenant_id = localStorage.getItem('tenant_id');
-
+    const time_log_date = new Date().toISOString().slice(0, 10);
     const response = await instance.get(`/log_times/`, {
-      params: { 'order_by' :'-id'}, 
+      params: { 'order_by' :'-id','time_log_date': time_log_date}, 
       headers: {
         'Authorization': `Bearer ${token}`,
         'x-tenant-id': tenant_id,
@@ -172,6 +172,47 @@ export const fetchTodayTimeLogs = async () => {
 
     return response.data; 
   } catch (error) {
+    throw error;
+  }
+};
+
+//Delete logged time
+export const deleteTimeLogs = async (id) => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    const tenant_id = localStorage.getItem('tenant_id');
+    const response = await instance.delete(`/log_times/${id}`, {
+      params: {}, 
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'x-tenant-id': tenant_id,
+      }
+    });
+
+    return response.data; 
+  } catch (error) {
+    throw error;
+  }
+};
+
+//Update timelog
+export const updateTimelogs = async (data,id) => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    const tenant_id = localStorage.getItem('tenant_id');
+
+    const response = await instance.put(`/log_times/${id}`,data, {
+      params: {}, 
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'x-tenant-id': tenant_id,
+      }
+    });
+
+    return response.data; 
+  } catch (error) {
+    console.log(error);
     throw error;
   }
 };
