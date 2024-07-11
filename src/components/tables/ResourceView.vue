@@ -35,14 +35,19 @@
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ person.invite_role }}</td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{  }}</td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{  }}</td>
-                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{  }}</td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{person.is_approver == "true" ? "True" : "False"  }}</td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ person.invite_status == "accepted" ? "Accepted" : "Pending" }}</td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                         {{ new Date(person.created_at).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) }}
                                     </td>
 
                                     <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                        <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit<span class="sr-only">, {{ person.invite_first_name }} {{ person.invite_last_name }}</span></a>
+                                        <input
+                                            type="checkbox"
+                                            class="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out"
+                                            :disabled="person.invite_status !== 'accepted'"
+                                            @change="handleCheckboxChange(person)"
+                                        >
                                     </td>
                                 </tr>
                     </tbody>
@@ -58,6 +63,7 @@
   <script>
   import Loader from '../../components/Loader.vue';
   import { getResourceInfo } from '../../utils/resource.js' ;
+  import { getActiveUser } from '../../utils/tenants.js' ;
   import { ref } from 'vue'; 
   
   export default {
@@ -96,12 +102,29 @@
                     invite_email: item.invite_email,
                     invite_role: item.invite_role,
                     invite_status: item.invite_status,
-                    created_at: item.created_at
+                    created_at: item.created_at,
+                    invited_by: item.invited_by,
+                    id: item.id,
                 }));
                 this.isLoading = false;
             } catch (error) {
                 this.error = 'An error occurred. Please try again.';
                 this.isLoading = false;
+            }
+        },
+
+        async handleCheckboxChange(person) {
+            if (person.invite_status === 'accepted') {
+                const data = {
+                    user_type: person.invite_role,
+                    status:  'inactive', 
+                    };
+                try {
+                    const response = await getActiveUser( person.id,person.invited_by,data);
+                    console.log('User activated:', response);
+                } catch (error) {
+                    console.error('Error activating user:', error);
+                }
             }
         },
     },    

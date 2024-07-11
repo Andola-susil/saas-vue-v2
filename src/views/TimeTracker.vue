@@ -15,27 +15,27 @@
             </div>
             <div class="relative mt-2 rounded-md shadow-sm w-1/6">
               <h2 class="text-sm font-medium text-gray-500">Start time</h2>
-              <div><input type="time" v-model="startTime" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" /></div>
+              <div><input type="time" v-model="startTime" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mt-2" /></div>
             </div>
             <div class="relative mt-2 rounded-md shadow-sm w-1/6">
               <h2 class="text-sm font-medium text-gray-500">End time</h2>
-              <div><input type="time" v-model="endTime" @input="calculateDuration()" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" /></div>
+              <div><input type="time" v-model="endTime" @input="calculateDuration()" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mt-2" /></div>
             </div>
             <div class="relative mt-2 rounded-md shadow-sm w-1/4">
-              <div class="flex pt-8">
+              <div class="flex pt-[38px]">
                 <input  v-model="is_billable" :value="day" type="checkbox" class="relative top-1 h-3 w-3 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600" />
-                <h2 class="text-sm font-medium text-gray-500">Is Billable</h2>
+                <h2 class="text-sm font-medium text-gray-500 ml-2">Is Billable</h2>
               </div>
             </div>
             <div class="relative mt-2 rounded-md shadow-sm w-1/4">
-              <div class="pt-8">
-                <span class="text-foreground font-semibold">
+              <div class="pt-[38px]">
+                <span class="text-foreground font-semibold ml-2">
                 {{ duration }}
                 </span>
                 </div>
             </div>
             <div class="relative mt-2 rounded-md shadow-sm w-1/4">
-              <div class="pt-8">
+              <div class="pt-[30px]">
                 <button v-if="log_id == null" @click="saveDailyTimeSheet" type="button" class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Submit</button>
                 <button v-else @click="updateTimeLog" type="button" class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Update</button>
               </div>

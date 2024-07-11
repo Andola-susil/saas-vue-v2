@@ -5,11 +5,11 @@
       <div>
         <div class="space-y-12">
           <div class="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3">
-            <div class="col-span-full">
-              <span class="text-sm font-medium leading-6 text-gray-900">Available to hire</span><br>
+            <div class="col-span-full items-center flex">
+              <span class="text-sm font-medium leading-6 text-gray-900">Available to hire</span> 
               <Switch
                 v-model="enabled"
-                class="group relative inline-flex h-5 w-10 flex-shrink-0 cursor-pointer items-center justify-center rounded-full focus:outline-none"
+                class="group relative inline-flex h-5 w-10 flex-shrink-0 cursor-pointer items-center justify-center rounded-full focus:outline-none ml-2"
               > 
                 <span class="sr-only">Use setting</span>
                 <span aria-hidden="true" class="pointer-events-none absolute h-full w-full rounded-md bg-white"></span>
@@ -93,7 +93,7 @@
               <div class="col-span-full">
               <label for="holiday" class="block text-sm font-medium leading-6 text-gray-900">Add Holiday</label>
               <div v-for="(holiday, index) in newHolidays" :key="index" class="mt-2 flex items-center">
-                <div class="flex rounded-md shadow-sm sm:max-w-md">
+                <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
                   <input
                     type="text"
                     :name="'newHoliday' + index"
@@ -101,23 +101,27 @@
                     class="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 outline-none sm:text-sm sm:leading-6"
                     placeholder="Holiday Name"
                     v-model="holiday.name"
-                  />
+                  /></div>
+                  <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md ml-2">
                   <input
                     type="date"
                     :name="'newDate' + index"
                     :id="'newDate' + index"
-                    class="ml-2 block border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                    class="block border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400  "
                     v-model="holiday.date"
                   />
                 </div>
                 <button @click="removeNewHoliday(index)" class="ml-2 bg-white-600 text-white px-2 py-1 rounded">
-                  <img src="/src/assets/images/minus.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Remove">
+                  <img src="/src/assets/images/circle-x.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Remove">
                 </button>
-                <button @click="addHoliday" class="ml-2 bg-white-600 text-white px-2 py-1 rounded flex items-center">
+                <button @click="addHoliday" class="bg-white-600 text-white px-2 py-1 rounded flex items-center">
                   <img src="/src/assets/images/circle-plus.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Add">
                 </button>
               </div>
-              <button @click="saveHolidays" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Save Holidays</button>
+              <div class="flex" style="margin-left: 19.5rem;">
+
+              <button @click="saveHolidays" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mt-2">Save Holidays</button>
+            </div>
             </div>
             </div>
           </div>
@@ -158,7 +162,7 @@ export default {
     Switch,
   },
   setup() {
-    const enabled = ref(false);
+    const enabled = ref(true);
     const isLoading = ref(true);
     const holidays = ref([]);
     const newHolidays = ref([{ name: '', date: '' }]);
@@ -195,7 +199,7 @@ export default {
     };
 
     const saveHolidays = async () => {
-      isLoading.value = true;
+      
       try {
         for (const holiday of newHolidays.value) {
           const holidayData = {
@@ -211,9 +215,8 @@ export default {
           hideProgressBar: true,
           dangerouslyHTMLString: true,
         });
-        clearForm();
         }
-        // Optionally, reset the form or show a success message
+       
       } catch (error) {
         toast("An error occurred. Please try again.", {
           theme: "colored",
@@ -227,12 +230,6 @@ export default {
     };
     fetchHolidays();
 
-    
-
-
-    // const removeHoliday = (id) => {
-    //   holidays.value = holidays.value.filter(holiday => holiday.id !== id);
-    // };
 
     return {
       enabled,
@@ -250,10 +247,9 @@ export default {
     async fetchWorkingHours() {
       this.isLoading = true;
       try {
-        const data = await getWorkingHourList();
-        console.warn(data.items[0].work_hours,'jgkjfhbjkf');
+        const data = await getWorkingHourList(); 
       
-          this.workHours = data.items[0].work_hours; // Adjust based on the structure of the response data
+          // this.workHours = data.items[0].work_hours; // Adjust based on the structure of the response data
      
       } catch (error) {
         toast('An error occurred while fetching work hours. Please try again.', {
