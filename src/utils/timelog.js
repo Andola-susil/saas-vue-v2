@@ -20,6 +20,11 @@ const time_sheet_fetch_instance = axios.create({
   // baseURL: 'http://timelog.ossiba.com/timesheetsapi/',
 });
 
+const line_item_instance = axios.create({
+  baseURL: 'https://osbaseleaf-timelog.andolasoft.co.in/timesheetlineitemsapi/',
+  // baseURL: 'http://timelog.ossiba.com/timesheetsapi/',
+});
+
 //Get Time logs
 
 export const getAllTimeLogs = async (page) => {
@@ -212,6 +217,26 @@ export const updateTimelogs = async (data,id) => {
     return response.data; 
   } catch (error) {
     console.log(error);
+    throw error;
+  }
+};
+
+//Review line items
+export const reviewTimeSheetLineItems = async (data,id) => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    const tenant_id = localStorage.getItem('tenant_id');
+
+    const response = await line_item_instance.put(`/timesheet_line_items/${id}`,data,{
+      params: {}, 
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'x-tenant-id': tenant_id,
+      }
+    });
+
+    return response.data; 
+  } catch (error) {
     throw error;
   }
 };

@@ -5,7 +5,7 @@
   import { useRoute } from 'vue-router';
   import ModalPopup from '../components/common/ModalPopup.vue';
   import { toast } from 'vue3-toastify';
-  import { submitTimeSheet,getTimeSheet,getWeekTimeSheetForWeek,reviewTimeSheet } from '../utils/timelog.js';
+  import { submitTimeSheet,getTimeSheet,getWeekTimeSheetForWeek,reviewTimeSheet,reviewTimeSheetLineItems } from '../utils/timelog.js';
   import { getResourceInfoById } from '../utils/resource.js';
   import axios from 'axios';
   import moment from 'moment';
@@ -41,6 +41,7 @@
               sunday: 0.0,
               total: 0.0 ,
               rejection_reason:"",
+              status: "",
             }
           ],//data for table to display
         isLoading:false,
@@ -206,6 +207,7 @@
         const actionType = e.target.dataset.action; // Get the data-action attribute of the clicked element
         const row = cell.getRow();
         const rowID = row.getIndex();
+        const rowData = row.getData();
         const imageElements = cell.getElement().querySelectorAll('img');
         if (actionType === "approve") {
             // Find the image element for approve button and update src attribute
@@ -216,17 +218,19 @@
                   img.src = "/src/assets/images/circle-x.svg";
                 }
             });
+            rowData.status = "approved";
+            this.reviewLineItems(rowData);
             // row.update();
         } else if (actionType === "reject") {
-            // Handle reject action
-            imageElements.forEach(img => {
-                if (img.dataset.action === "reject") {
-                    img.src = "/src/assets/images/circle-xmark.svg";
-                }else{
-                  img.src = "/src/assets/images/circle-check-blank.svg";
-                }
-            });
-            
+          // Handle reject action
+          imageElements.forEach(img => {
+              if (img.dataset.action === "reject") {
+                  img.src = "/src/assets/images/circle-xmark.svg";
+              }else{
+                img.src = "/src/assets/images/circle-check-blank.svg";
+              }
+          });
+          rowData.status = "rejected";
         } else {
             // Handle unexpected click (if needed)
         }
@@ -356,6 +360,7 @@
                   sunday: 0.0,
                   total: 0.0 ,
                   rejection_reason:"",
+                  status: "",
                 }
               ];
               this.disable_table = false;
@@ -453,8 +458,10 @@
                 }
                 this.task_list = [];
                 this.task_list.push({ label: "<strong>Create new task</strong>", value: 0, id: "" });
-                console.log(this.task_list, 1);
-                this.getTaskList();
+                if(cellValue != null && cellValue != ''){
+                  this.getTaskList();
+                }
+                
                 const project = this.project_list.find(p => p.value === cellValue);
                 return project ? project.label : cellValue;
               },
@@ -624,8 +631,37 @@
         });
         
         this.isModalOpen = false;
-      }
+      },
+      reviewLineItems(rowData){
+        console.log(rowData);
+        const lineItemsInfo = {
+          "timesheet_id": rowData.id,
+          "project_id": rowData.project_id,
+          "task_id": rowData.task_id,
+          "project_name": rowData.project_name,
+          "task_name": rowData.task_name,
+          "date_logged": '',
+          "day_of_week": '',
+          "time_spent": rowData.total,
+          "status": rowData.status,
+          "rejection_reason": rowData.rejection_reason,
+        };
+        this.isLoading = true;
+        const res = reviewTimeSheetLineItems(lineItemsInfo, rowData.id).then((data) => {
+          this.isLoading = false;
+          toast("Project created successfully!", {
+            "theme": "colored",
+            "type": "success",
+            "hideProgressBar": true,
+            "dangerouslyHTMLString": true
+          })
+          
+          this.getTaskList();
+        })
+        .catch((error) => {
 
+        });
+      }
     },
     mounted() {
       const currentDate = new Date();

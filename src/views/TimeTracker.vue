@@ -65,7 +65,7 @@
       <TimetrackerHeaderView />
       <div v-for="(record, index) in timerRecords" :key="index">
         <div class="bg-card p-4 rounded-lg shadow-md">
-          <TaskInput @editTimeLog="editLoggedTime" @deleteTimeLog="deleteLogTime" :time_log_date="record.time_log_date" :is_billable="record.is_billable" :task_id="record.task_id" :project_id="record.project_id" :log_id="record.id" :project="record.project_name" :elapsedTime="record.total_time" :task="record.task_name" :startTime="record.startTime" :endTime="record.endTime" />
+          <TaskInput @editTimeLog="editLoggedTime" @deleteTimeLog="deleteLogTime" :duration="record.total_time" :time_log_date="record.time_log_date" :is_billable="record.is_billable" :task_id="record.task_id" :project_id="record.project_id" :log_id="record.id" :project="record.project_name" :elapsedTime="record.total_time" :task="record.task_name" :startTime="record.startTime" :endTime="record.endTime" />
         </div>
       </div>
     </div>
@@ -354,6 +354,7 @@ export default {
       this.time_log_date = data.time_log_date;
       this.project_name = data.project_name;
       this.task_name = data.task_name;
+      this.duration = data.duration;
       this.getTaskList();
     },
     updateTimeLog(){
@@ -399,7 +400,7 @@ export default {
       this.time_log_date = '';
       this.project_name = '';
       this.task_name = '';
-      this.duration = '';
+      this.duration = '00:00:00';
     }
   },
   beforeDestroy() {

@@ -104,6 +104,10 @@
         type: String,
         default: ''
       },
+      duration:{
+        type: String,
+        default: ''
+      },
     },
     methods: {
       showTagModal() {
@@ -148,6 +152,7 @@
           'task_id' : this.task_id,
           'is_billable' : this.is_billable,
           'time_log_date' : this.time_log_date,
+          'duration': this.duration,
         };
         this.$emit('editTimeLog', log_info);
       },
