@@ -61,6 +61,25 @@ export const submitTimeSheet = async (time_log) => {
   }
 };
 
+  // Update time sheet
+  export const UpdateTimeSheet = async (time_log_id,time_log) => {
+    try {
+      // console.log(time_log_id);
+      const token = localStorage.getItem('accessToken');
+      const tenant_id = localStorage.getItem('tenant_id');
+      
+      const response = await time_sheet_instance.put(`/timesheetdetails/${time_log_id}`, time_log, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'x-tenant-id': tenant_id,
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
 // Get time sheet details by id
 export const getTimeSheet = async (time_log_id) => {
   try {
@@ -128,7 +147,7 @@ export const getAllTimeSheets = async (page,week_number,status,sortBy, sortDirec
 
     const response = await time_sheet_fetch_instance.get(`/timesheets/`, {
       params: { 'week_number' : week_number ,'status' : status,'sort_by': sortBy,
-        'sort_direction': sortDirection}, 
+        'sort_direction': sortDirection,'page':page}, 
       headers: {
         'Authorization': `Bearer ${token}`,
         'x-tenant-id': tenant_id,
@@ -162,13 +181,13 @@ export const saveTimelog = async (data) => {
   }
 };
 //Get all today time logs
-export const fetchTodayTimeLogs = async () => {
+export const fetchTodayTimeLogs = async (page) => {
   try {
     const token = localStorage.getItem('accessToken');
     const tenant_id = localStorage.getItem('tenant_id');
     const time_log_date = new Date().toISOString().slice(0, 10);
     const response = await instance.get(`/log_times/`, {
-      params: { 'order_by' :'-id','time_log_date': time_log_date}, 
+      params: { 'order_by' :'-id','time_log_date': time_log_date,'page':page}, 
       headers: {
         'Authorization': `Bearer ${token}`,
         'x-tenant-id': tenant_id,

@@ -60,14 +60,15 @@
 
     </div>
     <div>
-      <!-- <Header title="Today" totalLabel="Total" :totalTime="formattedTotalTime" /> -->
-      <h2 class="font-medium py-6 pl-4">Today({{new Date().toISOString().slice(0, 10)}})</h2>
+      <Header :title="'Today(' + new Date().toISOString().slice(0, 10) + ')'" :totalLabel="'Total'" :totalTime="total_time_logged_for_current_date" />
+      <!-- <h2 class="font-medium py-6 pl-4">Today({{new Date().toISOString().slice(0, 10)}})</h2> -->
       <TimetrackerHeaderView />
       <div v-for="(record, index) in timerRecords" :key="index">
         <div class="bg-card p-4 rounded-lg shadow-md">
           <TaskInput @editTimeLog="editLoggedTime" @deleteTimeLog="deleteLogTime" :duration="record.total_time" :time_log_date="record.time_log_date" :is_billable="record.is_billable" :task_id="record.task_id" :project_id="record.project_id" :log_id="record.id" :project="record.project_name" :elapsedTime="record.total_time" :task="record.task_name" :startTime="record.startTime" :endTime="record.endTime" />
         </div>
       </div>
+      <PaginationTemplate :paginationData="meta_data" @page-changed="getTodayTimeLogs"/>
     </div>
      <Loader :loading="isLoading" />
 </div>
@@ -85,6 +86,7 @@ import { saveTimelog,fetchTodayTimeLogs,deleteTimeLogs,updateTimelogs} from '../
 import SelectInput from '../components/common/SelectInput.vue';
 import { toast } from 'vue3-toastify';
 import Loader from '../components/Loader.vue';
+import PaginationTemplate from '../components/common/PaginationTemplate.vue';
 
 export default {
   components: {
@@ -93,6 +95,7 @@ export default {
     SelectInput,
     TimetrackerHeaderView,
     Loader,
+    PaginationTemplate
   },
   data() {
     return {
@@ -117,6 +120,13 @@ export default {
       log_id: null,
       time_log_date: '',
       isLoading: false,
+      meta_data : [],
+      paginationData: {
+        total_items: 0,
+        items_per_page: 2,
+        current_page: 1,
+      },
+      total_time_logged_for_current_date: '00:00:00',
     };
   },
   computed: {
@@ -130,7 +140,7 @@ export default {
   },
   mounted() {
     this.fetchProjectList();
-    this.getTodayTimeLogs();
+    this.getTodayTimeLogs(this.paginationData.current_page);
   },
   methods: {
     toggleDropdown() {
@@ -311,9 +321,12 @@ export default {
       // Format the time as HH:MM:SS
       return `${paddedHours}:${paddedMinutes}:${paddedSeconds}`;
     },
-    getTodayTimeLogs(){
-      const res = fetchTodayTimeLogs().then((data) => {
+    getTodayTimeLogs(page){
+      this.paginationData.current_page = page;
+      var total_time = 0;
+      const res = fetchTodayTimeLogs(page).then((data) => {
         data.items.forEach(log => {
+          total_time = total_time + log.total_time;
           this.timerRecords.push(
             { 
               startTime: log.task_start_time, 
@@ -329,6 +342,8 @@ export default {
             }
             );
         });
+        this.meta_data = data.meta;
+        this.total_time_logged_for_current_date = this.formatSecondsToHHMMSS(total_time);
       })
       .catch((error) => {
 
