@@ -3,10 +3,10 @@
   <div class="px-4">
     <div class="sm:flex sm:items-center">
       <div class="sm:flex-auto">
-        <h1 class="text-base font-semibold leading-6 text-gray-900">Calender</h1>
+        <h1 class="text-xl font-semibold leading-6 text-gray-900">Calender</h1>
       </div>
     </div>
-    <div class="mt-8 flow-root">
+    <div class="mt-1 flow-root">
      <CalenderView />
     </div>
   </div>
