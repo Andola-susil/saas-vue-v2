@@ -72,8 +72,11 @@
             <li>
               <ul role="list" class="-mx-2 space-y-1">
                 <li v-for="(item,key) in navigation" :key="key">
-                  <a @click="manageRoute(item,key)" href="#" :class="[item.current ? 'bg-indigo-700 text-white' : 'text-indigo-200 hover:bg-indigo-700 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6']">
-                    <component :is="item.icon" :class="[item.current ? 'text-white' : 'text-indigo-200 group-hover:text-white', 'h-6 w-6 shrink-0']" aria-hidden="true" />
+                  <a  @click.prevent="manageRoute(item,key)" href="#" :class="[item.current ? 'bg-indigo-700 text-white' : 'text-indigo-200 hover:bg-indigo-700 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6']">
+                    <!-- <component :is="item.icon" :class="[item.current ? 'text-white' : 'text-indigo-200 group-hover:text-white', 'h-6 w-6 shrink-0']" aria-hidden="true" /> -->
+                    <div class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500">
+                        <img aria-hidden="true" alt="" :src="item.icon" class="h-5 w-5" />
+                      </div>
                     {{ item.name }}
                   </a>
                 </li>
@@ -83,8 +86,11 @@
               <div class="text-xs font-semibold leading-6 text-indigo-200">Settings</div>
               <ul role="list" class="-mx-2 mt-2 space-y-1">
                 <li v-for="(team,skey) in settings" :key="skey">
-                  <a href="#" @click="manageRoute(team,skey)" :class="[team.current ? 'bg-indigo-700 text-white' : 'text-indigo-200 hover:bg-indigo-700 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6']">
-                    <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">{{ team.initial }}</span>
+                  <a href="#"  @click.prevent="manageRoute(team,skey)" :class="[team.current ? 'bg-indigo-700 text-white' : 'text-indigo-200 hover:bg-indigo-700 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6']">
+                    <!-- <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">{{ team.initial }}</span> -->
+                    <div class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500">
+                        <img aria-hidden="true" alt="" :src="team.initial" class="h-5 w-5" />
+                      </div>
                     <span class="truncate">{{ team.name }}</span>
                   </a>
                 </li>
@@ -191,32 +197,32 @@ const settings = ref([]);
 const userStore = useUserStore();
 // Navigation data
 const navigation_for_admin = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, current: false },
-  { name: 'Time Sheet', href: '/time-sheet', icon: DocumentDuplicateIcon, current: false },
-  { name: 'Time Log', href: '/time-tracker', icon: DocumentDuplicateIcon, current: false },
-  { name: 'Past Time Sheet', href: '/past-time-sheet', icon: DocumentDuplicateIcon, current: false },
-  { name: 'Approvals', href: '/time-sheet-approvals', icon: FolderIcon, current: false },
-  { name: 'Reports', href: '/time-sheet-reports', icon: ChartPieIcon, current: false },
-  { name: 'All TimeSheets', href: '/all-time-sheets', icon: ChartPieIcon, current: false },
+  { name: 'Dashboard', href: '/dashboard', icon: '/src/assets/images/dashboards.png', current: false },
+  { name: 'Time Sheet', href: '/time-sheet', icon:'/src/assets/images/time-management.png', current: false },
+  { name: 'Time Tracker', href: '/time-tracker', icon: '/src/assets/images/timetrack.png', current: false },
+  // { name: 'Past Time Sheet', href: '/past-time-sheet', icon: DocumentDuplicateIcon, current: false },
+  { name: 'Approvals', href: '/time-sheet-approvals', icon: '/src/assets/images/approval.png', current: false },
+  { name: 'Reports', href: '/time-sheet-reports', icon: '/src/assets/images/report.png', current: false },
+  { name: 'All TimeSheets', href: '/all-time-sheets', icon: '/src/assets/images/alltime-sheet.png', current: false },
 ]
 const navigation_for_resource = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, current: false },
-  { name: 'Time Sheet', href: '/time-sheet', icon: DocumentDuplicateIcon, current: false },
-  { name: 'Past Time Sheet', href: '/past-time-sheet', icon: DocumentDuplicateIcon, current: false },
-  { name: 'Reports', href: '/time-sheet-reports', icon: ChartPieIcon, current: false },
+  { name: 'Dashboard', href: '/dashboard', icon: '/src/assets/images/dashboards.png', current: false },
+  { name: 'Time Sheet', href: '/time-sheet', icon: '/src/assets/images/time-management.png', current: false },
+  // { name: 'Past Time Sheet', href: '/past-time-sheet', icon: DocumentDuplicateIcon, current: false },
+  { name: 'Reports', href: '/time-sheet-reports', icon: '/src/assets/images/report.png', current: false },
 ]
 const navigation_for_auditors = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, current: false },
-  { name: 'Reports', href: '/time-sheet-reports', icon: ChartPieIcon, current: false },
+  { name: 'Dashboard', href: '/dashboard', icon: '/src/assets/images/dashboards.png', current: false },
+  { name: 'Reports', href: '/time-sheet-reports', icon: '/src/assets/images/report.png', current: false },
 ]
 const settings_for_admin = [
-  { id: 1, name: 'Resource management', href: '/resource', initial: 'R', current: false },
-  { id: 2, name: 'Company calendars', href: '/calender-view', initial: 'C', current: false },
-  { id: 3, name: 'TimeSheet rules', href: '/time-sheet-rules', initial: 'T', current: false },
+  { id: 1, name: 'Resource management', href: '/resource', initial: '/src/assets/images/resource.png', current: false },
+  { id: 2, name: 'Company calendars', href: '/calender-view', initial: '/src/assets/images/calendar.png', current: false },
+  { id: 3, name: 'TimeSheet rules', href: '/time-sheet-rules', initial: '/src/assets/images/folder.png', current: false },
 ]
 const settings_resource = [
-  { id: 1, name: 'Company calendars', href: '/calender-view', initial: 'C', current: false },
-  { id: 2, name: 'TimeSheet rules', href: '/time-sheet', initial: 'T', current: false },
+  { id: 1, name: 'Company calendars', href: '/calender-view', initial: '/src/assets/images/calendar.png', current: false },
+  { id: 2, name: 'TimeSheet rules', href: '/time-sheet', initial: '/src/assets/images/folder.png', current: false },
 ]
 const userNavigation = [
   { name: 'Your profile', href: '/your-profile' },
@@ -276,10 +282,13 @@ const manageLogOut = async (item) => {
     }
   }
 }
-const manageRoute = async (item,key) => {
-  // navigation.forEach((navItem, navKey) => {
-  //   navItem.current = true;
-  // })
+const manageRoute = (item) => {
+  navigation.value.forEach(navItem => {
+    navItem.current = navItem.href === item.href;
+  });
+  settings.value.forEach(setting => {
+    setting.current = setting.href === item.href;
+  });
   router.push(item.href);
 }
 </script>

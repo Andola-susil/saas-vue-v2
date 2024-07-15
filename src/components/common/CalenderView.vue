@@ -83,7 +83,19 @@
         </Menu>
       </div>
     </header>
-    <vue-cal class="custom-vue-cal" :events="events" :view="currentView" />
+    <div class="vuecal__month-event">
+    <span class="vuecal__event-title">{{ event }}</span>
+  </div>
+    <vue-cal
+    :events="events"
+    :view="currentView"
+    :time="true"
+    :first-day-of-week="1"
+    :disable-views="['years','week','day']"
+    :locale="'en'"
+    color="#00aaff"
+    :readonly="false"
+  />
   </div>
 </template>
 
@@ -139,11 +151,18 @@ const openModal = () => {
  
 const loadEvents = () => {
   const storedEvents = JSON.parse(localStorage.getItem('events')) || [];
+  console.log(storedEvents);
   events.value = storedEvents;
 }
 
 onMounted(() => {
   loadEvents();
+});
+const setup = () => ({
+  events,
+  currentView,
+  state,
+  openModal,
 });
 </script>
 <style>
@@ -151,6 +170,7 @@ onMounted(() => {
   height: 100px;
   text-align: left;
   padding: 10px;
+  cursor: pointer;
 }
 .vuecal__cell-events-count {
     background-color: #4f46e5;
@@ -159,5 +179,25 @@ onMounted(() => {
     height: 20px;
     width: 20px;
     align-items: center;
+    cursor: pointer;
+}
+.vuecal__flex.vuecal__menu{
+  background-color: rgb(127 123 195);
+
+}
+.vuecal__title-bar{
+  background-color: rgb(208, 213, 247);
+}
+.vuecal__view-btn{
+  font-size: medium;
+}
+.vuecal__flex.vuecal__title{
+  font-size: 14px;
+}
+.vuecal__flex.weekday-label .full{
+  font-size: small;
+}
+.vuecal__cell-date{
+  font-size: small;
 }
 </style>
