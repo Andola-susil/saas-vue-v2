@@ -8,13 +8,16 @@
     </div>
     
     <div class="w-full flex rounded border border-gray-200">
-      <div class="w-2/6 pt-3.5 pl-2">
+      <!-- <div class="w-2/6 pt-3.5 pl-2">
         <div class="relative mt-2 rounded-md shadow-sm">
           <input type="text" name="account-number" id="account-number" class="block w-full rounded-md border-0 py-1.5 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 pl-2" placeholder="Search" />
           <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
             <QuestionMarkCircleIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
           </div>
         </div>
+      </div> -->
+      <div class="w-2/6 pl-6 pt-3.5 ">
+        <SelectInput :options="user_list" placeholder="Select user" :initialSelected="initialSelected" @handleSelector="getSelectedUserValue"/>
       </div>
       <div class="w-2/6 pl-6 pt-3.5 ">
         <SelectInput :options="status_list" placeholder="Select status" :initialSelected="initialSelected" @handleSelector="getSelectedValue"/>
@@ -75,6 +78,7 @@ import WeekFilter from '../components/common/WeekFilter.vue';
 import Loader from '../components/Loader.vue';
 import SelectInput from '../components/common/SelectInput.vue';
 import moment from 'moment';
+import { getResourceList } from '../utils/resource.js' ;
 
 export default {
     name: 'AllTimeSheets',
@@ -90,6 +94,7 @@ export default {
     const currentDate = new Date();
     this.getWeekInfo(currentDate);
     this.getTimeLogs(this.paginationData.current_page);
+    this.fetchUserRoles();
   },
   created() {
     
@@ -117,6 +122,8 @@ export default {
       start_of_week: null,
       end_of_week: null,
       status: null,
+      user_list: [],
+      resource_id: null,
     }
   },
   methods: {
@@ -149,7 +156,7 @@ export default {
       this.error = null;
       this.isLoading = true;
       try {
-        const response = await getAllTimeSheets(page,this.week_number, this.status);
+        const response = await getAllTimeSheets(page,this.week_number, this.status, this.resource_id);
         this.time_log = response.items;
         
         this.meta_data = response.meta;
@@ -180,6 +187,20 @@ export default {
     getSelectedValue(val){
       this.status = val.name;
       this.getTimeLogs(this.paginationData.current_page);
+    },
+    getSelectedUserValue(val){
+      this.resource_id = val;
+      this.getTimeLogs(this.paginationData.current_page);
+    },
+    fetchUserRoles(){
+      try {
+        const response = getResourceList(); 
+        if (response.items && response.items.length > 0) {
+          this.user_list = response.items; 
+        }
+      } catch (error) {
+        console.error('Error fetching user roles:', error);
+      }
     }
   },
   

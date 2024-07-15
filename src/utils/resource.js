@@ -18,7 +18,7 @@ export const getResourceList = async (page) => {
     const token = localStorage.getItem('accessToken');
     const tenant_id = localStorage.getItem('tenant_id');
     
-    const response = await instance.get('/resources', {
+    const response = await instance.get('/resources/', {
       params: { },
       headers: {
         'Authorization': `Bearer ${token}`,

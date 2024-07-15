@@ -228,7 +228,7 @@ export default {
       this.error = null;
       this.isLoading = true;
       try {
-        const response = await getAllTimeSheets(page, this.week_number, this.status, this.sortBy, this.sortDirection);
+        const response = await getAllTimeSheets(page, this.week_number, this.status,null, this.sortBy, this.sortDirection);
         this.time_log = response.items;
         this.meta_data = response.meta;
         this.isLoading = false;

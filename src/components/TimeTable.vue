@@ -5,7 +5,7 @@
   import { useRoute } from 'vue-router';
   import ModalPopup from '../components/common/ModalPopup.vue';
   import { toast } from 'vue3-toastify';
-  import { submitTimeSheet,getTimeSheet,getWeekTimeSheetForWeek,reviewTimeSheet } from '../utils/timelog.js';
+  import { submitTimeSheet,getTimeSheet,getWeekTimeSheetForWeek,reviewTimeSheet,reviewTimeSheetLineItems,UpdateTimeSheet } from '../utils/timelog.js';
   import { getResourceInfoById } from '../utils/resource.js';
   import axios from 'axios';
   import moment from 'moment';
@@ -27,10 +27,10 @@
         tableData: [
             { 
               id: 1,
-              project_id: 0,
+              project_id: null,
               project_name: "",
               task_name: "",
-              task_id: 0,
+              task_id: null,
               date_logged: "2024-06-25",
               monday: 0.0,
               tuesday: 0.0,
@@ -41,6 +41,7 @@
               sunday: 0.0,
               total: 0.0 ,
               rejection_reason:"",
+              status: "",
             }
           ],//data for table to display
         isLoading:false,
@@ -72,6 +73,9 @@
         showCreateProjectPopup: false,
         project_id: 0,
         showCreateTaskPopup: false,
+        current_timesheet_id: null,
+        time_sheet_status: '',
+        showTimeSheetSubmitConfirmation: false,
       }
     },
     props: {
@@ -92,33 +96,41 @@
       cellEditedCallback(cell) {
         let row = cell.getRow();
         let data = row.getData();
-        let total = this.totalHrscustomMutator(null, data);
+        
+        let total = parseFloat(this.totalHrscustomMutator(null, data));
         row.update({ total: total });
+        if(this.current_timesheet_id == null){
+          // console.log('Here'); return false;
+          this.submitTimesheet();
+        }else{
+          this.updateTimesheet();
+          // console.log('Here1231'); return false;
+        }
+        
       },
       totalHrscustomMutator(value, data, type, params, component) {
         let totalHours = parseFloat(data.monday || 0) +
-                   parseFloat(data.tuesday || 0) +
-                   parseFloat(data.wednesday || 0) +
-                   parseFloat(data.thursday || 0) +
-                   parseFloat(data.friday || 0) +
-                   parseFloat(data.saturday || 0) +
-                   parseFloat(data.sunday || 0);
-        let hours = Math.floor(totalHours);
-        let minutes = Math.round((totalHours - hours) * 60);
-        let formattedHours = hours.toString().padStart(2, '0');
-        let formattedMinutes = minutes.toString().padStart(2, '0');
-
-        return `${formattedHours}:${formattedMinutes}`;
+                 parseFloat(data.tuesday || 0) +
+                 parseFloat(data.wednesday || 0) +
+                 parseFloat(data.thursday || 0) +
+                 parseFloat(data.friday || 0) +
+                 parseFloat(data.saturday || 0) +
+                 parseFloat(data.sunday || 0);
+        return Math.round(totalHours * 100) / 100;
       },
       deleteIcon(cell, formatterParams, onRendered) {
-        return '<img src="/src/assets/images/trash-can.svg" alt="" class="h-5 w-5">';
+        return `<img src="/src/assets/images/trash-can-gray.svg" 
+               alt="" 
+               class="h-5 w-5" 
+               onmouseover="this.src='/src/assets/images/trash-can.svg'" 
+               onmouseout="this.src='/src/assets/images/trash-can-gray.svg'">`;
       },
       approvalActions(cell, formatterParams, onRendered){
         return '<div class="flex"><div class="px-1"><img src="/src/assets/images/circle-check-blank.svg" alt="" class="h-6 w-6 " data-action="approve"></div><div class="px-1"><img src="/src/assets/images/circle-x.svg" alt="" class="h-6 w-6" data-action="reject"></div></div>';
       },
       addRowToTable() {
         this.id_count ++;
-        this.tabulator.addRow({ id:this.id_count,project_id: 0,project_name: "", task_id: 0, task_name: "", monday: 0.0, tuesday: 0.0, wednesday: 0.0, thursday: 0.0, friday: 0.0, saturday: 0.0, sunday: 0.0, total: 0.0 , action:""})
+        this.tabulator.addRow({ id:this.id_count,project_id: null,project_name: "", task_id: null, task_name: "", monday: 0.0, tuesday: 0.0, wednesday: 0.0, thursday: 0.0, friday: 0.0, saturday: 0.0, sunday: 0.0, total: 0.0 , action:""})
           .then((row) => {
             // row - the row component for the row updated or added
             // run code after data has been updated
@@ -171,7 +183,7 @@
           this.tableData = data.lineitems;
           
           this.updateTable();
-        
+          this.getTimeSheetId();
           this.isLoading = false;
 
           toast("Timesheet submitted successfully!", {
@@ -186,7 +198,72 @@
         });
       
       },
+      showConfirmationPopup(){
+        this.modalContent.title="Are you sure? You want to submit this timeSheet.";
+        this.modalContent.description="";
+        this.modalContent.confirmLabel="Yes";
+        this.modalContent.cancelLabel="No";
+        this.modalContent.showInputField = false;
+        this.showTimeSheetSubmitConfirmation = true;
+        this.openPopup();
+      },
+      updateTimesheet(){
+        const allData = this.tabulator.getData();
+        const logEntry = this.generateLogEntry(allData);
+        const response = UpdateTimeSheet(this.current_timesheet_id,logEntry)
+        .then(data => {
+          this.tableData = data.lineitems;
+          
+          this.updateTable();
+          this.getTimeSheetId();
+
+          toast("Timesheet submitted successfully!", {
+            "theme": "colored",
+            "type": "success",
+            "hideProgressBar": true,
+            "dangerouslyHTMLString": true
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching timesheet details:', error);
+        });
+      },
+      getSecondsToHour(seconds){
+        var secondsPerMinute = 60;
+        var minutesPerHour = 60;
+        var hours = seconds / (secondsPerMinute * minutesPerHour);
+        return hours;
+      },
+      getHoursInSec(hours){
+        var minutesPerHour = 60;
+        var secondsPerMinute = 60;
+        var seconds = hours * minutesPerHour * secondsPerMinute;
+        return seconds;
+      },
       generateLogEntry(allData) {
+        const lineItems = [];
+        allData.forEach(data => {
+          const lineitem = {
+            action: undefined,
+            date_logged: "2024-06-12",
+            friday: this.getHoursInSec(data.friday),
+            id: data.id,
+            monday:this.getHoursInSec(data.monday),
+            project_id: data.project_id,
+            project_name: data.project_name,
+            rejection_reason: data.rejection_reason,
+            saturday: this.getHoursInSec(data.saturday),
+            status: data.status,
+            sunday: this.getHoursInSec(data.sunday),
+            task_id: data.task_id,
+            task_name: data.task_name,
+            thursday: this.getHoursInSec(data.thursday),
+            total: this.getHoursInSec(data.total),
+            tuesday: this.getHoursInSec(data.tuesday),
+            wednesday: this.getHoursInSec(data.wednesday)
+          };
+          lineItems.push(lineitem);
+        });
         const tenant_id = localStorage.getItem('tenant_id');
           return {
             resource_id: 303,
@@ -194,18 +271,17 @@
             week_number: this.week_number,
             start_date: this.start_of_week,
             end_date: this.end_of_week,
-            // start_date: '2024-07-01',
-            // end_date: '2024-07-07',
             tenant_id: tenant_id,
-            status: "pending",
-            rejection_reason: "",
-            lineitems: allData,
+            status: "draft",
+            // rejection_reason: "",
+            lineitems: lineItems,
           };
-        },
+      },
       reviewTimeSheet(e, cell) {
         const actionType = e.target.dataset.action; // Get the data-action attribute of the clicked element
         const row = cell.getRow();
         const rowID = row.getIndex();
+        const rowData = row.getData();
         const imageElements = cell.getElement().querySelectorAll('img');
         if (actionType === "approve") {
             // Find the image element for approve button and update src attribute
@@ -216,17 +292,19 @@
                   img.src = "/src/assets/images/circle-x.svg";
                 }
             });
+            rowData.status = "approved";
+            this.reviewLineItems(rowData);
             // row.update();
         } else if (actionType === "reject") {
-            // Handle reject action
-            imageElements.forEach(img => {
-                if (img.dataset.action === "reject") {
-                    img.src = "/src/assets/images/circle-xmark.svg";
-                }else{
-                  img.src = "/src/assets/images/circle-check-blank.svg";
-                }
-            });
-            
+          // Handle reject action
+          imageElements.forEach(img => {
+              if (img.dataset.action === "reject") {
+                  img.src = "/src/assets/images/circle-xmark.svg";
+              }else{
+                img.src = "/src/assets/images/circle-check-blank.svg";
+              }
+          });
+          rowData.status = "rejected";
         } else {
             // Handle unexpected click (if needed)
         }
@@ -315,7 +393,30 @@
         const log_data = getTimeSheet(id)
         .then((data) => {
           if(data.lineitems.length > 0){
-            this.tableData = data.lineitems;
+            this.tableData = [];
+            // this.tableData = data.lineitems;
+            this.time_sheet_status = data.status;
+            data.lineitems.forEach(obj => {
+              this.tableData.push(
+                {
+                  id:obj.id, 
+                  project_id: obj.project_id,
+                  project_name: obj.project_name,
+                  task_name:obj.task_name, 
+                  task_id: obj.task_id,
+                  date_logged: obj.date_logged,
+                  monday:this.getSecondsToHour(obj.monday), 
+                  tuesday: this.getSecondsToHour(obj.tuesday),
+                  wednesday: this.getSecondsToHour(obj.wednesday),
+                  thursday: this.getSecondsToHour(obj.thursday), 
+                  friday: this.getSecondsToHour(obj.friday),
+                  saturday: this.getSecondsToHour(obj.saturday),
+                  sunday: this.getSecondsToHour(obj.sunday), 
+                  rejection_reason: obj.rejection_reason,
+                  status: obj.status,
+                  total: this.getSecondsToHour(obj.total),
+                });
+            });
           }
           this.updateTable();
           this.isLoading = false;
@@ -333,6 +434,7 @@
           .then((data) => {
             if(data.items.length > 0){
               const time_sheet_id = data.items[0].id;
+              this.current_timesheet_id = time_sheet_id;
               this.resource_id = data.items[0].resource_id;
               this.getUserInfo(data.items[0].resource_id);
               this.getTimeLogData(time_sheet_id);
@@ -345,7 +447,7 @@
                   project_id: "",
                   project_name: "",
                   task_name: "",
-                  task_id: 0,
+                  task_id: "",
                   date_logged: "2024-06-25",
                   monday: 0.0,
                   tuesday: 0.0,
@@ -356,8 +458,10 @@
                   sunday: 0.0,
                   total: 0.0 ,
                   rejection_reason:"",
+                  status: "",
                 }
               ];
+              this.current_timesheet_id = null;
               this.disable_table = false;
               this.updateTable();
               this.show_submit_btn = true;
@@ -397,7 +501,7 @@
           validationMode:"blocking",
           columns: this.table_columns, //Set columns
         });
-        this.disableTableIfDataExists();
+        // this.disableTableIfDataExists();
       },
       formatDate(dateString) {
         const date = new Date(dateString);
@@ -451,10 +555,10 @@
                 if (cellValue === -1) {
                   this.handleSelectedProject();
                 }
-                this.task_list = [];
-                this.task_list.push({ label: "<strong>Create new task</strong>", value: 0, id: "" });
-                console.log(this.task_list, 1);
-                this.getTaskList();
+                if(cellValue != null && cellValue != ''){
+                  this.getTaskList();
+                }
+                
                 const project = this.project_list.find(p => p.value === cellValue);
                 return project ? project.label : cellValue;
               },
@@ -463,7 +567,7 @@
             },       
             {
               title: "Task",
-              field: "task_name",
+              field: "task_id",
               width: '16%',
               editor: "list",
               verticalNavigation:"hybrid",
@@ -487,13 +591,13 @@
               headerSort: false,
               resizable: false,
             },
-            {title:`MON<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"monday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: this.timeFormater},
-            {title:`TUE<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"tuesday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: this.timeFormater},
-            {title:`WED<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"wednesday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: this.timeFormater},
-            {title:`THU<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"thursday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: this.timeFormater},
-            {title:`FRI<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"friday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: this.timeFormater},
-            {title:`SAT<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"saturday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"], formatter: this.timeFormater},
-            {title:`SUN<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"sunday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9"],formatter: this.timeFormater},
+            {title:`MON<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"monday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"]},
+            {title:`TUE<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"tuesday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"]},
+            {title:`WED<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"wednesday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"]},
+            {title:`THU<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"thursday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"]},
+            {title:`FRI<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"friday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"]},
+            {title:`SAT<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"saturday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"]},
+            {title:`SUN<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"sunday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9"]},
             {title:"Total", field:"total", hozAlign:"center", width:'8%', headerSort:false, bottomCalc:"sum", bottomCalcParams:{precision:2}, mutator: this.totalHrscustomMutator, formatter: this.totalHoursFormatter },
             
         ];
@@ -509,9 +613,13 @@
         value = value.toString();
         let parts = value.split('.');
         let hours = parts[0] || '0';
-        let minutes = parts[1] || '0';
+        let minutesFraction = parts[1] || '0';
+
+        // Convert fractional part of hours to minutes
+        let fractionalMinutes = parseFloat(`0.${minutesFraction}`) * 60;
+
         let parsedHours = parseInt(hours);
-        let parsedMinutes = parseInt(minutes);
+        let parsedMinutes = Math.floor(fractionalMinutes);
 
         if (parsedHours > 24 || parsedHours < 0) {
           throw new Error("Hour must be between 0 and 24 (inclusive).");
@@ -520,10 +628,12 @@
         if (parsedMinutes > 60 || parsedMinutes < 0) {
           throw new Error("Minutes must be between 0 and 60 (inclusive).");
         }
+
         if (parsedMinutes >= 60) {
           parsedHours += Math.floor(parsedMinutes / 60);
           parsedMinutes = parsedMinutes % 60;
         }
+
         let formattedHours = parsedHours.toString().padStart(2, '0');
         let formattedMinutes = parsedMinutes.toString().padStart(2, '0');
 
@@ -551,6 +661,8 @@
       },
       getTaskList(){
         try {
+          // this.task_list = [];
+          this.task_list.push({ label: "<strong>Create new task</strong>", value: -1, id: "" });
           const data = geTaskList(this.project_id).then((data) => {
             if (data.items && data.items.length > 0) {
               data.items.forEach(task => {
@@ -624,8 +736,37 @@
         });
         
         this.isModalOpen = false;
-      }
+      },
+      reviewLineItems(rowData){
+        console.log(rowData);
+        const lineItemsInfo = {
+          "timesheet_id": rowData.id,
+          "project_id": rowData.project_id,
+          "task_id": rowData.task_id,
+          "project_name": rowData.project_name,
+          "task_name": rowData.task_name,
+          "date_logged": '',
+          "day_of_week": '',
+          "time_spent": rowData.total,
+          "status": rowData.status,
+          "rejection_reason": rowData.rejection_reason,
+        };
+        this.isLoading = true;
+        const res = reviewTimeSheetLineItems(lineItemsInfo, rowData.id).then((data) => {
+          this.isLoading = false;
+          toast("Project created successfully!", {
+            "theme": "colored",
+            "type": "success",
+            "hideProgressBar": true,
+            "dangerouslyHTMLString": true
+          })
+          
+          this.getTaskList();
+        })
+        .catch((error) => {
 
+        });
+      }
     },
     mounted() {
       const currentDate = new Date();
@@ -664,14 +805,19 @@
   <template>
     <div>
       
-      <div class="sm:flex-auto py-4">
+      <div class="sm:flex-auto py-2">
         <h1 class="text-base font-semibold leading-6 text-gray-900">TimeSheet</h1>
       </div>
-      <UserInfo 
-        name="Tom Cook"
-        id="56756"
-        role="Software Developer" 
-      />
+      <div class="flex">
+        <div class="w-4/5">
+          <UserInfo 
+            name="Tom Cook"
+            id="56756"
+            role="Software Developer" 
+          />
+        </div>
+        <div class="flex float-right w-1/5  justify-center"><div class="text-center py-4 rounded-md bg-indigo-50 px-2.5 py-1.5 text-sm font-semibold text-black w-full shadow-sm hover:bg-indigo-100">Status: {{time_sheet_status}}</div></div>
+      </div>
       <nav class="flex float-right">
         <div class="hidden py-2 md:flex md:items-center">
           <Menu as="div" class="relative" v-if="display_approve_btns">
@@ -693,15 +839,15 @@
       <Loader :loading="isLoading" />
       <!-- <div class="flex float-right" v-if="timeSheetId == null"> -->
         <div class="flex float-right" v-if="timeSheetId == null">
-          <div class="pl-4 pr-3" v-if="show_submit_btn == true">
+          <div class="pl-4 pr-3" v-if="show_submit_btn == true || time_sheet_status == 'draft'">
             <div>
-              <button type="button" class="rounded-md bg-indigo-500 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" @click="submitTimesheet">Submit</button>
+              <button type="button" class="rounded-md bg-indigo-500 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" @click="showConfirmationPopup">Submit</button>
             </div>
           </div>
-          <div class="" v-if="show_submit_btn == true">
+          <div class="" v-if="show_submit_btn == true || time_sheet_status == 'draft'">
             <div class="pl-4 pr-3">
               <button type="button" class="rounded-full bg-indigo-600 p-1.5 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" @click="addRowToTable">
-                <img src="/src/assets/images/plus.svg" alt="" class="h-5 w-5">
+                <img src="/src/assets/images/plus-large.svg" alt="" class="h-5 w-5">
               </button>
             </div>
           </div>
@@ -734,6 +880,18 @@
         />
       </div>
       <div v-if="showCreateTaskPopup">
+        <ModalPopup  
+          :open="isModalOpen"
+          :title="modalContent.title"
+          :description="modalContent.description"
+          :confirmLabel="modalContent.confirmLabel"
+          :cancelLabel="modalContent.cancelLabel"
+          :showInputField="modalContent.showInputField"
+          @closePopup="handleClosePopup"
+          @confirmPopup="createTask"
+        />
+      </div>
+      <div v-if="showTimeSheetSubmitConfirmation">
         <ModalPopup  
           :open="isModalOpen"
           :title="modalContent.title"
