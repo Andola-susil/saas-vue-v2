@@ -88,7 +88,7 @@
   </div>
     <vue-cal
     :events="events"
-    :view="defaultView"
+    :view="currentView"
     :time="true"
     :first-day-of-week="1"
     :disable-views="['years','week','day']"
@@ -151,12 +151,18 @@ const openModal = () => {
  
 const loadEvents = () => {
   const storedEvents = JSON.parse(localStorage.getItem('events')) || [];
-  console.warn(storedEvents);
+  console.log(storedEvents);
   events.value = storedEvents;
 }
 
 onMounted(() => {
   loadEvents();
+});
+const setup = () => ({
+  events,
+  currentView,
+  state,
+  openModal,
 });
 </script>
 <style>

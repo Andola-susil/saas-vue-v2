@@ -13,13 +13,13 @@
               <h2 class="text-sm font-medium text-gray-500">Task</h2>
               <SelectInput :options="task_list" placeholder="Select task" :initialSelected="task_info" @handleSelector="handleTaskSelect"/>
             </div>
-            <div class="relative mt-2 rounded-md shadow-sm w-1/6">
+            <div class="relative mt-2 rounded-md shadow-sm w-2/6">
               <h2 class="text-sm font-medium text-gray-500">Start time</h2>
-              <div><input type="time" v-model="startTime" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mt-2" /></div>
+              <div><input type="time" v-model="startTime" class="block w-full rounded-md border-0 py-1 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400  sm:text-sm sm:leading-6 mt-2" /></div>
             </div>
-            <div class="relative mt-2 rounded-md shadow-sm w-1/6">
+            <div class="relative mt-2 rounded-md shadow-sm w-2/6">
               <h2 class="text-sm font-medium text-gray-500">End time</h2>
-              <div><input type="time" v-model="endTime" @input="calculateDuration()" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mt-2" /></div>
+              <div><input type="time" v-model="endTime" @input="calculateDuration()" class="block w-full rounded-md border-0 py-1 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400  sm:text-sm sm:leading-6 mt-2" /></div>
             </div>
             <div class="relative mt-2 rounded-md shadow-sm w-1/4">
               <div class="flex pt-[38px]">
