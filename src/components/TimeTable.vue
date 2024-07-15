@@ -100,11 +100,9 @@
         let total = parseFloat(this.totalHrscustomMutator(null, data));
         row.update({ total: total });
         if(this.current_timesheet_id == null){
-          // console.log('Here'); return false;
           this.submitTimesheet();
         }else{
-          this.updateTimesheet();
-          // console.log('Here1231'); return false;
+          this.updateTimesheet(this.time_sheet_status);
         }
         
       },
@@ -175,23 +173,23 @@
         row.delete();
       },
       submitTimesheet() {
-        this.isLoading = true;
+        // this.isLoading = true;
         const allData = this.tabulator.getData();
-        const logEntry = this.generateLogEntry(allData);
+        const logEntry = this.generateLogEntry(allData,'draft');
         const response = submitTimeSheet(logEntry)
         .then(data => {
           this.tableData = data.lineitems;
-          
-          this.updateTable();
           this.getTimeSheetId();
-          this.isLoading = false;
+          this.updateTable();
+          
+          // this.isLoading = false;
 
-          toast("Timesheet submitted successfully!", {
-            "theme": "colored",
-            "type": "success",
-            "hideProgressBar": true,
-            "dangerouslyHTMLString": true
-          });
+          // toast("Timesheet submitted successfully!", {
+          //   "theme": "colored",
+          //   "type": "success",
+          //   "hideProgressBar": true,
+          //   "dangerouslyHTMLString": true
+          // });
         })
         .catch(error => {
           console.error('Error fetching timesheet details:', error);
@@ -207,22 +205,28 @@
         this.showTimeSheetSubmitConfirmation = true;
         this.openPopup();
       },
-      updateTimesheet(){
+      updateTimesheet(status = null){
+        if(status != 'draft'){
+          // this.isLoading = true;
+        }
         const allData = this.tabulator.getData();
-        const logEntry = this.generateLogEntry(allData);
+        const logEntry = this.generateLogEntry(allData,status);
         const response = UpdateTimeSheet(this.current_timesheet_id,logEntry)
         .then(data => {
           this.tableData = data.lineitems;
           
           this.updateTable();
           this.getTimeSheetId();
-
-          toast("Timesheet submitted successfully!", {
-            "theme": "colored",
-            "type": "success",
-            "hideProgressBar": true,
-            "dangerouslyHTMLString": true
-          });
+          // this.isModalOpen = false;
+          if(status != 'draft'){
+            this.isLoading = false;
+            toast("Timesheet submitted successfully!", {
+              "theme": "colored",
+              "type": "success",
+              "hideProgressBar": true,
+              "dangerouslyHTMLString": true
+            });
+          }
         })
         .catch(error => {
           console.error('Error fetching timesheet details:', error);
@@ -240,7 +244,7 @@
         var seconds = hours * minutesPerHour * secondsPerMinute;
         return seconds;
       },
-      generateLogEntry(allData) {
+      generateLogEntry(allData, status) {
         const lineItems = [];
         allData.forEach(data => {
           const lineitem = {
@@ -272,7 +276,7 @@
             start_date: this.start_of_week,
             end_date: this.end_of_week,
             tenant_id: tenant_id,
-            status: "draft",
+            status: status,
             // rejection_reason: "",
             lineitems: lineItems,
           };
@@ -417,9 +421,12 @@
                   total: this.getSecondsToHour(obj.total),
                 });
             });
+          }else{
+            this.time_sheet_status = '';
           }
           this.updateTable();
           this.isLoading = false;
+          
         })
         .catch((error) => {
 
@@ -463,8 +470,8 @@
               ];
               this.current_timesheet_id = null;
               this.disable_table = false;
-              this.updateTable();
               this.show_submit_btn = true;
+              this.updateTable();
               this.isLoading = false;
             }
             
@@ -501,7 +508,7 @@
           validationMode:"blocking",
           columns: this.table_columns, //Set columns
         });
-        // this.disableTableIfDataExists();
+        this.disableTableIfDataExists();
       },
       formatDate(dateString) {
         const date = new Date(dateString);
@@ -556,6 +563,7 @@
                   this.handleSelectedProject();
                 }
                 if(cellValue != null && cellValue != ''){
+                  // this.task_list = [];
                   this.getTaskList();
                 }
                 
@@ -640,7 +648,7 @@
         return `${formattedHours}:${formattedMinutes}`;
       },
       disableTableIfDataExists() {
-        if (this.disable_table) {
+        if (this.disable_table && this.time_sheet_status != 'draft' && this.time_sheet_status != '') {
           document.getElementById("timesheet-table").classList.add("disabled"); // Optional: Add disabled class for visual indication
         } else {
           document.getElementById("timesheet-table").classList.remove("disabled"); // Remove disabled class
@@ -728,7 +736,7 @@
             "hideProgressBar": true,
             "dangerouslyHTMLString": true
           })
-          
+          // this.task_list = [];
           this.getTaskList();
         })
         .catch((error) => {
@@ -738,7 +746,6 @@
         this.isModalOpen = false;
       },
       reviewLineItems(rowData){
-        console.log(rowData);
         const lineItemsInfo = {
           "timesheet_id": rowData.id,
           "project_id": rowData.project_id,
@@ -760,7 +767,7 @@
             "hideProgressBar": true,
             "dangerouslyHTMLString": true
           })
-          
+          // this.task_list = [];
           this.getTaskList();
         })
         .catch((error) => {
@@ -781,7 +788,7 @@
           this.display_approve_btns = false;
         }
       this.createTableColumns();
-      this.disableTableIfDataExists();
+      // this.disableTableIfDataExists();
       this.tabulator = new Tabulator(this.$refs.table, {
         data: this.tableData, //link data to table
         height:"100%",
@@ -900,7 +907,7 @@
           :cancelLabel="modalContent.cancelLabel"
           :showInputField="modalContent.showInputField"
           @closePopup="handleClosePopup"
-          @confirmPopup="createTask"
+          @confirmPopup="updateTimesheet('pending')"
         />
       </div>
     </div>
