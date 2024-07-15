@@ -183,7 +183,6 @@ export default {
         const response = await getUserRoles(); // Assuming getUserRoles returns a promise with data
         if (response.items && response.items.length > 0) {
           user_roles.value = response.items; 
-          console.log(user_roles, 13);
         }
       } catch (error) {
         console.error('Error fetching user roles:', error);

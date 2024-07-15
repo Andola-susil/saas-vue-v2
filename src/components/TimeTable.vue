@@ -74,6 +74,8 @@
         project_id: 0,
         showCreateTaskPopup: false,
         current_timesheet_id: null,
+        time_sheet_status: '',
+        showTimeSheetSubmitConfirmation: false,
       }
     },
     props: {
@@ -99,7 +101,7 @@
         row.update({ total: total });
         if(this.current_timesheet_id == null){
           // console.log('Here'); return false;
-          // this.submitTimesheet();
+          this.submitTimesheet();
         }else{
           this.updateTimesheet();
           // console.log('Here1231'); return false;
@@ -117,7 +119,11 @@
         return Math.round(totalHours * 100) / 100;
       },
       deleteIcon(cell, formatterParams, onRendered) {
-        return '<img src="/src/assets/images/trash-can.svg" alt="" class="h-5 w-5">';
+        return `<img src="/src/assets/images/trash-can-gray.svg" 
+               alt="" 
+               class="h-5 w-5" 
+               onmouseover="this.src='/src/assets/images/trash-can.svg'" 
+               onmouseout="this.src='/src/assets/images/trash-can-gray.svg'">`;
       },
       approvalActions(cell, formatterParams, onRendered){
         return '<div class="flex"><div class="px-1"><img src="/src/assets/images/circle-check-blank.svg" alt="" class="h-6 w-6 " data-action="approve"></div><div class="px-1"><img src="/src/assets/images/circle-x.svg" alt="" class="h-6 w-6" data-action="reject"></div></div>';
@@ -192,6 +198,15 @@
         });
       
       },
+      showConfirmationPopup(){
+        this.modalContent.title="Are you sure? You want to submit this timeSheet.";
+        this.modalContent.description="";
+        this.modalContent.confirmLabel="Yes";
+        this.modalContent.cancelLabel="No";
+        this.modalContent.showInputField = false;
+        this.showTimeSheetSubmitConfirmation = true;
+        this.openPopup();
+      },
       updateTimesheet(){
         const allData = this.tabulator.getData();
         const logEntry = this.generateLogEntry(allData);
@@ -213,7 +228,42 @@
           console.error('Error fetching timesheet details:', error);
         });
       },
+      getSecondsToHour(seconds){
+        var secondsPerMinute = 60;
+        var minutesPerHour = 60;
+        var hours = seconds / (secondsPerMinute * minutesPerHour);
+        return hours;
+      },
+      getHoursInSec(hours){
+        var minutesPerHour = 60;
+        var secondsPerMinute = 60;
+        var seconds = hours * minutesPerHour * secondsPerMinute;
+        return seconds;
+      },
       generateLogEntry(allData) {
+        const lineItems = [];
+        allData.forEach(data => {
+          const lineitem = {
+            action: undefined,
+            date_logged: "2024-06-12",
+            friday: this.getHoursInSec(data.friday),
+            id: data.id,
+            monday:this.getHoursInSec(data.monday),
+            project_id: data.project_id,
+            project_name: data.project_name,
+            rejection_reason: data.rejection_reason,
+            saturday: this.getHoursInSec(data.saturday),
+            status: data.status,
+            sunday: this.getHoursInSec(data.sunday),
+            task_id: data.task_id,
+            task_name: data.task_name,
+            thursday: this.getHoursInSec(data.thursday),
+            total: this.getHoursInSec(data.total),
+            tuesday: this.getHoursInSec(data.tuesday),
+            wednesday: this.getHoursInSec(data.wednesday)
+          };
+          lineItems.push(lineitem);
+        });
         const tenant_id = localStorage.getItem('tenant_id');
           return {
             resource_id: 303,
@@ -224,7 +274,7 @@
             tenant_id: tenant_id,
             status: "draft",
             // rejection_reason: "",
-            lineitems: allData,
+            lineitems: lineItems,
           };
       },
       reviewTimeSheet(e, cell) {
@@ -343,28 +393,30 @@
         const log_data = getTimeSheet(id)
         .then((data) => {
           if(data.lineitems.length > 0){
-            this.tableData = data.lineitems;
-            // data.lineitems.forEach(obj => {
-            //   this.tableData.push(
-            //     {
-            //       id:obj.id, 
-            //       project_id: obj.project_id,
-            //       project_name: obj.project_name,
-            //       task_name:obj.task_name, 
-            //       task_id: obj.task_id,
-            //       date_logged: obj.date_logged,
-            //       monday:obj.monday, 
-            //       tuesday: obj.tuesday,
-            //       wednesday: obj.wednesday,
-            //       thursday:obj.thursday, 
-            //       friday: obj.friday,
-            //       saturday: obj.saturday,
-            //       sunday:obj.sunday, 
-            //       rejection_reason: obj.rejection_reason,
-            //       status: obj.status,
-            //       total: obj.total,
-            //     });
-            // });
+            this.tableData = [];
+            // this.tableData = data.lineitems;
+            this.time_sheet_status = data.status;
+            data.lineitems.forEach(obj => {
+              this.tableData.push(
+                {
+                  id:obj.id, 
+                  project_id: obj.project_id,
+                  project_name: obj.project_name,
+                  task_name:obj.task_name, 
+                  task_id: obj.task_id,
+                  date_logged: obj.date_logged,
+                  monday:this.getSecondsToHour(obj.monday), 
+                  tuesday: this.getSecondsToHour(obj.tuesday),
+                  wednesday: this.getSecondsToHour(obj.wednesday),
+                  thursday: this.getSecondsToHour(obj.thursday), 
+                  friday: this.getSecondsToHour(obj.friday),
+                  saturday: this.getSecondsToHour(obj.saturday),
+                  sunday: this.getSecondsToHour(obj.sunday), 
+                  rejection_reason: obj.rejection_reason,
+                  status: obj.status,
+                  total: this.getSecondsToHour(obj.total),
+                });
+            });
           }
           this.updateTable();
           this.isLoading = false;
@@ -753,14 +805,19 @@
   <template>
     <div>
       
-      <div class="sm:flex-auto py-4">
+      <div class="sm:flex-auto py-2">
         <h1 class="text-base font-semibold leading-6 text-gray-900">TimeSheet</h1>
       </div>
-      <UserInfo 
-        name="Tom Cook"
-        id="56756"
-        role="Software Developer" 
-      />
+      <div class="flex">
+        <div class="w-4/5">
+          <UserInfo 
+            name="Tom Cook"
+            id="56756"
+            role="Software Developer" 
+          />
+        </div>
+        <div class="flex float-right w-1/5  justify-center"><div class="text-center py-4 rounded-md bg-indigo-50 px-2.5 py-1.5 text-sm font-semibold text-black w-full shadow-sm hover:bg-indigo-100">Status: {{time_sheet_status}}</div></div>
+      </div>
       <nav class="flex float-right">
         <div class="hidden py-2 md:flex md:items-center">
           <Menu as="div" class="relative" v-if="display_approve_btns">
@@ -782,15 +839,15 @@
       <Loader :loading="isLoading" />
       <!-- <div class="flex float-right" v-if="timeSheetId == null"> -->
         <div class="flex float-right" v-if="timeSheetId == null">
-          <div class="pl-4 pr-3" v-if="show_submit_btn == true">
+          <div class="pl-4 pr-3" v-if="show_submit_btn == true || time_sheet_status == 'draft'">
             <div>
-              <button type="button" class="rounded-md bg-indigo-500 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" @click="submitTimesheet">Submit</button>
+              <button type="button" class="rounded-md bg-indigo-500 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" @click="showConfirmationPopup">Submit</button>
             </div>
           </div>
-          <div class="" v-if="show_submit_btn == true">
+          <div class="" v-if="show_submit_btn == true || time_sheet_status == 'draft'">
             <div class="pl-4 pr-3">
               <button type="button" class="rounded-full bg-indigo-600 p-1.5 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" @click="addRowToTable">
-                <img src="/src/assets/images/plus.svg" alt="" class="h-5 w-5">
+                <img src="/src/assets/images/plus-large.svg" alt="" class="h-5 w-5">
               </button>
             </div>
           </div>
@@ -823,6 +880,18 @@
         />
       </div>
       <div v-if="showCreateTaskPopup">
+        <ModalPopup  
+          :open="isModalOpen"
+          :title="modalContent.title"
+          :description="modalContent.description"
+          :confirmLabel="modalContent.confirmLabel"
+          :cancelLabel="modalContent.cancelLabel"
+          :showInputField="modalContent.showInputField"
+          @closePopup="handleClosePopup"
+          @confirmPopup="createTask"
+        />
+      </div>
+      <div v-if="showTimeSheetSubmitConfirmation">
         <ModalPopup  
           :open="isModalOpen"
           :title="modalContent.title"

@@ -140,13 +140,13 @@ export const reviewTimeSheet = async (id, status,reason) => {
 };
 
 //Get all timesheets
-export const getAllTimeSheets = async (page,week_number,status,sortBy, sortDirection) => {
+export const getAllTimeSheets = async (page,week_number,status,resource_id,sortBy, sortDirection) => {
   try {
     const token = localStorage.getItem('accessToken');
     const tenant_id = localStorage.getItem('tenant_id');
 
     const response = await time_sheet_fetch_instance.get(`/timesheets/`, {
-      params: { 'week_number' : week_number ,'status' : status,'sort_by': sortBy,
+      params: { 'week_number' : week_number ,'resource_id' : resource_id, 'status' : status,'sort_by': sortBy,
         'sort_direction': sortDirection,'page':page}, 
       headers: {
         'Authorization': `Bearer ${token}`,
