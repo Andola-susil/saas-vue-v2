@@ -7,7 +7,8 @@
       </div>
     </div>
     <div class="mt-1 flow-root">
-     <CalenderView />
+     <!-- <CalenderView /> -->
+     <FullCalender/>
     </div>
   </div>
   
@@ -16,11 +17,13 @@
 <script>
 import { getAllTimeLogs } from '../utils/timelog.js';
 import CalenderView from '../components/common/CalenderView.vue';
+import FullCalender from '../components/common/FullCalender.vue';
 export default {
     name: 'Calender',
     path: '/calender',
   components: {
-    CalenderView
+    // CalenderView
+    FullCalender
   },
   mounted() {
    
