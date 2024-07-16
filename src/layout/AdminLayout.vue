@@ -197,7 +197,7 @@ const settings = ref([]);
 const userStore = useUserStore();
 // Navigation data
 const navigation_for_admin = [
-  { name: 'Dashboard', href: '/dashboard', icon: '/src/assets/images/dashboards.png', current: false },
+  { name: 'Dashboard', href: '/dashboard', icon: '/src/assets/images/dashboard11.png', current: false },
   { name: 'Time Sheet', href: '/time-sheet', icon:'/src/assets/images/time-management.png', current: false },
   { name: 'Time Tracker', href: '/time-tracker', icon: '/src/assets/images/timetrack.png', current: false },
   // { name: 'Past Time Sheet', href: '/past-time-sheet', icon: DocumentDuplicateIcon, current: false },
@@ -206,22 +206,22 @@ const navigation_for_admin = [
   { name: 'All TimeSheets', href: '/all-time-sheets', icon: '/src/assets/images/alltime-sheet.png', current: false },
 ]
 const navigation_for_resource = [
-  { name: 'Dashboard', href: '/dashboard', icon: '/src/assets/images/dashboards.png', current: false },
+  { name: 'Dashboard', href: '/dashboard', icon: '/src/assets/images/dashboard11.png', current: false },
   { name: 'Time Sheet', href: '/time-sheet', icon: '/src/assets/images/time-management.png', current: false },
   // { name: 'Past Time Sheet', href: '/past-time-sheet', icon: DocumentDuplicateIcon, current: false },
   { name: 'Reports', href: '/time-sheet-reports', icon: '/src/assets/images/report.png', current: false },
 ]
 const navigation_for_auditors = [
-  { name: 'Dashboard', href: '/dashboard', icon: '/src/assets/images/dashboards.png', current: false },
+  { name: 'Dashboard', href: '/dashboard', icon: '/src/assets/images/dashboard11.png', current: false },
   { name: 'Reports', href: '/time-sheet-reports', icon: '/src/assets/images/report.png', current: false },
 ]
 const settings_for_admin = [
   { id: 1, name: 'Resource management', href: '/resource', initial: '/src/assets/images/resource.png', current: false },
-  { id: 2, name: 'Company calendars', href: '/calender-view', initial: '/src/assets/images/calendar.png', current: false },
+  { id: 2, name: 'Holidays', href: '/calender-view', initial: '/src/assets/images/calendar.png', current: false },
   { id: 3, name: 'TimeSheet rules', href: '/time-sheet-rules', initial: '/src/assets/images/folder.png', current: false },
 ]
 const settings_resource = [
-  { id: 1, name: 'Company calendars', href: '/calender-view', initial: '/src/assets/images/calendar.png', current: false },
+  { id: 1, name: 'Holidays', href: '/calender-view', initial: '/src/assets/images/calendar.png', current: false },
   { id: 2, name: 'TimeSheet rules', href: '/time-sheet', initial: '/src/assets/images/folder.png', current: false },
 ]
 const userNavigation = [
