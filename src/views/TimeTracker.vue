@@ -71,6 +71,30 @@
       <PaginationTemplate :paginationData="meta_data" @page-changed="getTodayTimeLogs"/>
     </div>
      <Loader :loading="isLoading" />
+     <div v-if="showCreateProjectPopup">
+        <ModalPopup  
+          :open="isModalOpen"
+          :title="modalContent.title"
+          :description="modalContent.description"
+          :confirmLabel="modalContent.confirmLabel"
+          :cancelLabel="modalContent.cancelLabel"
+          :showInputField="modalContent.showInputField"
+          @closePopup="handleClosePopup"
+          @confirmPopup="createProject"
+        />
+      </div>
+      <div v-if="showCreateTaskPopup">
+        <ModalPopup  
+          :open="isModalOpen"
+          :title="modalContent.title"
+          :description="modalContent.description"
+          :confirmLabel="modalContent.confirmLabel"
+          :cancelLabel="modalContent.cancelLabel"
+          :showInputField="modalContent.showInputField"
+          @closePopup="handleClosePopup"
+          @confirmPopup="createTask"
+        />
+      </div>
 </div>
 
 
@@ -87,6 +111,7 @@ import SelectInput from '../components/common/SelectInput.vue';
 import { toast } from 'vue3-toastify';
 import Loader from '../components/Loader.vue';
 import PaginationTemplate from '../components/common/PaginationTemplate.vue';
+import ModalPopup from '../components/common/ModalPopup.vue';
 
 export default {
   components: {
@@ -95,7 +120,8 @@ export default {
     SelectInput,
     TimetrackerHeaderView,
     Loader,
-    PaginationTemplate
+    PaginationTemplate,
+    ModalPopup
   },
   data() {
     return {
@@ -127,6 +153,16 @@ export default {
         current_page: 1,
       },
       total_time_logged_for_current_date: '00:00:00',
+      showCreateProjectPopup: false,
+      showCreateTaskPopup: false,
+      showPopup : false,
+      modalContent: {
+        title : '',
+        description: '',
+        confirmLabel: '',
+        cancelLabel: '',
+        showInputField: false,
+      },
     };
   },
   computed: {
@@ -185,7 +221,7 @@ export default {
       localStorage.setItem('timerRecords', JSON.stringify(this.timerRecords));
     },
     fetchProjectList(){
-      // this.project_list.push({name: "<strong>Create new project</strong>", value: -1, id: "create_new"});
+      this.project_list.push({name: "Create new project", value: -1, id: "create_new"});
       const res = getProjectList().then((data) => {
         if(data.items.length > 0){
           data.items.forEach(pobj => {
@@ -197,18 +233,14 @@ export default {
 
       });
     },
-    getTaskList(){
+    fetchTaskList(){
+      this.task_list = [];
       try {
-        // this.task_list.push({ name: "<strong>Create new task</strong>", value: 0, id: "" });
+        this.task_list.push({ name: "Create new task", value: -1, id: "" });
         const data = geTaskList(this.project_id).then((data) => {
           if (data.items && data.items.length > 0) {
             data.items.forEach(task => {
               this.task_list.push({ name: task.task_title, value: task.id, id: task.id });
-            });
-            table.updateColumnDefinition("task_name", {
-              editorParams: {
-                values: taskList.value,
-              }
             });
           }
         })
@@ -220,12 +252,30 @@ export default {
       }
     },
     handleProjectSelect(project_info){
+      if(project_info.value == -1){
+        this.modalContent.title="Enter project name";
+        this.modalContent.description="";
+        this.modalContent.confirmLabel="Submit";
+        this.modalContent.cancelLabel="Cancel";
+        this.modalContent.showInputField = true;
+        this.showCreateProjectPopup = true;
+        this.openPopup();
+      }
       this.project_id = project_info.value;
       this.project_name = project_info.name;
-      this.getTaskList();
-      this.startTimer();
+      this.fetchTaskList();
+      // this.startTimer();
     },
     handleTaskSelect(task_info){
+      if(task_info.value == -1){
+          this.modalContent.title="Enter task name";
+          this.modalContent.description="";
+          this.modalContent.confirmLabel="Submit";
+          this.modalContent.cancelLabel="Cancel";
+          this.modalContent.showInputField = true;
+          this.showCreateTaskPopup = true;
+          this.openPopup();
+      }
       this.task_id = task_info.value;
       this.task_name = task_info.name;
     },
@@ -350,8 +400,8 @@ export default {
       });
     },
     deleteLogTime(id){
-        const res = deleteTimeLogs(id).then((data) => {
-        console.log(data);
+      const res = deleteTimeLogs(id).then((data) => {
+
       })
       .catch((error) => {
 
@@ -416,11 +466,57 @@ export default {
       this.project_name = '';
       this.task_name = '';
       this.duration = '00:00:00';
-    }
+    },
+    openPopup(){
+      this.isModalOpen = true;
+    },
+    createProject(input){
+        this.isLoading = true;
+        const res = createProject(input).then((data) => {
+          toast("Project created successfully!", {
+            "theme": "colored",
+            "type": "success",
+            "hideProgressBar": true,
+            "dangerouslyHTMLString": true
+          })
+          
+        })
+        .catch((error) => {
+
+        });
+        setTimeout(() => {
+          this.fetchProjectList();
+          this.project_info = { name: null, value: null, id: null };
+          this.isModalOpen = false;
+          this.isLoading = false;
+        }, 500);
+      
+      },
+      createTask(input){
+        this.isLoading = true;
+        const res = createTask(input, this.project_id).then((data) => {
+          toast("Task created successfully!", {
+            "theme": "colored",
+            "type": "success",
+            "hideProgressBar": true,
+            "dangerouslyHTMLString": true
+          })
+        })
+        .catch((error) => {
+
+        });
+        setTimeout(() => {
+          this.fetchTaskList();
+          this.task_info = { name: null, value: null, id: null };
+          this.isModalOpen = false;
+          this.isLoading = false;
+        }, 500);
+        
+      },
   },
   beforeDestroy() {
     // Ensure timer is stopped when component is destroyed
-    this.stopTimer();
+    // this.stopTimer();
   },
   
 };
