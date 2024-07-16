@@ -100,11 +100,9 @@
         let total = parseFloat(this.totalHrscustomMutator(null, data));
         row.update({ total: total });
         if(this.current_timesheet_id == null){
-          // console.log('Here'); return false;
           this.submitTimesheet();
         }else{
-          this.updateTimesheet();
-          // console.log('Here1231'); return false;
+          this.updateTimesheet(this.time_sheet_status);
         }
         
       },
@@ -175,23 +173,23 @@
         row.delete();
       },
       submitTimesheet() {
-        this.isLoading = true;
+        // this.isLoading = true;
         const allData = this.tabulator.getData();
-        const logEntry = this.generateLogEntry(allData);
+        const logEntry = this.generateLogEntry(allData,'draft');
         const response = submitTimeSheet(logEntry)
         .then(data => {
           this.tableData = data.lineitems;
-          
-          this.updateTable();
           this.getTimeSheetId();
-          this.isLoading = false;
+          this.updateTable();
+          
+          // this.isLoading = false;
 
-          toast("Timesheet submitted successfully!", {
-            "theme": "colored",
-            "type": "success",
-            "hideProgressBar": true,
-            "dangerouslyHTMLString": true
-          });
+          // toast("Timesheet submitted successfully!", {
+          //   "theme": "colored",
+          //   "type": "success",
+          //   "hideProgressBar": true,
+          //   "dangerouslyHTMLString": true
+          // });
         })
         .catch(error => {
           console.error('Error fetching timesheet details:', error);
@@ -207,22 +205,28 @@
         this.showTimeSheetSubmitConfirmation = true;
         this.openPopup();
       },
-      updateTimesheet(){
+      updateTimesheet(status = null){
+        if(status != 'draft'){
+          // this.isLoading = true;
+        }
         const allData = this.tabulator.getData();
-        const logEntry = this.generateLogEntry(allData);
+        const logEntry = this.generateLogEntry(allData,status);
         const response = UpdateTimeSheet(this.current_timesheet_id,logEntry)
         .then(data => {
           this.tableData = data.lineitems;
           
           this.updateTable();
           this.getTimeSheetId();
-
-          toast("Timesheet submitted successfully!", {
-            "theme": "colored",
-            "type": "success",
-            "hideProgressBar": true,
-            "dangerouslyHTMLString": true
-          });
+          // this.isModalOpen = false;
+          if(status != 'draft'){
+            this.isLoading = false;
+            toast("Timesheet submitted successfully!", {
+              "theme": "colored",
+              "type": "success",
+              "hideProgressBar": true,
+              "dangerouslyHTMLString": true
+            });
+          }
         })
         .catch(error => {
           console.error('Error fetching timesheet details:', error);
@@ -240,7 +244,7 @@
         var seconds = hours * minutesPerHour * secondsPerMinute;
         return seconds;
       },
-      generateLogEntry(allData) {
+      generateLogEntry(allData, status) {
         const lineItems = [];
         allData.forEach(data => {
           const lineitem = {
@@ -272,7 +276,7 @@
             start_date: this.start_of_week,
             end_date: this.end_of_week,
             tenant_id: tenant_id,
-            status: "draft",
+            status: status,
             // rejection_reason: "",
             lineitems: lineItems,
           };
@@ -417,9 +421,12 @@
                   total: this.getSecondsToHour(obj.total),
                 });
             });
+          }else{
+            this.time_sheet_status = '';
           }
           this.updateTable();
           this.isLoading = false;
+          
         })
         .catch((error) => {
 
@@ -463,8 +470,8 @@
               ];
               this.current_timesheet_id = null;
               this.disable_table = false;
-              this.updateTable();
               this.show_submit_btn = true;
+              this.updateTable();
               this.isLoading = false;
             }
             
@@ -501,7 +508,7 @@
           validationMode:"blocking",
           columns: this.table_columns, //Set columns
         });
-        // this.disableTableIfDataExists();
+        this.disableTableIfDataExists();
       },
       formatDate(dateString) {
         const date = new Date(dateString);
@@ -556,6 +563,7 @@
                   this.handleSelectedProject();
                 }
                 if(cellValue != null && cellValue != ''){
+                  // this.task_list = [];
                   this.getTaskList();
                 }
                 
@@ -640,13 +648,13 @@
         return `${formattedHours}:${formattedMinutes}`;
       },
       disableTableIfDataExists() {
-        if (this.disable_table) {
+        if (this.disable_table && this.time_sheet_status != 'draft' && this.time_sheet_status != '') {
           document.getElementById("timesheet-table").classList.add("disabled"); // Optional: Add disabled class for visual indication
         } else {
           document.getElementById("timesheet-table").classList.remove("disabled"); // Remove disabled class
         }
       },
-      getProjectList(){
+      fetchProjectList(){
         this.project_list.push({label: "<strong>Create new project</strong>", value: -1, id: "create_new"});
         const res = getProjectList().then((data) => {
           if(data.items.length > 0){
@@ -660,20 +668,25 @@
         });
       },
       getTaskList(){
+        console.log(this.project_id);
         try {
-          // this.task_list = [];
-          this.task_list.push({ label: "<strong>Create new task</strong>", value: -1, id: "" });
           const data = geTaskList(this.project_id).then((data) => {
+            // this.task_list = [];
             if (data.items && data.items.length > 0) {
+              this.task_list.push({ label: "<strong>Create new task</strong>", value: -1, id: "" });
               data.items.forEach(task => {
                 this.task_list.push({ label: task.task_title, value: task.id, id: task.id });
               });
               table.updateColumnDefinition("task_name", {
                 editorParams: {
-                  values: taskList.value,
+                  values: task_list.label,
                 }
               });
+            }else{
+              this.task_list.push({ label: "<strong>Create new task</strong>", value: -1, id: "" });
             }
+            console.log(this.task_list);
+            this.updateTable();
           })
           .catch((error) => {
 
@@ -710,7 +723,7 @@
             "hideProgressBar": true,
             "dangerouslyHTMLString": true
           })
-          this.getProjectList();
+          this.fetchProjectList();
         })
         .catch((error) => {
 
@@ -728,7 +741,7 @@
             "hideProgressBar": true,
             "dangerouslyHTMLString": true
           })
-          
+          // this.task_list = [];
           this.getTaskList();
         })
         .catch((error) => {
@@ -738,7 +751,6 @@
         this.isModalOpen = false;
       },
       reviewLineItems(rowData){
-        console.log(rowData);
         const lineItemsInfo = {
           "timesheet_id": rowData.id,
           "project_id": rowData.project_id,
@@ -760,7 +772,7 @@
             "hideProgressBar": true,
             "dangerouslyHTMLString": true
           })
-          
+          // this.task_list = [];
           this.getTaskList();
         })
         .catch((error) => {
@@ -781,7 +793,7 @@
           this.display_approve_btns = false;
         }
       this.createTableColumns();
-      this.disableTableIfDataExists();
+      // this.disableTableIfDataExists();
       this.tabulator = new Tabulator(this.$refs.table, {
         data: this.tableData, //link data to table
         height:"100%",
@@ -795,7 +807,7 @@
       this.table_columns = this.columns;
       this.isLoading = false;
       this.getTimeSheetId();
-      this.getProjectList();
+      this.fetchProjectList();
     },
     computed: {
       
@@ -806,7 +818,7 @@
     <div>
       
       <div class="sm:flex-auto py-2">
-        <h1 class="text-base font-semibold leading-6 text-gray-900">TimeSheet</h1>
+        <h1 class="text-base font-semibold leading-6 text-gray-900">Timesheet</h1>
       </div>
       <div class="flex">
         <div class="w-4/5">
@@ -816,7 +828,14 @@
             role="Software Developer" 
           />
         </div>
-        <div class="flex float-right w-1/5  justify-center"><div class="text-center py-4 rounded-md bg-indigo-50 px-2.5 py-1.5 text-sm font-semibold text-black w-full shadow-sm hover:bg-indigo-100">Status: {{time_sheet_status}}</div></div>
+        <div class="flex float-right w-1/5 justify-end">
+          <div class="text-center py-4 ">
+            <div v-if="time_sheet_status == 'draft'" class="flex rounded-md bg-stone-600 px-2.5 py-1.5 text-sm font-semibold text-white w-full shadow-sm"><img src="/src/assets/images/firstdraft.svg" alt="" class="h-5 w-5"><span class="pl-2">In draft</span></div>
+            <div v-if="time_sheet_status == 'pending'" class="flex rounded-md bg-orange-600	 px-2.5 py-1.5 text-sm font-semibold text-white w-full shadow-sm"><img src="/src/assets/images/clock-nine.svg" alt="" class="h-5 w-5"><span class="pl-2">Pending</span></div>
+            <div v-if="time_sheet_status == 'approved'" class="flex rounded-md bg-green-600 px-2.5 py-1.5 text-sm font-semibold text-white w-full shadow-sm"><img src="/src/assets/images/circle-check.svg" alt="" class="h-5 w-5"><span class="pl-2">Approved</span></div>
+            <div v-if="time_sheet_status == 'rejected'" class="flex rounded-md bg-red-600 px-2.5 py-1.5 text-sm font-semibold text-white w-full shadow-sm"><img src="/src/assets/images/circle-minus-white.svg" alt="" class="h-5 w-5"><span class="pl-2">Rejected</span></div>
+          </div>
+        </div>
       </div>
       <nav class="flex float-right">
         <div class="hidden py-2 md:flex md:items-center">
@@ -838,14 +857,14 @@
       <div class="w-full" id="timesheet-table" ref="table"></div>
       <Loader :loading="isLoading" />
       <!-- <div class="flex float-right" v-if="timeSheetId == null"> -->
-        <div class="flex float-right" v-if="timeSheetId == null">
-          <div class="pl-4 pr-3" v-if="show_submit_btn == true || time_sheet_status == 'draft'">
-            <div>
-              <button type="button" class="rounded-md bg-indigo-500 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" @click="showConfirmationPopup">Submit</button>
+        <div class="flex float-right justify-end w-2/4 py-6" v-if="timeSheetId == null">
+          <div class="pl-4 pr-3 w-2/5" v-if="show_submit_btn == true || time_sheet_status == 'draft'">
+            <div class="">
+              <button type="button" class="h-9 w-full rounded-md bg-indigo-500 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" @click="showConfirmationPopup">Submit</button>
             </div>
           </div>
           <div class="" v-if="show_submit_btn == true || time_sheet_status == 'draft'">
-            <div class="pl-4 pr-3">
+            <div class="pl-4">
               <button type="button" class="rounded-full bg-indigo-600 p-1.5 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" @click="addRowToTable">
                 <img src="/src/assets/images/plus-large.svg" alt="" class="h-5 w-5">
               </button>
@@ -900,7 +919,7 @@
           :cancelLabel="modalContent.cancelLabel"
           :showInputField="modalContent.showInputField"
           @closePopup="handleClosePopup"
-          @confirmPopup="createTask"
+          @confirmPopup="updateTimesheet('pending')"
         />
       </div>
     </div>
