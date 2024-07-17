@@ -214,8 +214,6 @@
         const response = UpdateTimeSheet(this.current_timesheet_id,logEntry)
         .then(data => {
           this.tableData = data.lineitems;
-          
-          this.updateTable();
           this.getTimeSheetId();
           // this.isModalOpen = false;
           if(status != 'draft'){
@@ -523,7 +521,23 @@
         this.getWeekInfo(input);
         this.getTimeSheetId();
         this.createTableColumns();
-        this.updateTable();
+      },
+      getSelectedTask(taskId, index) {
+        if(index){
+          const selectedTask = this.task_list.find(p => p.value === taskId);
+          console.log(selectedTask, 'index');
+          if (selectedTask) {
+            console.log(this.tableData[parseInt(index)]);
+            // this.tableData[parseInt(index)].task_name = selectedTask.label;
+          }
+          console.log("Row Index:", this.tableData);
+          return selectedTask;
+        }
+        
+
+        // console.log(index);
+        // console.log(this.task_list.find(p => p.value === taskId));
+        // return this.task_list.find(p => p.value === taskId);
       },
       createTableColumns(){
         if(this.startDateOfWeek != null){
@@ -593,8 +607,10 @@
                 if (cellValue === -1) {
                   this.handleSelectedTask();
                 }
-                const project = this.task_list.find(p => p.value === cellValue);
-                return project ? project.label : cellValue;
+                const rowIndex = cell.getRow().getPosition();
+                const selectedProject = this.getSelectedTask(cellValue, rowIndex);
+
+                return selectedProject ? selectedProject.label : cellValue;
               },
               headerSort: false,
               resizable: false,
@@ -668,7 +684,6 @@
         });
       },
       getTaskList(){
-        console.log(this.project_id);
         try {
           const data = geTaskList(this.project_id).then((data) => {
             // this.task_list = [];
@@ -685,8 +700,7 @@
             }else{
               this.task_list.push({ label: "<strong>Create new task</strong>", value: -1, id: "" });
             }
-            console.log(this.task_list);
-            this.updateTable();
+            // this.updateTable();
           })
           .catch((error) => {
 

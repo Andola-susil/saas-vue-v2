@@ -63,7 +63,7 @@
       <Header :title="'Today(' + new Date().toISOString().slice(0, 10) + ')'" :totalLabel="'Total'" :totalTime="total_time_logged_for_current_date" />
       <!-- <h2 class="font-medium py-6 pl-4">Today({{new Date().toISOString().slice(0, 10)}})</h2> -->
       <TimetrackerHeaderView />
-      <div v-for="(record, index) in timerRecords" :key="index">
+      <div v-for="(record, index) in timerRecords" :key="index" class="h-1/4">
         <div class="bg-card p-4 rounded-lg shadow-md">
           <TaskInput @editTimeLog="editLoggedTime" @deleteTimeLog="deleteLogTime" :duration="record.total_time" :time_log_date="record.time_log_date" :is_billable="record.is_billable" :task_id="record.task_id" :project_id="record.project_id" :log_id="record.id" :project="record.project_name" :elapsedTime="record.total_time" :task="record.task_name" :startTime="record.startTime" :endTime="record.endTime" />
         </div>
@@ -511,6 +511,18 @@ export default {
           this.isModalOpen = false;
           this.isLoading = false;
         }, 500);
+        
+      },
+      handleClosePopup(){
+        this.isModalOpen = false;
+        if(this.showCreateTaskPopup == true){
+          this.task_info = { name: null, value: null, id: null };
+          this.showCreateTaskPopup = false;
+        }
+        if(this.showCreateProjectPopup == true){
+          this.project_info = { name: null, value: null, id: null };
+          this.showCreateProjectPopup = false;
+        }
         
       },
   },

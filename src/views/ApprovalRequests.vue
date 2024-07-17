@@ -142,7 +142,7 @@ export default {
   },
   data() {
     return {
-      sortBy: '',
+      sortBy: 'id',
       sortDirection: 'asc',
       status_list :[
         { id: 'pending', name: 'Pending' },
