@@ -78,7 +78,7 @@ import WeekFilter from '../components/common/WeekFilter.vue';
 import Loader from '../components/Loader.vue';
 import SelectInput from '../components/common/SelectInput.vue';
 import moment from 'moment';
-import { getResourceList } from '../utils/resource.js' ;
+import { getResourceInfo } from '../utils/resource.js' ;
 
 export default {
     name: 'AllTimeSheets',
@@ -189,15 +189,25 @@ export default {
       this.getTimeLogs(this.paginationData.current_page);
     },
     getSelectedUserValue(val){
-      this.resource_id = val;
+      this.resource_id = val.value;
       this.getTimeLogs(this.paginationData.current_page);
     },
     fetchUserRoles(){
       try {
-        const response = getResourceList(); 
-        if (response.items && response.items.length > 0) {
-          this.user_list = response.items; 
-        }
+        const response = getResourceInfo().then((data) => {
+          var users = [];
+          data.items.forEach(obj => {
+            users.push({
+              name : obj.invite_first_name + ' ' + obj.invite_last_name,
+              value : obj.id
+            });
+          });
+          this.user_list = users;
+        })
+        .catch((error) => {
+          console.error('Error fetching user roles:', error);
+        }); 
+        
       } catch (error) {
         console.error('Error fetching user roles:', error);
       }
