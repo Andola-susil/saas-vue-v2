@@ -57,7 +57,7 @@ export const getResourceInfo = async (page) => {
     const tenant_id = localStorage.getItem('tenant_id');
 
     const response = await instance_type.get( '/user_invitations/',{
-      params: { page, size: 50, get_all: false },
+      params: { page, size: 10, get_all: false },
       headers: {
         'Authorization': `Bearer ${token}`,
         'x-tenant-id': tenant_id,

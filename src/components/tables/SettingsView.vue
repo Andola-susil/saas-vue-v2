@@ -83,6 +83,7 @@
                     </div>
                   </li>
                 </ul>
+                <PaginationTemplate :paginationData="meta_data" @page-changed="fetchHolidays"/>
               </div>
               <div class="col-span-full">
                 <div class="flex h-6 items-center">
@@ -141,15 +142,24 @@ import Loader from '../Loader.vue';
 import { ref } from 'vue';
 import { toast } from 'vue3-toastify';
 import { addHolidayList, getHolidayList, addWorkHourList, getWorkingHourList } from '../../utils/setting.js';
+import PaginationTemplate from '../common/PaginationTemplate.vue';
+
 
 export default {
   name: 'Settings', 
   components: {
     Loader, 
+    PaginationTemplate,
   },
 
   data() {
     return {
+      meta_data : [],
+      paginationData: {
+        total_items: 0,
+        items_per_page: 10,
+        current_page: 1,
+      },
       selectedTab: 'Working Hours',
       tabs: [
         { name: 'Working Hours', current: true },
@@ -173,11 +183,14 @@ export default {
       this.selectedTab = tab.name;
     },
 
-    async fetchHolidays() {
+    async fetchHolidays(page) {
+      this.paginationData.current_page = page;
       try {
-        const response = await getHolidayList();
+        const response = await getHolidayList(page);
         console.warn(response);
-        this.holidays = response.items; // assuming response.data contains the holiday list
+        this.holidays = response.items;
+        this.meta_data = response.meta;
+       
       } catch (error) {
         console.error('Error fetching holidays:', error);
       } finally {
@@ -276,6 +289,7 @@ export default {
     this.isLoading = false;
     this.fetchHolidays();
     this.fetchWorkingHours();
+    this.fetchHolidays(this.paginationData.current_page);
   },
 };
 </script>

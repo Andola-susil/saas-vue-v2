@@ -41,17 +41,18 @@
                                         {{ new Date(person.created_at).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) }}
                                     </td>
 
-                                    <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                    <!-- <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                                         <input
                                             type="checkbox"
                                             class="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out"
                                             :disabled="person.invite_status !== 'accepted'"
                                             @change="handleCheckboxChange(person)"
                                         >
-                                    </td>
+                                    </td> -->
                                 </tr>
                     </tbody>
                 </table>
+                <PaginationTemplate :paginationData="meta_data" @page-changed="getAllResources"/>
             </div>
             </div>
         </div>
@@ -65,15 +66,18 @@
   import { getResourceInfo } from '../../utils/resource.js' ;
   import { getActiveUser } from '../../utils/tenants.js' ;
   import { ref } from 'vue'; 
+  import PaginationTemplate from '../common/PaginationTemplate.vue';
   
   export default {
     name: 'Resource',
     
     components: {
-        Loader,
+        PaginationTemplate,
+        Loader, 
     },
     data() {
         return {
+            meta_data : [],
             people: [],
             isLoading: true,
             paginationData: {
@@ -106,6 +110,7 @@
                     invited_by: item.invited_by,
                     id: item.id,
                 }));
+                this.meta_data = response.meta;
                 this.isLoading = false;
             } catch (error) {
                 this.error = 'An error occurred. Please try again.';

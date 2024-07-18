@@ -29,17 +29,31 @@ export const addHolidayList = async (holidayData) => {
       throw error;
     }
   };
-export const getHolidayList = async ( ) => {
+export const getHolidayList = async ( page) => {
     try {
       const token = localStorage.getItem('accessToken');
       const tenant_id = localStorage.getItem('tenant_id');
   
       const response = await instance.get( 'company_holidays/',{
-        params: {
-            page: 1,
-            size: 50,
-            get_all: false
-          },
+        params: { page, size: 10, get_all: false },
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'x-tenant-id': tenant_id,
+          'Content-Type': 'application/json',
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+export const holidayList = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const tenant_id = localStorage.getItem('tenant_id');
+  
+      const response = await instance.get( 'company_holidays/',{
+        params: { page : 1, size: 50, get_all: false },
         headers: {
           'Authorization': `Bearer ${token}`,
           'x-tenant-id': tenant_id,
