@@ -43,16 +43,22 @@
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 bg-white">
-                  <tr v-for="(val, key) in time_log" :key="key">
+                  <tr v-if="time_log.length > 0" v-for="(val, key) in time_log" :key="key">
                     <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{ key+1 }}</td>
                     <td @click="viewTimeSheetDetails(val)" class="cursor-pointer underline underline-offset-1 whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.resource_name }}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">#{{ val.week_number }}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.start_date }}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.end_date }}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      <img v-if="val.status == 'pending'" src="/src/assets/images/pending.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Pending">
-                      <img v-else-if="val.status == 'rejected'" src="/src/assets/images/ban.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Rejected">
-                      <img v-else src="/src/assets/images/circle-check.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Approved">
+                      <img v-if="val.status === 'pending'" src="/src/assets/images/pending.svg" alt="Pending" class="h-5 w-5" v-b-tooltip.hover title="Pending">
+                      <img v-else-if="val.status === 'rejected'" src="/src/assets/images/ban.svg" alt="Rejected" class="h-5 w-5" v-b-tooltip.hover title="Rejected">
+                      <img v-else src="/src/assets/images/circle-check-fill.svg" alt="Approved" class="h-5 w-5" v-b-tooltip.hover title="Approved">
+                    </td>
+                  </tr>
+                  <tr v-if="time_log.length === 0">
+                    <td colspan="6" class="whitespace-nowrap py-4 pl-4 pr-3 text-center text-sm text-gray-500">
+                      <img src="/src/assets/images/no-data.avif" alt="No data found!" class="h-20 mx-auto mb-2">
+                      <span>No data found!</span>
                     </td>
                   </tr>
                 </tbody>
@@ -79,6 +85,7 @@ import Loader from '../components/Loader.vue';
 import SelectInput from '../components/common/SelectInput.vue';
 import moment from 'moment';
 import { getResourceInfo } from '../utils/resource.js' ;
+import { timeSheetInfo } from '../stores/timeSheetInfo.js';
 
 export default {
     name: 'AllTimeSheets',
@@ -95,6 +102,9 @@ export default {
     this.getWeekInfo(currentDate);
     this.getTimeLogs(this.paginationData.current_page);
     this.fetchUserRoles();
+    const mainStore = timeSheetInfo();
+    console.log(mainStore,4545);
+    mainStore.updateCurrentPage('all_timesheet');
   },
   created() {
     

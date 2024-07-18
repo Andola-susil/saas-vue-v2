@@ -17,6 +17,7 @@
   import { getProjectList,createProject } from '../utils/project.js';
   import { geTaskList ,createTask} from '../utils/task.js';
   import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
+  import { timeSheetInfo } from '../stores/timeSheetInfo.js';
 
   export default {
     data() {
@@ -76,6 +77,14 @@
         current_timesheet_id: null,
         time_sheet_status: '',
         showTimeSheetSubmitConfirmation: false,
+        show_approval_btns: false,
+        disable_date_range: false,
+        state_info: {},
+        isEditable: false,
+        user_name: '',
+        resource_id: '',
+        user_role: '',
+        state : [],
       }
     },
     props: {
@@ -289,7 +298,7 @@
             // Find the image element for approve button and update src attribute
             imageElements.forEach(img => {
                 if (img.dataset.action === "approve") {
-                    img.src = "/src/assets/images/circle-check.svg";
+                    img.src = "/src/assets/images/circle-check-fill.svg";
                 }else{
                   img.src = "/src/assets/images/circle-x.svg";
                 }
@@ -323,7 +332,7 @@
             imgElements.forEach(img => {
               const actionType = img.dataset.action;
               if (actionType === "approve") {
-                img.src = "/src/assets/images/circle-check.svg";
+                img.src = "/src/assets/images/circle-check-fill.svg";
               } else if (actionType === "reject") {
                 img.src = "/src/assets/images/circle-x.svg";
               }
@@ -469,7 +478,7 @@
               this.current_timesheet_id = null;
               this.disable_table = false;
               this.show_submit_btn = true;
-              this.updateTable();
+              // this.updateTable();
               this.isLoading = false;
             }
             
@@ -525,12 +534,10 @@
       getSelectedTask(taskId, index) {
         if(index){
           const selectedTask = this.task_list.find(p => p.value === taskId);
-          console.log(selectedTask, 'index');
           if (selectedTask) {
-            console.log(this.tableData[parseInt(index)]);
+            // console.log(this.tableData[parseInt(index)]);
             // this.tableData[parseInt(index)].task_name = selectedTask.label;
           }
-          console.log("Row Index:", this.tableData);
           return selectedTask;
         }
         
@@ -576,30 +583,38 @@
                 if (cellValue === -1) {
                   this.handleSelectedProject();
                 }
-                if(cellValue != null && cellValue != ''){
-                  // this.task_list = [];
+                if (cellValue != null && cellValue != '') {
                   this.getTaskList();
                 }
                 
                 const project = this.project_list.find(p => p.value === cellValue);
-                return project ? project.label : cellValue;
+                const projectLabel = project ? project.label : cellValue;
+
+                // Set the title attribute for the cell to display full name on hover
+                onRendered(() => {
+                  const cellElement = cell.getElement();
+                  cellElement.setAttribute('title', projectLabel);
+                });
+
+                return projectLabel;
               },
               headerSort: false,
               resizable: false,
+              editable: this.isEditable,
             },       
             {
               title: "Task",
               field: "task_id",
               width: '16%',
               editor: "list",
-              verticalNavigation:"hybrid",
+              verticalNavigation: "hybrid",
               editorParams: {
                 values: this.task_list,
                 valuesLookup: "active",
                 valuesLookupField: "color",
                 clearable: true,
                 itemFormatter: function(label, value, item, element) {
-                  return  label;
+                  return label;
                 },
               },
               formatter: (cell, formatterParams, onRendered) => {
@@ -608,27 +623,34 @@
                   this.handleSelectedTask();
                 }
                 const rowIndex = cell.getRow().getPosition();
-                const selectedProject = this.getSelectedTask(cellValue, rowIndex);
+                const selectedTask = this.getSelectedTask(cellValue, rowIndex);
 
-                return selectedProject ? selectedProject.label : cellValue;
+                // Set the title attribute for the cell to display full task name on hover
+                onRendered(() => {
+                  const cellElement = cell.getElement();
+                  cellElement.setAttribute('title', selectedTask ? selectedTask.label : cellValue);
+                });
+
+                return selectedTask ? selectedTask.label : cellValue;
               },
               headerSort: false,
               resizable: false,
+              editable: this.isEditable,
             },
-            {title:`MON<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"monday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"]},
-            {title:`TUE<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"tuesday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"]},
-            {title:`WED<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"wednesday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"]},
-            {title:`THU<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"thursday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"]},
-            {title:`FRI<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"friday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"]},
-            {title:`SAT<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"saturday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"]},
-            {title:`SUN<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })})`, field:"sunday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9"]},
-            {title:"Total", field:"total", hozAlign:"center", width:'8%', headerSort:false, bottomCalc:"sum", bottomCalcParams:{precision:2}, mutator: this.totalHrscustomMutator, formatter: this.totalHoursFormatter },
+            {title:`MON<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' })})`, field:"monday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"],editable: this.isEditable},
+            {title:`TUE<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' })})`, field:"tuesday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"],editable: this.isEditable},
+            {title:`WED<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' })})`, field:"wednesday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"],editable: this.isEditable},
+            {title:`THU<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' })})`, field:"thursday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"],editable: this.isEditable},
+            {title:`FRI<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' })})`, field:"friday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"],editable: this.isEditable},
+            {title:`SAT<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' })})`, field:"saturday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["number","required", "min:0","max:9"],editable: this.isEditable},
+            {title:`SUN<br>(${new Date(startOfWeek.setDate(startOfWeek.getDate() + 1)).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' })})`, field:"sunday", hozAlign:"center", width:'8%', editor:"number", headerSort:false, bottomCalc: "sum", bottomCalcFormatter: (cell) => cell.getValue().toFixed(2), cellEdited: this.cellEditedCallback, validator:["required", "min:0","max:9"],editable: this.isEditable},
+            {title:"Total", field:"total", hozAlign:"center", width:'8%', headerSort:false, bottomCalc:"sum", bottomCalcParams:{precision:2}, mutator: this.totalHrscustomMutator, formatter: this.totalHoursFormatter,editable: this.isEditable },
             
         ];
         if(this.timeSheetId){
-          this.columns.push({title:"Action", field:"action", hozAlign:"center", formatter:this.approvalActions, width:'10%', headerSort:false, cellClick:this.reviewTimeSheet,resizable: false});
+          this.columns.push({title:"Action", field:"action", hozAlign:"center", formatter:this.approvalActions, width:'10%', headerSort:false, cellClick:this.reviewTimeSheet,resizable: false,editable: this.isEditable});
         }else{
-          this.columns.push({title:"", field:"action", hozAlign:"center", formatter:this.deleteIcon, width:'5%', headerSort:false, cellClick:this.removeBottomRow,resizable: false});
+          this.columns.push({title:"", field:"action", hozAlign:"center", formatter:this.deleteIcon, width:'5%', headerSort:false, cellClick:this.removeBottomRow,resizable: false,editable: this.isEditable});
         }
         this.table_columns = this.columns;
       },
@@ -664,10 +686,10 @@
         return `${formattedHours}:${formattedMinutes}`;
       },
       disableTableIfDataExists() {
-        if (this.disable_table && this.time_sheet_status != 'draft' && this.time_sheet_status != '') {
-          document.getElementById("timesheet-table").classList.add("disabled"); // Optional: Add disabled class for visual indication
+        if ((this.time_sheet_status != 'draft' && this.time_sheet_status != '') || this.state_info.current_page == "all_timesheet" && this.time_sheet_status == 'approved') {
+          this.isEditable = false;
         } else {
-          document.getElementById("timesheet-table").classList.remove("disabled"); // Remove disabled class
+          this.isEditable = true;
         }
       },
       fetchProjectList(){
@@ -798,6 +820,23 @@
       const currentDate = new Date();
       this.getWeekInfo(currentDate);
       this.isLoading = true;
+      const mainStore = timeSheetInfo();
+      this.state = mainStore;
+      this.state_info = mainStore.$state;
+      this.user_name = localStorage.getItem('user_name');
+      this.resource_id = localStorage.getItem('resource_id');
+      this.user_role = localStorage.getItem('user_type');
+      console.log(mainStore.$state.current_page, 'mainStore');
+      if(mainStore.$state.current_page == "all_timesheet"){
+        this.show_approval_btns = false;
+        this.disable_date_range = true;
+      }else if(mainStore.$state.current_page == "approval_requests"){
+        this.show_approval_btns = true;
+        this.disable_date_range = false;
+      }else{
+        this.show_approval_btns = false;
+        this.disable_date_range = false;
+      }
       var route = useRoute();
         if(route.query.id){
           this.timeSheetId = route.query.id;
@@ -825,7 +864,11 @@
     },
     computed: {
       
-    }
+    },
+    beforeDestroy() {
+      console.log('Here');
+    this.state.updateCurrentPage('');
+  },
   }
 </script>
   <template>
@@ -837,9 +880,9 @@
       <div class="flex">
         <div class="w-4/5">
           <UserInfo 
-            name="Tom Cook"
-            id="56756"
-            role="Software Developer" 
+            :name="user_name"
+            :id="resource_id"
+            :role="user_role" 
           />
         </div>
         <div class="flex float-right w-1/5 justify-end">
@@ -853,17 +896,17 @@
       </div>
       <nav class="flex float-right">
         <div class="hidden py-2 md:flex md:items-center">
-          <Menu as="div" class="relative" v-if="display_approve_btns">
+          <Menu as="div" class="relative" v-if="show_approval_btns">
             <button @click="approveTimeSheet()" type="button" class="inline-flex items-center gap-x-1.5 rounded-md bg-green-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
               Approve TimeSheet
             </button>
           </Menu>
-          <Menu as="div" class="relative pl-3.5" v-if="display_approve_btns">
+          <Menu as="div" class="relative pl-3.5" v-if="show_approval_btns">
             <button @click="rejectTimeSheet()" type="button" class="inline-flex items-center gap-x-1.5 rounded-md bg-red-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
               Reject TimeSheet
             </button>
           </Menu>
-          <Menu as="div" class="relative">
+          <Menu as="div" class="relative" :class="disable_date_range == true ? 'disabled' : ''">
             <WeekFilter @handleWeekChange=handleWeekChange />
           </Menu>
         </div>
@@ -896,6 +939,8 @@
           :confirmLabel="modalContent.confirmLabel"
           :cancelLabel="modalContent.cancelLabel"
           :showInputField="modalContent.showInputField"
+          :iconUrl="'/src/assets/images/circle-check-blank.svg'"
+          :colorCode="'bg-green-100'"
           @closePopup="handleClosePopup"
           @confirmPopup="handleConfirmation"
         />
@@ -932,6 +977,8 @@
           :confirmLabel="modalContent.confirmLabel"
           :cancelLabel="modalContent.cancelLabel"
           :showInputField="modalContent.showInputField"
+          :iconUrl="'/src/assets/images/circle-check-blank.svg'"
+          :colorCode="'bg-green-100'"
           @closePopup="handleClosePopup"
           @confirmPopup="updateTimesheet('pending')"
         />

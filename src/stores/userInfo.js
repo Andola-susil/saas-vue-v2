@@ -1,62 +1,40 @@
-// stores/user.js
-import { defineStore, acceptHMRUpdate } from 'pinia';
+// import { defineStore } from 'pinia';
 
-/**
- * Simulate a login
- */
-function apiLogin(a, p) {
-  if (a === 'ed' && p === 'ed') return Promise.resolve({ isAdmin: true });
-  if (p === 'ed') return Promise.resolve({ isAdmin: false });
-  return Promise.reject(new Error('invalid credentials'));
-}
-
-export const useUserStore = defineStore('user', {
-  state: () => ({
-    'accessToken': '',
-    'layout': '',
-    'is_admin': false,
-    'is_approver': false,
-    'is_resource': false,
-  }),
-
-  actions: {
-    logout() {
-      this.$patch({
-        name: '',
-        isAdmin: false,
-      });
-    },
-
-    /**
-     * Attempt to login a user
-     */
-    async login(user, password) {
-        console.log('Here35');
-      try {
-        const userData = await apiLogin(user, password);
-        this.$patch({
-          name: user,
-          ...userData,
-        });
-      } catch (error) {
-        throw new Error('Invalid credentials');
-      }
-    },
-
-    /**
-     * Set user data
-     */
-    setUser(data) {
-      this.state.accessToken = data[0].accessToken;
-      this.state.layout = data[0].layout;
-      this.state.is_admin = data[0].is_admin;
-      this.state.is_approver = data[0].is_approver;
-      this.state.is_resource = data[0].is_resource;
-      console.log(this.state, 'gfgfdf');
-    },
-  },
-});
-
-if (import.meta.hot) {
-  import.meta.hot.accept(acceptHMRUpdate(useUserStore, import.meta.hot));
-}
+// export const userInfo = defineStore('main', {
+//   state: () => ({
+//     count: 0,
+//     current_page: '',
+//     name: 'Pinia Store',
+//     accessToken: '',
+//     layout: '',
+//     is_admin: false,
+//     is_approver: false,
+//     is_resource: false,
+//     tenant_id: '',
+//     user_name: '',
+//     resource_id : '',
+//     profile_image : '',
+//     user_type : '',
+//   }),
+//   getters: {
+//     doubleCount: (state) => state.count * 2,
+//   },
+//   actions: {
+//     increment() {
+//       this.count++;
+//     },
+//     updateUserInfo(data){
+//       // console.log(data);
+//       this.accessToken = data.accessToken;
+//       this.layout = data.layout;
+//       this.is_admin = data.is_admin;
+//       this.is_approver = data.is_approver;
+//       this.is_resource = data.is_resource;
+//       this.tenant_id = data.tenant_id;
+//       this.user_name = data.user_name;
+//       this.resource_id = data.resource_id;
+//       this.profile_image = data.profile_image;
+//       this.user_type = data.user_type;
+//     },
+//   },
+// });

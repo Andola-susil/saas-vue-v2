@@ -30,8 +30,8 @@
           </div>
         </div>
       </div>
-      <div class="w-2/6 pl-6 pt-3.5 ">
-        <!-- <SelectInput :options="status_list" placeholder="Select status" :initialSelected="initialSelected" @handleSelector="getSelectedValue"/> -->
+      <div class="w-2/6 pl-6 pt-3.5 disabled">
+        <SelectInput :options="status_list" placeholder="Select status" :initialSelected="initialSelected" @handleSelector="getSelectedValue"/>
       </div>
       <div class="w-2/5 pt-2 pr-2">
         <WeekFilter @handleWeekChange=handleWeekChange />
@@ -72,7 +72,7 @@
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 bg-white">
-                  <tr v-for="(val, key) in time_log" :key="key">
+                  <tr v-if="time_log.length > 0" v-for="(val, key) in time_log" :key="key">
                     <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                       <input type="checkbox" class="cursor-pointer" v-model="selectedRows" :value="val.id" @click="selectTimeSheet(val.id)">
                     </td>
@@ -86,6 +86,12 @@
                       <img v-if="val.status == 'pending'" src="/src/assets/images/pending.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Pending">
                       <img v-else-if="val.status == 'reject'" src="/src/assets/images/ban.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Rejected">
                       <img v-else src="/src/assets/images/circle-check.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Approved">
+                    </td>
+                  </tr>
+                    <tr v-if="time_log.length === 0">
+                    <td colspan="8" class="whitespace-nowrap py-4 pl-4 pr-3 text-center text-sm text-gray-500">
+                      <img src="/src/assets/images/no-data.avif" alt="No data found!" class="h-20 mx-auto mb-2">
+                      <span>No data found!</span>
                     </td>
                   </tr>
                 </tbody>
@@ -120,6 +126,7 @@ import Loader from '../components/Loader.vue';
 import SelectInput from '../components/common/SelectInput.vue';
 import WeekFilter from '../components/common/WeekFilter.vue';
 import moment from 'moment';
+import { timeSheetInfo } from '../stores/timeSheetInfo.js';
 export default {
     name: 'Approvals',
     path: '/time-sheet-approvals',
@@ -135,7 +142,8 @@ export default {
     this.getWeekInfo(currentDate);
     this.status = 'pending';
     this.getTimeLogs(this.paginationData.current_page);
-    
+    const mainStore = timeSheetInfo();
+    mainStore.updateCurrentPage('approval_requests');
   },
   created() {
     
@@ -149,7 +157,7 @@ export default {
         // { id: 'approved', name: 'Approved' },
         // { id: 'rejected', name: 'Rejected' },
       ],
-      initialSelected : 3,
+      initialSelected : { id: 'pending', name: 'Pending' },
       week_number : null,
       start_of_week: null,
       end_of_week: null,

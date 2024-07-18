@@ -47,7 +47,7 @@ import { getSubscription } from '../../utils/tenants.js';
 
 import Loader from '../../components/Loader.vue';
 import axios from 'axios';
-import { useUserStore } from '../../stores/userInfo.js';
+// import { userInfo } from '../../stores/userInfo.js';
 import { toast } from 'vue3-toastify';
 import '../../../node_modules/vue3-toastify/dist/index.css';
 
@@ -60,6 +60,7 @@ export default {
       error: null,
       errorMessages: [],
       isLoading: false,
+      user_info: [],
     }
   },
   components: {
@@ -67,8 +68,9 @@ export default {
     toast
   },
   setup() {
-    const userStore = useUserStore();
-    return { userStore };
+    // const userStore = userInfo();
+   
+    // return { userStore };
   },
   methods: {
     async login() {
@@ -83,13 +85,14 @@ export default {
           "hideProgressBar": true,
           "dangerouslyHTMLString": true
         })
+        // console.log(this.userStore, 'here');
         localStorage.setItem('accessToken', token); // Store the token
         localStorage.setItem('layout', 'Admin');
-        localStorage.setItem('is_admin', true); 
+         
         localStorage.setItem('is_approver', false); 
-        localStorage.setItem('is_resource', false); 
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`; // Set the token in the headers
         
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`; // Set the token in the headers
+         
         //Response for tenant list
         const usersapi_response = await getTenantsList();
 
@@ -101,20 +104,31 @@ export default {
         const user_profile_info = await getUserProfile();
         const subscription_info = await getSubscription();
         
-        console.warn(current_tenant_info);
-        console.warn(user_profile_info);
-        console.warn(subscription_info);
+        // console.warn(current_tenant_info);
+        // console.warn(user_profile_info);
+        // console.warn(subscription_info);
 
         localStorage.setItem('loggedin_user_id', user_profile_info.id);
 
-        const data = [{
-          'accessToken': token,
-          'layout': 'Admin',
-          'is_admin': true,
-          'is_approver': false,
-          'is_resource': false,
-        }];
-        // await this.userStore.setUser(data);
+        var user_data = {
+          accessToken: token,
+          layout: 'Admin',
+          is_admin: user_profile_info.user_type == "owner" ? true : false,
+          is_approver: false,
+          is_resource: false,
+          'tenant_id': usersapi_response.tenants[0].id,
+          'user_name': user_profile_info.first_name+' '+user_profile_info.last_name,
+          'resource_id' : user_profile_info.resource_id,
+          'profile_image' : user_profile_info.profile_image,
+          'user_type' : user_profile_info.user_type,
+        };
+        // await this.userStore.updateUserInfo(user_data);
+        localStorage.setItem('user_name', user_profile_info.first_name+' '+user_profile_info.last_name);
+        localStorage.setItem('resource_id', user_profile_info.resource_id);
+        localStorage.setItem('profile_image', user_profile_info.profile_image);
+        localStorage.setItem('user_type', user_profile_info.user_type);
+        localStorage.setItem('is_admin', user_profile_info.user_type == "owner" ? true : false);
+        localStorage.setItem('is_resource', user_profile_info.user_type == "owner" ? false : true); 
         this.$router.push('/dashboard'); // Redirect to another page
         
       } catch (error) {

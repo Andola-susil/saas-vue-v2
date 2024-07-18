@@ -149,7 +149,7 @@
                 <span class="sr-only">Open user menu</span>
                 <img class="h-8 w-8 rounded-full bg-gray-50" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
                 <span class="hidden lg:flex lg:items-center">
-                  <span class="ml-4 text-sm font-semibold leading-6 text-gray-900" aria-hidden="true">Tom Cook</span>
+                  <span class="ml-4 text-sm font-semibold leading-6 text-gray-900" aria-hidden="true">{{user_name}}</span>
                   <ChevronDownIcon class="ml-2 h-5 w-5 text-gray-400" aria-hidden="true" />
                 </span>
               </MenuButton>
@@ -179,7 +179,7 @@ import { signOut } from '../utils/api.js'
 import axios from 'axios'
 import { onMounted, ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { useUserStore } from '../stores/userInfo.js';
+// import { userInfo } from '../stores/userInfo.js';
 import {
   Dialog,
   Menu,
@@ -214,7 +214,9 @@ import 'vue3-toastify/dist/index.css';
 
 const navigation = ref([]);
 const settings = ref([]);
-const userStore = useUserStore();
+console.log(localStorage);
+// const userStore = userInfo();
+// console.log(userStore, 'Here64654');
 // Navigation data
 const navigation_for_admin = [
   { name: 'Dashboard', href: '/dashboard', icon: '/src/assets/images/dashboard11.png', current: false },
@@ -229,11 +231,13 @@ const navigation_for_resource = [
   { name: 'Dashboard', href: '/dashboard', icon: '/src/assets/images/dashboard11.png', current: false },
   { name: 'Time Sheet', href: '/time-sheet', icon: '/src/assets/images/time-management.png', current: false },
   // { name: 'Past Time Sheet', href: '/past-time-sheet', icon: DocumentDuplicateIcon, current: false },
-  { name: 'Reports', href: '/time-sheet-reports', icon: '/src/assets/images/report.png', current: false },
+  { name: 'Time Tracker', href: '/time-tracker', icon: '/src/assets/images/timetrack.png', current: false },
 ]
 const navigation_for_auditors = [
   { name: 'Dashboard', href: '/dashboard', icon: '/src/assets/images/dashboard11.png', current: false },
-  { name: 'Reports', href: '/time-sheet-reports', icon: '/src/assets/images/report.png', current: false },
+  { name: 'Time Sheet', href: '/time-sheet', icon: '/src/assets/images/time-management.png', current: false },
+  { name: 'Time Tracker', href: '/time-tracker', icon: '/src/assets/images/timetrack.png', current: false },
+  { name: 'Approvals', href: '/time-sheet-approvals', icon: '/src/assets/images/approval.png', current: false },
 ]
 const settings_for_admin = [
   { id: 1, name: 'Resource', href: '/resource', initial: '/src/assets/images/resource.png', current: false },
@@ -241,8 +245,8 @@ const settings_for_admin = [
   { id: 3, name: 'Rules', href: '/time-sheet-rules', initial: '/src/assets/images/folder.png', current: false},
 ]
 const settings_resource = [
-  { id: 1, name: 'Calendar', href: '/calender-view', initial: '/src/assets/images/calendar.png', current: false },
-  { id: 2, name: 'Rules', href: '/time-sheet', initial: '/src/assets/images/folder.png', current: false },
+  // { id: 1, name: 'Calendar', href: '/calender-view', initial: '/src/assets/images/calendar.png', current: false },
+  // { id: 2, name: 'Rules', href: '/time-sheet', initial: '/src/assets/images/folder.png', current: false },
 ]
 const userNavigation = [
   { name: 'Your profile', href: '/your-profile' },
@@ -257,6 +261,8 @@ const route = useRoute();
 const is_admin = ref(false);
 const is_approver = ref(false);
 const is_resource = ref(false);
+const user_name = ref('');
+const user_profile_img = ref('');
 onMounted(() => {
     // console.log(userStore);
   is_admin.value = localStorage.getItem('is_admin');
@@ -273,6 +279,8 @@ onMounted(() => {
     navigation.value = navigation_for_resource;
     settings.value = settings_resource;
   }
+  user_name.value = localStorage.getItem('user_name');
+  user_profile_img.value = localStorage.getItem('user_nameprofile_image');
 });
 
 // The async function to handle log out

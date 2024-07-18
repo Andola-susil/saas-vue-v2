@@ -44,7 +44,7 @@
             <span class="sr-only">Previous</span>
             <ChevronLeftIcon class="h-5 w-5" aria-hidden="true" />
           </a>
-          <a
+          <span v-if="pages.length > 0"><a
             v-for="page in pages"
             :key="page"
             href="#"
@@ -52,7 +52,8 @@
             :class="['relative inline-flex items-center px-4 py-2 text-sm font-semibold', page === currentPage ? 'bg-indigo-600 text-white z-10' : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50', { 'focus:z-20 focus:outline-offset-0': true }]"
           >
             {{ page }}
-          </a>
+          </a></span>
+          <span class="relative inline-flex items-center px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-not-allowed opacity-50" v-else>0</span>
           <a
             href="#"
             @click.prevent="nextPage"
