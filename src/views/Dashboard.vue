@@ -37,13 +37,13 @@
         </dl>
       </div>
       <div class="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
-        <ChartOne />
-        <BarChat />
-        <BarChat />
-        <BarChat />
-        <PieChat />
-        <BarChat />
-        <PieChat />
+        <ChartOne :chartData="myDynamicChartData" :apexOptions="myDynamicApexOptions"  title="Monthly Timesheet Overview"/>
+        <BarChat  :chartData="chartData" :chartOptions="apexOptions" title="Project Plans for week" />
+        <BarChat  :chartData="chartData2" :chartOptions="apexOptions" title="Approved vs Rejected Timesheets"/>
+        <BarChat  :chartData="chartData3" :chartOptions="apexOptions" title="Task Hours Completed vs Planned" />
+        <PieChat :chartData="chartData5" :apexOptions="apexOptions" title="Hours spent per project"/>
+        <BarChat  :chartData="chartData4" :chartOptions="apexOptions" title="Weekly working hours overview"/>
+        <PieChat :chartData="chartData6" :apexOptions="apexOptions" title="Total Overtime"/>
       </div>
     </div>
   </div>
@@ -73,6 +73,169 @@ export default {
         { id: 2, name: 'Avg. Approved Timesheet Rate', stat: '58.16%', icon: EnvelopeOpenIcon, change: '5.4%', changeType: 'increase' },
         { id: 3, name: 'Avg. Reject Timesheet Rate', stat: '24.57%', icon: CursorArrowRaysIcon, change: '3.2%', changeType: 'decrease' },
       ],
+      chartData: {
+        series: [
+          {
+            name: 'Project A',
+            data: [8, 7.5, 8, 8, 7, 6.5, 0] // Hours worked on Project A each day of the week
+          },
+          {
+            name: 'Project B',
+            data: [2, 1, 1.5, 1, 2, 1, 0] // Hours worked on Project B each day of the week
+          },
+          {
+            name: 'Meetings',
+            data: [1, 1, 0.5, 2, 1.5, 0, 0] // Hours spent in meetings each day of the week
+          }
+        ],
+        labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+      },
+      chartData2:{
+        series: [
+            {
+              name: 'Approved Timesheets',
+              data: [35, 50, 45, 60, 30, 40, 55] // Replace these values with your actual data
+            },
+            {
+              name: 'Rejected Timesheets',
+              data: [10, 5, 15, 7, 20, 3, 10] // Replace these values with your actual data
+            }
+        ],
+        labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+      },
+       chartData3 : {
+            series: [
+              {
+                name: 'Task Hours Completed',
+                data: [6, 7, 8, 5, 6, 7, 7] // Replace these values with your actual task hours completed data
+              },
+              {
+                name: 'Task Hours Planned',
+                data: [8, 8, 8, 8, 8, 8, 8] // Replace these values with your actual task hours planned data
+              }
+            ],
+            labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+          },
+       chartData4 : {
+            series: [
+              {
+                name: 'Weekly Working Hours Completed',
+                data: [6, 7, 8, 5, 6, 7, 7] // Replace these values with your actual task hours completed data
+              },
+              {
+                name: 'Weekly Working Hours Planned',
+                data: [8, 8, 8, 8, 8, 8, 8] // Replace these values with your actual task hours planned data
+              }
+            ],
+            labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+          },
+      apexOptions: {
+        colors: ['#3056D3', '#80CAEE'],
+        chart: {
+          type: 'bar',
+          height: 335,
+          stacked: true,
+          toolbar: {
+            show: false
+          },
+          zoom: {
+            enabled: false
+          }
+        },
+        responsive: [
+          {
+            breakpoint: 1536,
+            options: {
+              plotOptions: {
+                bar: {
+                  borderRadius: 0,
+                  columnWidth: '35%'
+                }
+              }
+            }
+          }
+        ],
+        plotOptions: {
+          bar: {
+            horizontal: false,
+            borderRadius: 0,
+            columnWidth: '35%',
+            borderRadiusApplication: 'end',
+            borderRadiusWhenStacked: 'last'
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        xaxis: {
+          type: 'category',
+          categories: ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+        },
+        legend: {
+          position: 'top',
+          horizontalAlign: 'left',
+          fontFamily: 'Satoshi',
+          fontWeight: 500,
+          fontSize: '14px',
+          markers: {
+            radius: 99
+          }
+        },
+        fill: {
+          opacity: 1
+        }
+      },
+      myDynamicChartData: {
+        series: [
+        { name: 'Total timesheet number', data: [10, 20, 2, 15, 18, 25, 30] },
+        { name: 'Department wise hour spent data', data: [5, 15, 8, 12, 20, 18, 22] }
+        ]
+      },
+      myDynamicApexOptions: {
+        legend: { /* your options */ },
+        colors: ['#3C50E0', '#80CAEE'],
+        // other options
+      },
+      chartData5: {
+        series: [45, 25, 15, 15],
+        labels: ['Project A', 'Project B', 'Project C', 'Project D']
+      },
+      chartData6: {
+        series: [30, 35, 20, 15],
+        labels: ['Team A', 'Team B', 'Team C', 'Team D']
+      },
+      apexOptions: {
+        colors: ['#3C50E0', '#80CAEE'],
+        chart: {
+          type: 'pie',
+          width: 380
+        },
+        plotOptions: {
+          pie: {
+            donut: {
+              size: '10%',
+              background: 'transparent'
+            }
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        legend: {
+          show: true,
+          position: 'bottom'
+        },
+        responsive: [
+          {
+            breakpoint: 640,
+            options: {
+              chart: {
+                width: 200
+              }
+            }
+          }
+        ]
+      }
     };
   },
   mounted() {
