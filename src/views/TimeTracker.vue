@@ -5,39 +5,39 @@
         </div>
         <div class="border border-gray-200 shadow-md">
             <div class="p-4 flex space-x-2">
-            <div class="relative mt-2 rounded-md shadow-sm w-2/6">
+            <div class="relative mt-2 rounded-md w-2/6">
               <h2 class="text-sm font-medium text-gray-500">Project</h2>
               <SelectInput :options="project_list" placeholder="Select project" :initialSelected="project_info" @handleSelector="handleProjectSelect"/>
             </div>
-            <div class="relative mt-2 rounded-md shadow-sm w-2/6">
+            <div class="relative mt-2 rounded-md w-2/6">
               <h2 class="text-sm font-medium text-gray-500">Task</h2>
               <SelectInput :options="task_list" placeholder="Select task" :initialSelected="task_info" @handleSelector="handleTaskSelect"/>
             </div>
-            <div class="relative mt-2 rounded-md shadow-sm w-2/6">
+            <div class="relative mt-2 rounded-md w-2/6">
               <h2 class="text-sm font-medium text-gray-500">Start time</h2>
-              <div><input type="time" v-model="startTime" class="block w-full rounded-md border-0 py-1 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400  sm:text-sm sm:leading-6 mt-2" /></div>
+              <div><input type="time" v-model="startTime" class="block w-full rounded-md border-0 py-1 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400  sm:text-sm sm:leading-6 mt-2" /></div>
             </div>
-            <div class="relative mt-2 rounded-md shadow-sm w-2/6">
+            <div class="relative mt-2 rounded-md w-2/6">
               <h2 class="text-sm font-medium text-gray-500">End time</h2>
-              <div><input type="time" v-model="endTime" @input="calculateDuration()" class="block w-full rounded-md border-0 py-1 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400  sm:text-sm sm:leading-6 mt-2" /></div>
+              <div><input type="time" v-model="endTime" @input="calculateDuration()" class="block w-full rounded-md border-0 py-1 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400  sm:text-sm sm:leading-6 mt-2" /></div>
             </div>
-            <div class="relative mt-2 rounded-md shadow-sm w-1/4">
+            <div class="relative mt-2 rounded-md w-1/4">
               <div class="flex pt-[38px] px-2">
                 <input  v-model="is_billable" :value="day" type="checkbox" class="relative top-1 h-3 w-3 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600" />
                 <h2 class="text-sm font-medium text-gray-500 ml-2">Is Billable</h2>
               </div>
             </div>
-            <div class="relative mt-2 rounded-md shadow-sm w-1/4">
+            <div class="relative mt-2 rounded-md w-1/4">
               <div class="pt-[38px]">
                 <span class="text-foreground font-semibold mx-2">
                 {{ duration }}
                 </span>
                 </div>
             </div>
-            <div class="relative mt-2 rounded-md shadow-sm w-1/4">
-              <div class="pt-[30px] px-3">
-                <button v-if="log_id == null" @click="saveDailyTimeSheet" type="button" class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Submit</button>
-                <button v-else @click="updateTimeLog" type="button" class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Update</button>
+            <div class="relative mt-2 rounded-md w-1/4">
+              <div class="pt-[30px]">
+                <button v-if="log_id == null" @click="saveDailyTimeSheet" type="button" class="w-full block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Submit</button>
+                <button v-else @click="updateTimeLog" type="button" class="w-full block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Update</button>
               </div>
             </div>
             <!-- <div class="relative mt-2 rounded-md shadow-sm w-1/4">
@@ -63,9 +63,15 @@
       <Header :title="'Today(' + new Date().toISOString().slice(0, 10) + ')'" :totalLabel="'Total'" :totalTime="total_time_logged_for_current_date" />
       <!-- <h2 class="font-medium py-6 pl-4">Today({{new Date().toISOString().slice(0, 10)}})</h2> -->
       <TimetrackerHeaderView />
-      <div v-for="(record, index) in timerRecords" :key="index">
+      <div v-if="timerRecords.length > 0" v-for="(record, index) in timerRecords" :key="index" class="h-1/4">
         <div class="bg-card p-4 rounded-lg shadow-md">
           <TaskInput @editTimeLog="editLoggedTime" @deleteTimeLog="deleteLogTime" :duration="record.total_time" :time_log_date="record.time_log_date" :is_billable="record.is_billable" :task_id="record.task_id" :project_id="record.project_id" :log_id="record.id" :project="record.project_name" :elapsedTime="record.total_time" :task="record.task_name" :startTime="record.startTime" :endTime="record.endTime" />
+        </div>
+      </div>
+      <div v-else>
+        <div class="bg-card p-4 rounded-lg shadow-md">
+          <img src="/src/assets/images/no-data.avif" alt="No data found!" class="h-20 mx-auto mb-2">
+          <div class="text-center">No data found!</div>
         </div>
       </div>
       <PaginationTemplate :paginationData="meta_data" @page-changed="getTodayTimeLogs"/>
@@ -511,6 +517,18 @@ export default {
           this.isModalOpen = false;
           this.isLoading = false;
         }, 500);
+        
+      },
+      handleClosePopup(){
+        this.isModalOpen = false;
+        if(this.showCreateTaskPopup == true){
+          this.task_info = { name: null, value: null, id: null };
+          this.showCreateTaskPopup = false;
+        }
+        if(this.showCreateProjectPopup == true){
+          this.project_info = { name: null, value: null, id: null };
+          this.showCreateProjectPopup = false;
+        }
         
       },
   },
