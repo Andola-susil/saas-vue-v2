@@ -133,7 +133,11 @@
                onmouseout="this.src='/src/assets/images/trash-can-gray.svg'">`;
       },
       approvalActions(cell, formatterParams, onRendered){
-        return '<div class="flex"><div class="px-1"><img src="/src/assets/images/circle-check-blank.svg" alt="" class="h-6 w-6 " data-action="approve"></div><div class="px-1"><img src="/src/assets/images/circle-x.svg" alt="" class="h-6 w-6" data-action="reject"></div></div>';
+        if(this.time_sheet_status == 'approved'){
+          return '<div class="flex"><div class="px-1"><img src="/src/assets/images/circle-check-fill.svg" alt="" class="h-6 w-6 " data-action="approve"></div><div class="px-1"><img src="/src/assets/images/circle-x.svg" alt="" class="h-6 w-6" data-action="reject"></div></div>';
+        }else if(this.time_sheet_status == 'rejected'){
+          return '<div class="flex"><div class="px-1"><img src="/src/assets/images/circle-check-blank.svg" alt="" class="h-6 w-6 " data-action="approve"></div><div class="px-1"><img src="/src/assets/images/circle-xmark.svg" alt="" class="h-6 w-6" data-action="reject"></div></div>';
+        }
       },
       addRowToTable() {
         this.id_count ++;
@@ -224,9 +228,10 @@
         .then(data => {
           this.tableData = data.lineitems;
           this.getTimeSheetId();
-          // this.isModalOpen = false;
           if(status != 'draft'){
+            this.isModalOpen = false;
             this.isLoading = false;
+            this.showTimeSheetSubmitConfirmation = false;
             toast("Timesheet submitted successfully!", {
               "theme": "colored",
               "type": "success",
@@ -452,6 +457,7 @@
               this.resource_id = data.items[0].resource_id;
               this.getUserInfo(data.items[0].resource_id);
               this.getTimeLogData(time_sheet_id);
+              this.time_sheet_status = data.status;
               this.show_submit_btn = false;
               this.disable_table = true;
             }else{
@@ -478,8 +484,9 @@
               this.current_timesheet_id = null;
               this.disable_table = false;
               this.show_submit_btn = true;
-              // this.updateTable();
+              this.updateTable();
               this.isLoading = false;
+              this.time_sheet_status = 'draft';
             }
             
           })
@@ -687,7 +694,7 @@
       },
       disableTableIfDataExists() {
         if ((this.time_sheet_status != 'draft' && this.time_sheet_status != '') || this.state_info.current_page == "all_timesheet" && this.time_sheet_status == 'approved') {
-          this.isEditable = false;
+          this.isEditable = true;
         } else {
           this.isEditable = true;
         }
@@ -826,7 +833,6 @@
       this.user_name = localStorage.getItem('user_name');
       this.resource_id = localStorage.getItem('resource_id');
       this.user_role = localStorage.getItem('user_type');
-      console.log(mainStore.$state.current_page, 'mainStore');
       if(mainStore.$state.current_page == "all_timesheet"){
         this.show_approval_btns = false;
         this.disable_date_range = true;
@@ -866,7 +872,6 @@
       
     },
     beforeDestroy() {
-      console.log('Here');
     this.state.updateCurrentPage('');
   },
   }
