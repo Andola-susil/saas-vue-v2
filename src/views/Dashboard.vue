@@ -78,15 +78,15 @@ export default {
       chartData: {
         series: [
           {
-            name: 'Project A',
+            name: 'TaskSync',
             data: [8, 7.5, 8, 8, 7, 6.5, 0] // Hours worked on Project A each day of the week
           },
           {
-            name: 'Project B',
+            name: 'ProjectFlow',
             data: [2, 1, 1.5, 1, 2, 1, 0] // Hours worked on Project B each day of the week
           },
           {
-            name: 'Meetings',
+            name: 'MilestoneMaster',
             data: [1, 1, 0.5, 2, 1.5, 0, 0] // Hours spent in meetings each day of the week
           }
         ],
@@ -190,7 +190,7 @@ export default {
       myDynamicChartData: {
         series: [
         { name: 'Total timesheet number', data: [10, 20, 2, 15, 18, 25, 30] },
-        { name: 'Total hour spent data', data: [5, 15, 8, 12, 20, 18, 22] }
+        { name: 'Total Hours Spent', data: [5, 15, 8, 12, 20, 18, 22] }
         ]
       },
       myDynamicApexOptions: {
@@ -200,7 +200,7 @@ export default {
       },
       chartData5: {
         series: [45, 25, 15, 15],
-        labels: ['Project A', 'Project B', 'Project C', 'Project D']
+        labels: ['TaskSync', 'ProjectFlow', 'MilestoneMaster', 'AgileTrack']
       },
       chartData6: {
         series: [30, 35, 20, 15],
@@ -244,7 +244,7 @@ export default {
     // icon: `/src/assets/images/dashboard11.png`,
     title: 'Total Spend Hour',
     total: '800hrs',
-    growthRate: 70,
+    growthRate: 80,
     totalHours: '1000hrs'
   },
   {
@@ -252,14 +252,14 @@ export default {
     title: 'Task completed',
     total: '10',
     growthRate: 70,
-    totalHours: '1000 tasks'
+    totalHours: '17 tasks'
   },
   {
     // icon: ``,
     title: 'Total In progress',
     total: '7',
     growthRate: 30,
-    totalHours: '1000 tasks'
+    totalHours: '17 tasks'
   },
   {
     // icon: ``,
