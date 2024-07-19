@@ -8,42 +8,38 @@
         </div>
       </div>
       <div class="mt-8 flow-root">
-        <h3 class="text-base font-semibold leading-6 text-gray-900">Last 30 days</h3>
-        <dl class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          <div v-for="item in stats" :key="item.id" class="relative overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 shadow sm:px-6 sm:pt-6">
-            <dt>
-              <div class="absolute rounded-md bg-indigo-500 p-3">
-                <component :is="item.icon" class="h-6 w-6 text-white" aria-hidden="true" />
-              </div>
-              <p class="ml-16 truncate text-sm font-medium text-gray-500">{{ item.name }}</p>
-            </dt>
-            <dd class="ml-16 flex items-baseline pb-6 sm:pb-7">
-              <p class="text-2xl font-semibold text-gray-900">{{ item.stat }}</p>
-              <p :class="[item.changeType === 'increase' ? 'text-green-600' : 'text-red-600', 'ml-2 flex items-baseline text-sm font-semibold']">
-                <ArrowUpIcon v-if="item.changeType === 'increase'" class="h-5 w-5 flex-shrink-0 self-center text-green-500" aria-hidden="true" />
-                <ArrowDownIcon v-else class="h-5 w-5 flex-shrink-0 self-center text-red-500" aria-hidden="true" />
-                <span class="sr-only"> {{ item.changeType === 'increase' ? 'Increased' : 'Decreased' }} by </span>
-                {{ item.change }}
-              </p>
-              <div class="absolute inset-x-0 bottom-0 bg-gray-50 px-4 py-4 sm:px-6">
-                <div class="text-sm">
-                  <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500"
-                    >View all<span class="sr-only"> {{ item.name }} stats</span></a
-                  >
-                </div>
-              </div>
-            </dd>
-          </div>
-        </dl>
+        <!-- <h3 class="text-base font-semibold leading-6 text-gray-900">Last 30 days</h3> -->
+        <div v-if="startDate !== null">
+        <DateRangePicker v-model="dateRange" @change="handleDateRangeChange" />
+        </div>
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
+          <DataCardOne
+      v-for="(item, index) in cardItems"
+      :key="index"
+       
+      :title="item.title"
+      :total="item.total"
+      :growthRate="item.growthRate"
+      :totalHours="item.totalHours"
+    />
+    </div>
+       
       </div>
+      
       <div class="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
         <ChartOne :chartData="myDynamicChartData" :apexOptions="myDynamicApexOptions"  title="Monthly Timesheet Overview"/>
-        <BarChat  :chartData="chartData" :chartOptions="apexOptions" title="Project Plans for week" />
-        <BarChat  :chartData="chartData2" :chartOptions="apexOptions" title="Approved vs Rejected Timesheets"/>
-        <BarChat  :chartData="chartData3" :chartOptions="apexOptions" title="Task Hours Completed vs Planned" />
-        <PieChat :chartData="chartData5" :apexOptions="apexOptions" title="Hours spent per project"/>
-        <BarChat  :chartData="chartData4" :chartOptions="apexOptions" title="Weekly working hours overview"/>
-        <PieChat :chartData="chartData6" :apexOptions="apexOptions" title="Total Overtime"/>
+        <!-- <BarChat  :chartData="chartData" :chartOptions="apexOptions" title="Project Plans for week" />
+        <BarChat  :chartData="chartData2" :chartOptions="apexOptions" title="Approved vs Rejected Timesheets"/> -->
+        
+
+        <BarChat  :chartData="chartData3" :chartOptions="apexOptions" title="Completed vs Planned Task Hours" />
+        <PieChat :chartData="chartData5" :apexOptions="apexOptions" title="Project Hours Distribution"/>
+        <BarChat  :chartData="chartData4" :chartOptions="apexOptions" title="Weekly Work Hours Overview"/>
+        <TableOne :tableData="tableData"/>
+        <PieChat :chartData="chartData6" :apexOptions="apexOptions" title="Project Overtime Analytics"/>
+        
+        
+       
       </div>
     </div>
   </div>
@@ -56,23 +52,29 @@ import ChartOne from '../views/Charts/ChartOne.vue';
 import BarChat from './Charts/BarChat.vue';
 import PieChat from './Charts/PieChat.vue';
 import Loader from '../components/Loader.vue';
-
+import DataCardOne from '../views/Charts/DataCardOne.vue'
+import TableOne from '../views/Charts/TableOne.vue'
+import { computed,ref } from 'vue';
+import DateRangePicker from 'vue3-daterange-picker';
 export default {
   name: 'Dashboard',
   components: {
+    DateRangePicker,
     ChartOne,
     BarChat,
     PieChat,
     Loader,
+    DataCardOne,
+    TableOne
   },
   data() {
     return {
       isLoading: true,
-      stats: [
-        { id: 1, name: 'Total Resources', stat: '71,897', icon: UsersIcon, change: '122', changeType: 'increase' },
-        { id: 2, name: 'Avg. Approved Timesheet Rate', stat: '58.16%', icon: EnvelopeOpenIcon, change: '5.4%', changeType: 'increase' },
-        { id: 3, name: 'Avg. Reject Timesheet Rate', stat: '24.57%', icon: CursorArrowRaysIcon, change: '3.2%', changeType: 'decrease' },
-      ],
+      dateRange: {
+        startDate: null,
+        endDate: null
+      },
+      
       chartData: {
         series: [
           {
@@ -188,12 +190,12 @@ export default {
       myDynamicChartData: {
         series: [
         { name: 'Total timesheet number', data: [10, 20, 2, 15, 18, 25, 30] },
-        { name: 'Department wise hour spent data', data: [5, 15, 8, 12, 20, 18, 22] }
+        { name: 'Total hour spent data', data: [5, 15, 8, 12, 20, 18, 22] }
         ]
       },
       myDynamicApexOptions: {
         legend: { /* your options */ },
-        colors: ['#3C50E0', '#80CAEE'],
+        colors: ['#c9afed', '#69e1ff'],
         // other options
       },
       chartData5: {
@@ -205,7 +207,7 @@ export default {
         labels: ['Team A', 'Team B', 'Team C', 'Team D']
       },
       apexOptions: {
-        colors: ['#3C50E0', '#80CAEE'],
+        colors: ['#287be0', '#28e0d1'],
         chart: {
           type: 'pie',
           width: 380
@@ -213,7 +215,7 @@ export default {
         plotOptions: {
           pie: {
             donut: {
-              size: '10%',
+              size: '0%',
               background: 'transparent'
             }
           }
@@ -235,8 +237,72 @@ export default {
             }
           }
         ]
-      }
+      },
+      cardItems : ref([
+  
+  {
+    // icon: `/src/assets/images/dashboard11.png`,
+    title: 'Total Spend Hour',
+    total: '800hrs',
+    growthRate: 70,
+    totalHours: '1000hrs'
+  },
+  {
+    // icon: ``,
+    title: 'Task completed',
+    total: '10',
+    growthRate: 70,
+    totalHours: '1000 tasks'
+  },
+  {
+    // icon: ``,
+    title: 'Total In progress',
+    total: '7',
+    growthRate: 30,
+    totalHours: '1000 tasks'
+  },
+  {
+    // icon: ``,
+    title: 'Over Time',
+    total: '40hrs',
+    growthRate: 90,
+    totalHours: '1000hrs'
+  },
+]),
+tableData : [
+  {
+    totalTimesheet: '10',
+    timesheetSubmitted: '7',
+    timesheetNotSubmitted: '3',
+    weekNo: '#3'
+
+  },
+  {
+    totalTimesheet: '15',
+    timesheetSubmitted: '10',
+    timesheetNotSubmitted: '5',
+    weekNo: '#2'
+  },
+  {
+    totalTimesheet: '20',
+    timesheetSubmitted: '18',
+    timesheetNotSubmitted: '2',
+    weekNo: '#1'
+  }
+]
     };
+  },
+  computed: {
+    startDate() {
+      return this.dateRange.startDate || null;
+    }
+  },
+  methods: {
+    handleDateRangeChange(value) {
+      // Handle date range change here
+      console.log('Selected Date Range:', value);
+      // You can fetch data based on the selected date range
+    }
   },
   mounted() {
     // Simulate data fetching

@@ -74,7 +74,7 @@
                 <li v-for="(item,key) in navigation" :key="key">
                   <a  @click.prevent="manageRoute(item,key)" href="#" :class="[item.current ? 'bg-indigo-700 text-white' : 'text-indigo-200 hover:bg-indigo-700 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6']">
                     <!-- <component :is="item.icon" :class="[item.current ? 'text-white' : 'text-indigo-200 group-hover:text-white', 'h-6 w-6 shrink-0']" aria-hidden="true" /> -->
-                    <div class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500">
+                    <div class="h-5 w-5 text-gray-400 group-hover:text-gray-500">
                         <img aria-hidden="true" alt="" :src="item.icon" class="h-5 w-5" />
                       </div>
                     {{ item.name }}
@@ -82,7 +82,7 @@
                 </li>
                 <Disclosure as="li" v-slot="{ open }">
                 <DisclosureButton class="text-indigo-200 hover:bg-indigo-700 hover:text-white group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 w-full">
-                    <div class="flex">
+                    <div class="flex items-center">
                       <div class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500"><img aria-hidden="true" alt="" src="/src/assets/images/settings.png" class="h-5 w-5" /></div>
                       <span class="mr-3">Settings</span>
                       <ChevronRightIcon :class="[open ? 'rotate-90 text-gray-500' : 'text-gray-400', 'h-5 w-5 shrink-0']" aria-hidden="true" /></div>
