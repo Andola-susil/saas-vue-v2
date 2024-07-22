@@ -35,7 +35,7 @@
                 </div>
             </div>
             <div class="relative mt-2 rounded-md w-1/4">
-              <div class="pt-[30px]">
+              <div class="pt-[30px]" :class="task_id == '' || duration == '00:00:00' ? 'disabled':''">
                 <button v-if="log_id == null" @click="saveDailyTimeSheet" type="button" class="w-full block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Submit</button>
                 <button v-else @click="updateTimeLog" type="button" class="w-full block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Update</button>
               </div>
@@ -356,7 +356,7 @@ export default {
           "dangerouslyHTMLString": true
         });
         this.project_id = null;
-        this.task_id = null;
+        this.task_id = '';
         this.is_billable = false;
         })
       .catch((error) => {

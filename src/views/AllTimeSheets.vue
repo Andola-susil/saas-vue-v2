@@ -34,11 +34,14 @@
              <table class="min-w-full divide-y divide-gray-300">
                 <thead class="bg-gray-50">
                   <tr>
-                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">SL NO.</th>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">SL#</th>
                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Resource Name</th>
                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Week No.</th>
                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Start Date</th>
                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">End Date</th>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total hours</th>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Hours spent</th>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">OT</th>
                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
                   </tr>
                 </thead>
@@ -49,6 +52,9 @@
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">#{{ val.week_number }}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.start_date }}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.end_date }}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">0</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">0</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">0</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       <img v-if="val.status === 'pending'" src="/src/assets/images/pending.svg" alt="Pending" class="h-5 w-5" v-b-tooltip.hover title="Pending">
                       <img v-else-if="val.status === 'rejected'" src="/src/assets/images/ban.svg" alt="Rejected" class="h-5 w-5" v-b-tooltip.hover title="Rejected">
@@ -101,7 +107,7 @@ export default {
     const currentDate = new Date();
     this.getWeekInfo(currentDate);
     this.getTimeLogs(this.paginationData.current_page);
-    this.fetchUserRoles();
+    this.fetchUsers();
     const mainStore = timeSheetInfo();
     console.log(mainStore,4545);
     mainStore.updateCurrentPage('all_timesheet');
@@ -202,7 +208,7 @@ export default {
       this.resource_id = val.value;
       this.getTimeLogs(this.paginationData.current_page);
     },
-    fetchUserRoles(){
+    fetchUsers(){
       try {
         const response = getResourceInfo().then((data) => {
           var users = [];
