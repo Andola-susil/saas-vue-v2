@@ -69,17 +69,17 @@
               <div class="col-span-full">
                 <p class="text-gray-500 text-sm">Set the holiday list for 2024</p>
                 <ul role="list" class="divide-y divide-gray-100">
-                  <li v-for="holiday in holidays" :key="holiday.id" class="flex justify-between gap-x-6 py-5">
-                    <div class="flex w-2/4 gap-x-4">
+                  <li v-for="holiday in holidays" :key="holiday.id" class="flex justify-center gap-x-6 py-5">
+                    <div class="flex w-1/3 gap-x-4">
                       <div class="min-w-0 flex-auto">
                         <p class="text-sm leading-6 text-gray-900">{{ holiday.description }}</p>
                       </div>
                     </div>
-                    <div class="hidden w-1/4 shrink-0 sm:flex sm:flex-col sm:items-end">
+                    <div class="hidden w-1/3 shrink-0 sm:flex sm:flex-col sm:items-center">
                       <p class="text-sm leading-6 text-gray-900">{{ holiday.holiday }}</p>
                     </div>
-                    <div class="hidden w-1/4 shrink-0 sm:flex sm:flex-col sm:items-end">
-                      <span class="text-sm leading-6 text-gray-900 cursor-pointer" @click="removeHoliday(holiday.id)">Remove</span>
+                    <div class="hidden w-1/3 shrink-0 sm:flex sm:flex-col sm:items-end">
+                      <span class="text-sm leading-6 text-gray-900 cursor-pointer" @click="removeHoliday(holiday.id)"><img src="/src/assets/images/trash-can-gray.svg" alt="" class="h-5 w-5" onmouseover="this.src='/src/assets/images/trash-can.svg'" onmouseout="this.src='/src/assets/images/trash-can-gray.svg'"></span>
                     </div>
                   </li>
                 </ul>

@@ -27,7 +27,7 @@ const chart = ref(null)
         <h4 class="text-md font-bold text-black dark:text-white">{{ title }}</h4>
       </div>
       <div>
-        <div class="relative z-20 inline-block">
+        <!-- <div class="relative z-20 inline-block">
           <select
             name=""
             id=""
@@ -56,7 +56,7 @@ const chart = ref(null)
               />
             </svg>
           </span>
-        </div>
+        </div> -->
       </div>
     </div>
     <div class="mb-2">
