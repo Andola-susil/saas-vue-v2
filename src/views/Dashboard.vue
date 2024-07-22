@@ -14,15 +14,39 @@
         </div>
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
           <DataCardOne
-      v-for="(item, index) in cardItems"
-      :key="index"
-       
-      :title="item.title"
-      :total="item.total"
-      :growthRate="item.growthRate"
-      :totalHours="item.totalHours"
-    />
-    </div>
+            v-for="(item, index) in cardItems"
+            :key="index"
+            :title="item.title"
+            :total="item.total"
+            :growthRate="item.growthRate"
+            :totalHours="item.totalHours"
+          />
+          <div class="rounded-sm border border-stroke bg-white  shadow-default dark:border-strokedark dark:bg-boxdark shadow-lg">
+            <PieChat :chartData="chartData_pie2" :apexOptions="apexOptions_pie2" :chartWidth="250" title="Timesheet"/>
+          </div>
+          <div class="rounded-sm border border-stroke bg-white  shadow-default dark:border-strokedark dark:bg-boxdark shadow-lg">
+            <div class="flex h-11.5 w-11.5 py-2 px-2 items-center justify-center rounded-full bg-meta-2 dark:bg-meta-4">
+              <h4 class="text-title-md font-bold text-black dark:text-white">156 hrs</h4>
+            </div>
+            <div class="flex justify-center"><span class="text-sm font-medium">Over Time</span></div>
+            <div className="p-4 sm:p-6 xl:p-10">
+              <div className="flex max-w-[470px] flex-col gap-10 pt-5 xl:pt-4">
+                <div className="relative h-2.5 w-full rounded-full bg-indigo-100 dark:bg-indigo-100">
+                  <div className="absolute left-0 h-full w-9/12 rounded-full bg-indigo-800">
+                    <span className="absolute bottom-full -right-4 z-1 mb-2 inline-block rounded-sm bg-indigo-800 px-2 py-1 text-xs font-bold text-white">
+                      <span className="absolute -bottom-1 left-1/2 -z-1 h-2 w-2 -translate-x-1/2 rotate-45 bg-indigo-800"></span>
+                      75%
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="rounded-sm border border-stroke bg-white  shadow-default dark:border-strokedark dark:bg-boxdark shadow-lg">
+            <PieChat :chartData="chartData_pie" :apexOptions="apexOptions_pie" title="Billable hours"/>
+          </div>
+        </div>
+        
        
       </div>
       
@@ -32,10 +56,11 @@
         <BarChat  :chartData="chartData2" :chartOptions="apexOptions" title="Approved vs Rejected Timesheets"/> -->
         
 
-        <BarChat  :chartData="chartData3" :chartOptions="apexOptions" title="Completed vs Planned Task Hours" />
-        <PieChat :chartData="chartData5" :apexOptions="apexOptions" title="Project Hours Distribution"/>
+        <!-- <BarChat  :chartData="chartData3" :chartOptions="apexOptions" title="Completed vs Planned Task Hours" />
+        <PieChat :chartData="chartData5" :apexOptions="apexOptions" title="Project Hours Distribution"/> -->
         <BarChat  :chartData="chartData4" :chartOptions="apexOptions" title="Weekly Work Hours Overview"/>
         <TableOne :tableData="tableData"/>
+        <TableTwo :tableData="tableData"/>
         <PieChat :chartData="chartData6" :apexOptions="apexOptions" title="Project Overtime Analytics"/>
         
         
@@ -54,8 +79,10 @@ import PieChat from './Charts/PieChat.vue';
 import Loader from '../components/Loader.vue';
 import DataCardOne from '../views/Charts/DataCardOne.vue'
 import TableOne from '../views/Charts/TableOne.vue'
+import TableTwo from '../views/Charts/TableTwo.vue'
 import { computed,ref } from 'vue';
 import DateRangePicker from 'vue3-daterange-picker';
+import 'vue3-daterange-picker/dist/vue3-daterange-picker.css';
 export default {
   name: 'Dashboard',
   components: {
@@ -65,7 +92,8 @@ export default {
     PieChat,
     Loader,
     DataCardOne,
-    TableOne
+    TableOne,
+    TableTwo
   },
   data() {
     return {
@@ -187,6 +215,118 @@ export default {
           opacity: 1
         }
       },
+      apexOptions_pie: {
+        colors: ['#3056D3', '#80CAEE'],
+        chart: {
+          type: 'bar',
+          height: 80,
+          stacked: true,
+          toolbar: {
+            show: false
+          },
+          zoom: {
+            enabled: false
+          }
+        },
+        responsive: [
+          {
+            breakpoint: 1536,
+            options: {
+              plotOptions: {
+                bar: {
+                  borderRadius: 0,
+                  columnWidth: '15%'
+                }
+              }
+            }
+          }
+        ],
+        plotOptions: {
+          bar: {
+            horizontal: false,
+            borderRadius: 0,
+            columnWidth: '15%',
+            borderRadiusApplication: 'end',
+            borderRadiusWhenStacked: 'last'
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        xaxis: {
+          type: 'category',
+          categories: ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+        },
+        legend: {
+          position: 'top',
+          horizontalAlign: 'left',
+          fontFamily: 'Satoshi',
+          fontWeight: 500,
+          fontSize: '14px',
+          markers: {
+            radius: 90
+          }
+        },
+        fill: {
+          opacity: 1
+        }
+      },
+      apexOptions_pie2: {
+        colors: ['#11f1bd70','#f16e11d9','#f1114f73'],
+        chart: {
+          type: 'bar',
+          height: 80,
+          stacked: true,
+          toolbar: {
+            show: false
+          },
+          zoom: {
+            enabled: false
+          }
+        },
+        responsive: [
+          {
+            breakpoint: 1536,
+            options: {
+              plotOptions: {
+                bar: {
+                  borderRadius: 0,
+                  columnWidth: '15%'
+                }
+              }
+            }
+          }
+        ],
+        plotOptions: {
+          bar: {
+            horizontal: false,
+            borderRadius: 0,
+            columnWidth: '15%',
+            borderRadiusApplication: 'end',
+            borderRadiusWhenStacked: 'last'
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        xaxis: {
+          type: 'category',
+          categories: ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+        },
+        legend: {
+          position: 'top',
+          horizontalAlign: 'left',
+          fontFamily: 'Satoshi',
+          fontWeight: 500,
+          fontSize: '14px',
+          markers: {
+            radius: 90
+          }
+        },
+        fill: {
+          opacity: 1
+        }
+      },
       myDynamicChartData: {
         series: [
         { name: 'Total timesheet number', data: [10, 20, 2, 15, 18, 25, 30] },
@@ -205,6 +345,14 @@ export default {
       chartData6: {
         series: [30, 35, 20, 15],
         labels: ['Team A', 'Team B', 'Team C', 'Team D']
+      },
+      chartData_pie: {
+        series: [75, 25],
+        // labels: ['Billable', 'Non-billable']
+      },
+      chartData_pie2: {
+        series: [65, 25, 10],
+        // labels: ['Approved', 'Pending', 'Rejected']
       },
       apexOptions: {
         colors: ['#287be0', '#28e0d1'],
@@ -239,36 +387,35 @@ export default {
         ]
       },
       cardItems : ref([
-  
-  {
-    // icon: `/src/assets/images/dashboard11.png`,
-    title: 'Total Spend Hour',
-    total: '800hrs',
-    growthRate: 80,
-    totalHours: '1000hrs'
-  },
-  {
-    // icon: ``,
-    title: 'Task completed',
-    total: '10',
-    growthRate: 70,
-    totalHours: '17 tasks'
-  },
-  {
-    // icon: ``,
-    title: 'Total In progress',
-    total: '7',
-    growthRate: 30,
-    totalHours: '17 tasks'
-  },
-  {
-    // icon: ``,
-    title: 'Over Time',
-    total: '40hrs',
-    growthRate: 90,
-    totalHours: '1000hrs'
-  },
-]),
+        {
+          // icon: `/src/assets/images/dashboard11.png`,
+          title: 'Total Spend Hour',
+          total: '800hrs',
+          growthRate: 80,
+          totalHours: '1000hrs'
+        },
+        // {
+        //   // icon: ``,
+        //   title: 'Timesheet Submitted',
+        //   total: '10',
+        //   growthRate: 70,
+        //   totalHours: '400'
+        // },
+        // {
+        //   // icon: ``,
+        //   title: 'Total In progress',
+        //   total: '7',
+        //   growthRate: 30,
+        //   totalHours: '17 tasks'
+        // },
+        // {
+        //   // icon: ``,
+        //   title: 'Over Time',
+        //   total: '40hrs',
+        //   growthRate: 90,
+        //   totalHours: '1000hrs'
+        // },
+      ]),
 tableData : [
   {
     totalTimesheet: '10',
