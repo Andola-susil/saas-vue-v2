@@ -1,7 +1,7 @@
 <template>
     <div class="col-span-12 rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:col-span-8">
         <div class="flex h-11.5 w-11.5 items-center justify-center rounded-full bg-meta-2 dark:bg-meta-4">
-        <h4 class="text-title-md font-bold text-black dark:text-white">Timesheet table</h4>
+        <h4 class="text-title-md font-bold text-black dark:text-white">Timesheet Submission Overview</h4>
       </div>
         <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
       <table class="min-w-full divide-y divide-gray-300">

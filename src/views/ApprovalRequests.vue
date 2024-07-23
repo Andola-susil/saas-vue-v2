@@ -71,7 +71,7 @@
                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200 bg-white">
+                <tbody class="divide-y divide-gray-200 bg-white">{{ time_log }}
                   <tr v-if="time_log.length > 0" v-for="(val, key) in time_log" :key="key">
                     <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                       <input type="checkbox" class="cursor-pointer" v-model="selectedRows" :value="val.id" @click="selectTimeSheet(val.id)">

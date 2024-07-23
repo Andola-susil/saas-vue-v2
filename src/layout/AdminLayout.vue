@@ -34,7 +34,7 @@
                         </li>
                       </ul>
                     </li>
-                    <li v-if="is_admin == 'true'">
+                    <li v-if="is_admin == true || is_approver == true">
                       <div class="text-xs font-semibold leading-6 text-indigo-200">Your teams</div>
                       <ul role="list" class="-mx-2 mt-2 space-y-1">
                         <li v-for="team in settings" :key="team.name">
@@ -80,7 +80,7 @@
                     {{ item.name }}
                   </a>
                 </li>
-                <Disclosure as="li" v-slot="{ open }">
+                <Disclosure as="li" v-slot="{ open }" v-if="is_admin == 'true'">
                 <DisclosureButton class="text-indigo-200 hover:bg-indigo-700 hover:text-white group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 w-full">
                     <div class="flex items-center">
                       <div class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500"><img aria-hidden="true" alt="" src="/src/assets/images/settings.png" class="h-5 w-5" /></div>

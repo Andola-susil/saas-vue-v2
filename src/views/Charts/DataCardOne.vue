@@ -63,7 +63,7 @@ const apexOptions = ref({
           show: false,
         },
         value: {
-          fontSize: '22px',
+          fontSize: '14px',
           show: true,
         },
       },

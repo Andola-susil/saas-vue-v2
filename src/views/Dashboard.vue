@@ -4,8 +4,13 @@
     <div v-if="!isLoading">
       <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
-          <h1 class="text-base font-semibold leading-6 text-gray-900">Dashboard</h1>
-        </div>
+    <h1 class="text-base font-semibold leading-6 text-gray-900">Dashboard</h1> 
+    <!-- <label for="time-period" class="block text-sm font-medium text-gray-700 mt-4">Select Time Period:</label> -->
+    <select id="time-period" name="time-period" class="mt-1 block py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="selectedPeriod" @change="handlePeriodChange">
+    <option value="30days">30 Days List</option>
+    <option value="15days">15 Days List</option>
+</select>
+</div>
       </div>
       <div class="mt-8 flow-root">
         <!-- <h3 class="text-base font-semibold leading-6 text-gray-900">Last 30 days</h3> -->
@@ -70,6 +75,7 @@ export default {
   data() {
     return {
       isLoading: true,
+      selectedPeriod: '30days',
       dateRange: {
         startDate: null,
         endDate: null
@@ -265,7 +271,7 @@ export default {
     // icon: ``,
     title: 'Over Time',
     total: '40hrs',
-    growthRate: 90,
+    growthRate: '4',
     totalHours: '1000hrs'
   },
 ]),
@@ -302,7 +308,14 @@ tableData : [
       // Handle date range change here
       console.log('Selected Date Range:', value);
       // You can fetch data based on the selected date range
+    },
+    handlePeriodChange() {
+      this.isLoading = true;
+      setTimeout(() => {
+        this.isLoading = false; 
+      }, 100); 
     }
+
   },
   mounted() {
     // Simulate data fetching
