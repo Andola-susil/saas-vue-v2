@@ -9,8 +9,8 @@
       </div>
       <div class="mt-8 flow-root">
         <!-- <h3 class="text-base font-semibold leading-6 text-gray-900">Last 30 days</h3> -->
-        <div v-if="startDate !== null">
-        <DateRangePicker v-model="dateRange" @change="handleDateRangeChange" />
+        <div >
+          <DateRangePicker v-model="dateRange"  :dateRange="dateRange" @update:modelValue="handleDateRangeChange" />
         </div>
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
           <DataCardOne
@@ -82,7 +82,6 @@ import TableOne from '../views/Charts/TableOne.vue'
 import TableTwo from '../views/Charts/TableTwo.vue'
 import { computed,ref } from 'vue';
 import DateRangePicker from 'vue3-daterange-picker';
-import 'vue3-daterange-picker/dist/vue3-daterange-picker.css';
 export default {
   name: 'Dashboard',
   components: {
@@ -440,15 +439,37 @@ tableData : [
     };
   },
   computed: {
-    startDate() {
-      return this.dateRange.startDate || null;
+    formattedRange() {
+      if (this.selectedRange.length === 2) {
+        return {
+          startDate: this.formatDate(this.selectedRange[0]),
+          endDate: this.formatDate(this.selectedRange[1])
+        };
+      }
+      return {};
     }
   },
   methods: {
     handleDateRangeChange(value) {
-      // Handle date range change here
-      console.log('Selected Date Range:', value);
-      // You can fetch data based on the selected date range
+      this.isLoading = true;
+      setTimeout(() => {
+        this.isLoading = false;
+      }, 100);
+    },
+    formatDate(date) {
+      const d = new Date(date);
+      // Ensure time is set to 06:30:00.000Z
+      d.setUTCHours(6, 30, 0, 0);
+      return d.toISOString();
+    },
+    calculateCurrentTwoWeeks(){
+      const today = new Date();
+      const start = new Date(today);
+      start.setDate(today.getDate() - today.getDay() - 1); // Set to the start of the week (Monday)
+      const end = new Date(start);
+      end.setDate(start.getDate() + 13); // Set to the end of the two-week period (14 days later)
+      
+      return [start, end];
     }
   },
   mounted() {
@@ -456,6 +477,9 @@ tableData : [
     setTimeout(() => {
       this.isLoading = false;
     }, 100); // Simulating a 2-second load time
+    const [start, end] = this.calculateCurrentTwoWeeks();
+    this.dateRange = { "startDate": start, "endDate": end };
+
   },
 };
 </script>

@@ -17,7 +17,7 @@ const props = defineProps({
   },
   chartWidth: {
     type: String,
-    default: '200'
+    default: '250'
   }
 })
 
