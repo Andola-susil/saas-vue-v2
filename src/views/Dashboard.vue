@@ -60,7 +60,7 @@
         <PieChat :chartData="chartData5" :apexOptions="apexOptions" title="Project Hours Distribution"/> -->
         <BarChat  :chartData="chartData4" :chartOptions="apexOptions" title="Weekly Work Hours Overview"/>
         <TableOne :tableData="tableData"/>
-        <TableTwo :tableData="tableData"/>
+        <TableTwo :tableData="tableData2"/>
         <PieChat :chartData="chartData6" :apexOptions="apexOptions" title="Project Overtime Analytics"/>
         
         
@@ -415,27 +415,54 @@ export default {
         //   totalHours: '1000hrs'
         // },
       ]),
-tableData : [
-  {
-    totalTimesheet: '10',
-    timesheetSubmitted: '7',
-    timesheetNotSubmitted: '3',
-    weekNo: '#3'
+      tableData : [
+        {
+          totalTimesheet: '10',
+          timesheetSubmitted: '7',
+          timesheetNotSubmitted: '3',
+          weekNo: '#3',
+          resource_name:'Johnson Emily'
 
-  },
-  {
-    totalTimesheet: '15',
-    timesheetSubmitted: '10',
-    timesheetNotSubmitted: '5',
-    weekNo: '#2'
-  },
-  {
-    totalTimesheet: '20',
-    timesheetSubmitted: '18',
-    timesheetNotSubmitted: '2',
-    weekNo: '#1'
-  }
-]
+        },
+        {
+          totalTimesheet: '15',
+          timesheetSubmitted: '10',
+          timesheetNotSubmitted: '5',
+          weekNo: '#2',
+          resource_name:'John Smith'
+        },
+        {
+          totalTimesheet: '20',
+          timesheetSubmitted: '18',
+          timesheetNotSubmitted: '2',
+          weekNo: '#1',
+          resource_name:'Williams Sarah'
+        }
+      ],
+      tableData2 : [
+        {
+          totalTimesheet: '10',
+          timesheetSubmitted: '7',
+          timesheetNotSubmitted: '3',
+          weekNo: '#3',
+          project_name:'Task management tool'
+
+        },
+        {
+          totalTimesheet: '15',
+          timesheetSubmitted: '10',
+          timesheetNotSubmitted: '5',
+          weekNo: '#2',
+          project_name:'Absence request management tool'
+        },
+        {
+          totalTimesheet: '20',
+          timesheetSubmitted: '18',
+          timesheetNotSubmitted: '2',
+          weekNo: '#1',
+          project_name:'Time tracking tool'
+        }
+      ]
     };
   },
   computed: {
@@ -450,6 +477,30 @@ tableData : [
     }
   },
   methods: {
+    generateMockData(count) {
+      const mockData = [];
+      const firstNames = ['John', 'Jane', 'Alex', 'Emily', 'Chris', 'Katie', 'Michael', 'Sarah', 'David', 'Laura'];
+      const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Martinez', 'Lopez'];
+
+      for (let i = 1; i <= count; i++) {
+        const startDate = new Date(2024, 4, 25 + (i - 1) * 7); // May 25, 2024
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + 6);
+
+        const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+        const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+
+        mockData.push({
+          id: i,
+          name: `${firstName} ${lastName}`,
+          week_no: 52 - i + 1,
+          start_date: startDate.toLocaleDateString('en-GB'),
+          end_date: endDate.toLocaleDateString('en-GB'),
+          status: i % 3 === 0 ? 'Pending' : (i % 3 === 1 ? 'Approved' : 'Reject'),
+        });
+      }
+      return mockData;
+    },
     handleDateRangeChange(value) {
       this.isLoading = true;
       setTimeout(() => {

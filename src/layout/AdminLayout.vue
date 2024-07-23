@@ -123,7 +123,7 @@
     </div>
 
     <div class="lg:pl-72">
-      <div class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+      <div class="sticky top-0 z-40 flex h-10 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
         <button type="button" class="-m-2.5 p-2.5 text-gray-700 lg:hidden" @click="sidebarOpen = true">
           <span class="sr-only">Open sidebar</span>
           <Bars3Icon class="h-6 w-6" aria-hidden="true" />
@@ -146,17 +146,16 @@
             <!-- Profile dropdown -->
             <Menu as="div" class="relative">
               <MenuButton class="-m-1.5 flex items-center p-1.5">
-                <span class="sr-only">Open user menu</span>
-                <img class="h-8 w-8 rounded-full bg-gray-50" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
                 <span class="hidden lg:flex lg:items-center">
-                  <span class="ml-4 text-sm font-semibold leading-6 text-gray-900" aria-hidden="true">{{user_name}}</span>
+                  <span class=" text-sm font-semibold leading-6 text-gray-900" aria-hidden="true">{{user_name}}</span>
+                  <img class="ml-2 h-8 w-8 rounded-full bg-gray-50" :src="user_profile_img" alt="" />
                   <ChevronDownIcon class="ml-2 h-5 w-5 text-gray-400" aria-hidden="true" />
                 </span>
               </MenuButton>
               <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
                 <MenuItems class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
                   <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
-                    <a @click="manageLogOut(item)" :href="item.href" :class="[active ? 'bg-gray-50' : '', 'block px-3 py-1 text-sm leading-6 text-gray-900']">{{ item.name }}</a>
+                    <a @click="manageLogOut(item,item.name)" href="#" :class="[active ? 'bg-gray-50' : '', 'block px-3 py-1 text-sm leading-6 text-gray-900']">{{ item.name }}</a>
                   </MenuItem>
                 </MenuItems>
               </transition>
@@ -214,9 +213,7 @@ import 'vue3-toastify/dist/index.css';
 
 const navigation = ref([]);
 const settings = ref([]);
-console.log(localStorage);
 // const userStore = userInfo();
-// console.log(userStore, 'Here64654');
 // Navigation data
 const navigation_for_admin = [
   { name: 'Dashboard', href: '/dashboard', icon: '/src/assets/images/dashboard11.png', current: false },
@@ -280,7 +277,7 @@ onMounted(() => {
     settings.value = settings_resource;
   }
   user_name.value = localStorage.getItem('user_name');
-  user_profile_img.value = localStorage.getItem('user_nameprofile_image');
+  user_profile_img.value = localStorage.getItem('profile_image');
 });
 
 // The async function to handle log out
@@ -308,6 +305,8 @@ const manageLogOut = async (item) => {
     } catch (err) {
       error.value = 'An error occurred. Please try again.'
     }
+  }else{
+    router.push(item.href);
   }
 }
 const manageRoute = (item) => {

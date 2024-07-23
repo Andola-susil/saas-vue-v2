@@ -7,6 +7,7 @@
 body {
     /* @apply relative z-1 bg-whiten font-satoshi text-base font-normal text-body; */
     font-family: 'Satoshi';
+    background: rgb(241 245 249/var(--tw-bg-opacity));
 }
 /* } */
 .lg\:w-72 {

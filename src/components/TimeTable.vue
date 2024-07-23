@@ -103,14 +103,11 @@
     },
     methods: {
       cellEditedCallback(cell) {
-        console.log(cell);
         let row = cell.getRow();
         let data = row.getData();
         let column = this.tabulator.getColumn('monday');
         // let cells = column.getCells();
-        console.log(column,data);
         let total = parseFloat(this.totalHrscustomMutator(null, data));
-        console.log(total); return false;
         row.update({ total: total });
         if(this.current_timesheet_id == null){
           this.submitTimesheet();
@@ -288,8 +285,8 @@
         });
         const tenant_id = localStorage.getItem('tenant_id');
           return {
-            resource_id: 303,
-            approver_id: 505,
+            resource_id: this.resource_id,
+            approver_id: null,
             week_number: this.week_number,
             start_date: this.start_of_week,
             end_date: this.end_of_week,
@@ -460,8 +457,8 @@
             if(data.items.length > 0){
               const time_sheet_id = data.items[0].id;
               this.current_timesheet_id = time_sheet_id;
-              this.resource_id = data.items[0].resource_id;
-              this.getUserInfo(data.items[0].resource_id);
+              // this.resource_id = data.items[0].resource_id;
+              this.getUserInfo();
               this.getTimeLogData(time_sheet_id);
               this.time_sheet_status = data.status;
               this.show_submit_btn = false;
@@ -502,8 +499,8 @@
         
         
       },
-      getUserInfo(resource_id){
-        const res = getResourceInfoById(resource_id)
+      getUserInfo(){
+        const res = getResourceInfoById(this.resource_id)
         .then((data) => {
           
         })
@@ -553,11 +550,6 @@
           }
           return selectedTask;
         }
-        
-
-        // console.log(index);
-        // console.log(this.task_list.find(p => p.value === taskId));
-        // return this.task_list.find(p => p.value === taskId);
       },
       createTableColumns(){
         if(this.startDateOfWeek != null){

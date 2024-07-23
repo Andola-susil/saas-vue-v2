@@ -42,7 +42,7 @@
 
 <script>
 import { loginUser } from '../../utils/api.js';
-import { getTenantsList,getUserProfile,getCurrentTenant } from '../../utils/user.js';
+import { getTenantsList,getUserProfile,getCurrentTenant,getUserProfilePhoto} from '../../utils/user.js';
 import { getSubscription } from '../../utils/tenants.js';
 
 import Loader from '../../components/Loader.vue';
@@ -103,10 +103,7 @@ export default {
         const current_tenant_info = await getCurrentTenant();
         const user_profile_info = await getUserProfile();
         const subscription_info = await getSubscription();
-        
-        // console.warn(current_tenant_info);
-        // console.warn(user_profile_info);
-        // console.warn(subscription_info);
+        const profilePhoto_info = await getUserProfilePhoto(user_profile_info.file_id);
 
         localStorage.setItem('loggedin_user_id', user_profile_info.id);
 
@@ -119,13 +116,13 @@ export default {
           'tenant_id': usersapi_response.tenants[0].id,
           'user_name': user_profile_info.first_name+' '+user_profile_info.last_name,
           'resource_id' : user_profile_info.resource_id,
-          'profile_image' : user_profile_info.profile_image,
+          'profile_image' : profilePhoto_info.url,
           'user_type' : user_profile_info.user_type,
         };
         // await this.userStore.updateUserInfo(user_data);
         localStorage.setItem('user_name', user_profile_info.first_name+' '+user_profile_info.last_name);
         localStorage.setItem('resource_id', user_profile_info.resource_id);
-        localStorage.setItem('profile_image', user_profile_info.profile_image);
+        localStorage.setItem('profile_image', profilePhoto_info.url);
         localStorage.setItem('user_type', user_profile_info.user_type);
         localStorage.setItem('is_admin', user_profile_info.user_type == "owner" ? true : false);
         localStorage.setItem('is_resource', user_profile_info.user_type == "owner" ? false : true); 

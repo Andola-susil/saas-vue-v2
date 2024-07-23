@@ -256,7 +256,6 @@ export default {
     async updateProfileImage() {
         this.isLoading = true;
         this.error = null;
-        console.warn(11111);
         try {
           if (!this.profilePhoto) {
             throw new Error('No file selected.');
@@ -272,20 +271,17 @@ export default {
             hideProgressBar: true,
             dangerouslyHTMLString: true,
           });
-
-          
-          
-    } catch (error) {
-      this.error = error.message || 'An error occurred. Please try again.';
-      toast(this.error, {
-        theme: "colored",
-        type: "error",
-        hideProgressBar: true,
-        dangerouslyHTMLString: true,
-      });
-    } finally {
-      this.isLoading = false;
-    }
+        } catch (error) {
+          this.error = error.message || 'An error occurred. Please try again.';
+          toast(this.error, {
+            theme: "colored",
+            type: "error",
+            hideProgressBar: true,
+            dangerouslyHTMLString: true,
+          });
+        } finally {
+          this.isLoading = false;
+        }
   },
   handleFileChange(event) {
     const file = event.target.files[0];
@@ -294,9 +290,8 @@ export default {
     }
   },
 
-  async fetchUserProfilePhoto() {
+  async fetchUserProfilePhoto(file_id) {
     try {
-      const file_id = localStorage.getItem('file_id');
       const response = await getUserProfilePhoto(file_id);
       this.profilePhotoUrl = response.url;  
     } catch (error) {
@@ -362,8 +357,9 @@ export default {
   
   },
   mounted() {
+      const file_id = localStorage.getItem('file_id');
       this.getUserDetailsMethod();
-      this.fetchUserProfilePhoto();
+      this.fetchUserProfilePhoto(file_id);
       this.fetchTimeZones();
     },
     computed: {

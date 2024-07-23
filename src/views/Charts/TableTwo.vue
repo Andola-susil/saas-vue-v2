@@ -8,19 +8,19 @@
         <thead class="bg-gray-50">
           <tr>
            <!-- <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Sl No</th> -->
-           <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Project Name</th>
-           <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">No. of resources</th>
-           <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Total hours</th>
-           <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Avg. hours</th>
+           <th scope="col" class="whitespace-nowrap py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Project Name</th>
+           <th scope="col" class="whitespace-nowrap py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">No. of resources</th>
+           <th scope="col" class="whitespace-nowrap py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Total hours</th>
+           <th scope="col" class="whitespace-nowrap py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Avg. hours</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 bg-white">
           <tr v-for="(item, index) in tableData" :key="index">
             <!-- <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{ index + 1 }}</td> -->
-            <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 text-center">{{ item.weekNo }}</td>
-            <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 text-center">{{item.totalTimesheet}}</td>
-            <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 text-center">{{ item.timesheetSubmitted }}</td>
-            <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 text-center">{{ item.timesheetNotSubmitted }}</td>
+            <td class="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 text-left">{{ item.project_name }}</td>
+            <td class="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 text-left">{{item.totalTimesheet}}</td>
+            <td class="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 text-left">{{ item.timesheetSubmitted }}</td>
+            <td class="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 text-left">{{ item.timesheetNotSubmitted }}</td>
             <!-- <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
               <button @click="handleAction(item)"></button>
             </td> -->
@@ -41,6 +41,7 @@
       timesheetSubmitted: string;
       timesheetNotSubmitted: string;
       weekNo: string;
+      project_name: string;
     }>;
   }>();
   

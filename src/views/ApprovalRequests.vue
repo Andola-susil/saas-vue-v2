@@ -17,7 +17,6 @@
               Reject TimeSheet
             </button>
           </Menu>
-          <WeekFilter />
         </div>
       </nav>
     </div>
