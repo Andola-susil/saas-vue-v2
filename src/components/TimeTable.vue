@@ -137,6 +137,8 @@
           return '<div class="flex"><div class="px-1"><img src="/src/assets/images/circle-check-fill.svg" alt="" class="h-6 w-6 " data-action="approve"></div><div class="px-1"><img src="/src/assets/images/circle-x.svg" alt="" class="h-6 w-6" data-action="reject"></div></div>';
         }else if(this.time_sheet_status == 'rejected'){
           return '<div class="flex"><div class="px-1"><img src="/src/assets/images/circle-check-blank.svg" alt="" class="h-6 w-6 " data-action="approve"></div><div class="px-1"><img src="/src/assets/images/circle-xmark.svg" alt="" class="h-6 w-6" data-action="reject"></div></div>';
+        }else{
+          return '<div class="flex"><div class="px-1"><img src="/src/assets/images/circle-check-blank.svg" alt="" class="h-6 w-6 " data-action="approve"></div><div class="px-1"><img src="/src/assets/images/circle-x.svg" alt="" class="h-6 w-6" data-action="reject"></div></div>';
         }
       },
       addRowToTable() {
@@ -911,7 +913,8 @@
               Reject TimeSheet
             </button>
           </Menu>
-          <Menu as="div" class="relative" :class="disable_date_range == true ? 'disabled' : ''">
+          <Menu as="div" class="relative">
+            <!-- <Menu as="div" class="relative" :class="disable_date_range == true ? 'disabled' : ''"> -->
             <WeekFilter @handleWeekChange=handleWeekChange />
           </Menu>
         </div>
