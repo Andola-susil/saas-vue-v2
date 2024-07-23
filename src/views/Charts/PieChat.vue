@@ -14,6 +14,10 @@ const props = defineProps({
   title: {
     type: String,
     required: true
+  },
+  chartWidth: {
+    type: String,
+    default: '250'
   }
 })
 
@@ -63,7 +67,7 @@ const chart = ref(null)
       <div id="chartThree" class="mx-auto flex justify-center">
         <VueApexCharts
           type="donut"
-          width="340"
+          :width="chartWidth"
           :options="apexOptions"
           :series="chartData.series"
           ref="chart"

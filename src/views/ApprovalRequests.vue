@@ -23,12 +23,7 @@
     </div>
     <div class="w-full flex rounded border border-gray-200">
       <div class="w-2/6 pt-3.5 pl-2">
-        <div class="relative mt-2 rounded-md shadow-sm">
-          <input type="text" name="account-number" id="account-number" class="block w-full rounded-md border-0 py-1.5 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 pl-2" placeholder="Search" />
-          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-            <QuestionMarkCircleIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
-          </div>
-        </div>
+        <SelectInput :options="user_list" placeholder="Select user" :initialSelected="initialUserSelected" @handleSelector="getSelectedUserValue"/>
       </div>
       <div class="w-2/6 pl-6 pt-3.5 disabled">
         <SelectInput :options="status_list" placeholder="Select status" :initialSelected="initialSelected" @handleSelector="getSelectedValue"/>
@@ -63,11 +58,13 @@
                     </th>
                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Start Date</th>
                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">End Date</th>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total hours</th>
                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                    <span @click="sort('total_time_spent')" class="cursor-pointer">Total Hours
-                      <img v-if="sortBy === 'total_time_spent'" :src="sortDirection === 'asc' ? '/src/assets/images/angle-down.svg' : '/src/assets/images/angle-up.svg'" alt="Sort Icon" class="inline ml-2 h-4 w-4">
-                    </span>
-                  </th>
+                      <span @click="sort('total_time_spent')" class="cursor-pointer">Hours spent
+                        <img v-if="sortBy === 'total_time_spent'" :src="sortDirection === 'asc' ? '/src/assets/images/angle-down.svg' : '/src/assets/images/angle-up.svg'" alt="Sort Icon" class="inline ml-2 h-4 w-4">
+                      </span>
+                    </th>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">OT</th>
                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
                   </tr>
                 </thead>
@@ -81,7 +78,9 @@
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">#{{ val.week_number }}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.start_date }}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.end_date }}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">0</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.total_time_spent }}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">0</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       <img v-if="val.status == 'pending'" src="/src/assets/images/pending.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Pending">
                       <img v-else-if="val.status == 'reject'" src="/src/assets/images/ban.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Rejected">
@@ -127,6 +126,7 @@ import SelectInput from '../components/common/SelectInput.vue';
 import WeekFilter from '../components/common/WeekFilter.vue';
 import moment from 'moment';
 import { timeSheetInfo } from '../stores/timeSheetInfo.js';
+import { getResourceInfo } from '../utils/resource.js' ;
 export default {
     name: 'Approvals',
     path: '/time-sheet-approvals',
@@ -143,6 +143,7 @@ export default {
     this.status = 'pending';
     this.getTimeLogs(this.paginationData.current_page);
     const mainStore = timeSheetInfo();
+    this.fetchUsers();
     mainStore.updateCurrentPage('approval_requests');
   },
   created() {
@@ -158,6 +159,7 @@ export default {
         // { id: 'rejected', name: 'Rejected' },
       ],
       initialSelected : { id: 'pending', name: 'Pending' },
+      initialUserSelected : { },
       week_number : null,
       start_of_week: null,
       end_of_week: null,
@@ -182,6 +184,8 @@ export default {
         cancelLabel: '',
         showInputField: false,
       },
+      user_list: [],
+      resource_id: null,
     }
   },
   methods: {
@@ -236,7 +240,7 @@ export default {
       this.error = null;
       this.isLoading = true;
       try {
-        const response = await getAllTimeSheets(page, this.week_number, this.status,null, this.sortBy, this.sortDirection);
+        const response = await getAllTimeSheets(page, this.week_number, this.status,this.resource_id, this.sortBy, this.sortDirection);
         this.time_log = response.items;
         this.meta_data = response.meta;
         this.isLoading = false;
@@ -317,12 +321,35 @@ export default {
     },
     
     handleWeekChange(input){
-      console.log(input);
       this.getWeekInfo(input);
       this.getTimeLogs(this.paginationData.current_page);
     },
     getSelectedValue(val){ 
       this.status = val; 
+      this.getTimeLogs(this.paginationData.current_page);
+    },
+    fetchUsers(){
+      try {
+        const response = getResourceInfo().then((data) => {
+          var users = [];
+          data.items.forEach(obj => {
+            users.push({
+              name : obj.invite_first_name + ' ' + obj.invite_last_name,
+              value : obj.id
+            });
+          });
+          this.user_list = users;
+        })
+        .catch((error) => {
+          console.error('Error fetching user roles:', error);
+        }); 
+        
+      } catch (error) {
+        console.error('Error fetching user roles:', error);
+      }
+    },
+    getSelectedUserValue(val){
+      this.resource_id = val.value;
       this.getTimeLogs(this.paginationData.current_page);
     },
   },
