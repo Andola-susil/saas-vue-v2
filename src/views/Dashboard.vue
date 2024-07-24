@@ -10,7 +10,7 @@
       <div class="mt-8 flow-root">
         <!-- <h3 class="text-base font-semibold leading-6 text-gray-900">Last 30 days</h3> -->
         <div >
-          <DateRangePicker v-model="dateRange"  :dateRange="dateRange" @update:modelValue="handleDateRangeChange" />
+          <DateRangePicker v-model="dateRange" :ranges="false" :autoApply='true' :dateRange="dateRange" @input="onDateChange" @update:modelValue="handleDateRangeChange" />
         </div>
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
           <DataCardOne
@@ -51,7 +51,7 @@
       </div>
       
       <div class="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
-        <ChartOne :chartData="myDynamicChartData" :apexOptions="myDynamicApexOptions"  title="Monthly Timesheet Overview"/>
+        <ChartOne :chartData="myDynamicChartData" :apexOptions="myDynamicApexOptions"  title="Average Daily Work Hours"/>
         <!-- <BarChat  :chartData="chartData" :chartOptions="apexOptions" title="Project Plans for week" />
         <BarChat  :chartData="chartData2" :chartOptions="apexOptions" title="Approved vs Rejected Timesheets"/> -->
         
@@ -82,6 +82,10 @@ import TableOne from '../views/Charts/TableOne.vue'
 import TableTwo from '../views/Charts/TableTwo.vue'
 import { computed,ref } from 'vue';
 import DateRangePicker from 'vue3-daterange-picker';
+import { startOfWeek, endOfWeek, isSameDay } from 'date-fns';
+import { toast } from 'vue3-toastify';
+
+
 export default {
   name: 'Dashboard',
   components: {
@@ -97,6 +101,7 @@ export default {
   data() {
     return {
       isLoading: true,
+      errorMessage: '',
       dateRange: {
         startDate: null,
         endDate: null
@@ -425,6 +430,42 @@ export default {
 
         },
         {
+          totalTimesheet: '10',
+          timesheetSubmitted: '7',
+          timesheetNotSubmitted: '3',
+          weekNo: '#3',
+          resource_name:'Johnson Emily'
+
+        },
+        {
+          totalTimesheet: '15',
+          timesheetSubmitted: '10',
+          timesheetNotSubmitted: '5',
+          weekNo: '#2',
+          resource_name:'John Smith'
+        },
+        {
+          totalTimesheet: '20',
+          timesheetSubmitted: '18',
+          timesheetNotSubmitted: '2',
+          weekNo: '#1',
+          resource_name:'Williams Sarah'
+        },
+         {
+          totalTimesheet: '15',
+          timesheetSubmitted: '10',
+          timesheetNotSubmitted: '5',
+          weekNo: '#2',
+          resource_name:'John Smith'
+        },
+        {
+          totalTimesheet: '20',
+          timesheetSubmitted: '18',
+          timesheetNotSubmitted: '2',
+          weekNo: '#1',
+          resource_name:'Williams Sarah'
+        },
+         {
           totalTimesheet: '15',
           timesheetSubmitted: '10',
           timesheetNotSubmitted: '5',
@@ -461,7 +502,15 @@ export default {
           timesheetNotSubmitted: '2',
           weekNo: '#1',
           project_name:'Time tracking tool'
-        }
+        },
+        {
+          totalTimesheet: '10',
+          timesheetSubmitted: '7',
+          timesheetNotSubmitted: '3',
+          weekNo: '#3',
+          project_name:'Task management tool'
+
+        },
       ]
     };
   },
@@ -502,6 +551,20 @@ export default {
       return mockData;
     },
     handleDateRangeChange(value) {
+      if (this.isValidWeek(value.startDate, value.endDate)) {
+        this.errorMessage = '';
+        // Process the valid date range
+      } else {
+        this.errorMessage = 'Please select a full week from Sunday to Saturday.';
+        toast(this.errorMessage, {
+          "theme": "colored",
+          "type": "success",
+          "hideProgressBar": true,
+          "dangerouslyHTMLString": true
+        });
+        const [start, end] = this.calculateCurrentWeeks();
+        this.dateRange = { "startDate": start, "endDate": end };
+      }
       this.isLoading = true;
       setTimeout(() => {
         this.isLoading = false;
@@ -513,22 +576,28 @@ export default {
       d.setUTCHours(6, 30, 0, 0);
       return d.toISOString();
     },
-    calculateCurrentTwoWeeks(){
+    calculateCurrentWeeks(){
       const today = new Date();
       const start = new Date(today);
-      start.setDate(today.getDate() - today.getDay() - 1); // Set to the start of the week (Monday)
+      start.setDate(today.getDate() - today.getDay()); // Set to the start of the week (Sunday)
       const end = new Date(start);
-      end.setDate(start.getDate() + 13); // Set to the end of the two-week period (14 days later)
-      
+      end.setDate(start.getDate() + 6); // Set to the end of the week (Saturday)
       return [start, end];
-    }
+
+    },
+    isValidWeek(startDate, endDate) {
+      const startOfWeekDate = startOfWeek(startDate, { weekStartsOn: 0 }); // Sunday
+      const endOfWeekDate = endOfWeek(startDate, { weekStartsOn: 0 }); // Saturday
+      return isSameDay(startDate, startOfWeekDate) && isSameDay(endDate, endOfWeekDate);
+    },
+    
   },
   mounted() {
     // Simulate data fetching
     setTimeout(() => {
       this.isLoading = false;
     }, 100); // Simulating a 2-second load time
-    const [start, end] = this.calculateCurrentTwoWeeks();
+    const [start, end] = this.calculateCurrentWeeks();
     this.dateRange = { "startDate": start, "endDate": end };
 
   },
