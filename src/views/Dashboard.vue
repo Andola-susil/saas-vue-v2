@@ -84,7 +84,7 @@ import { computed,ref } from 'vue';
 import DateRangePicker from 'vue3-daterange-picker';
 import { startOfWeek, endOfWeek, isSameDay } from 'date-fns';
 import { toast } from 'vue3-toastify';
-
+import { getBillableHours, getTotalOt, getTotalSpentTime, getTimeSheetApprovalStatus, getTimeSheetOverView, getProjectOverView } from '../utils/dashboard.js';
 
 export default {
   name: 'Dashboard',
@@ -420,98 +420,8 @@ export default {
         //   totalHours: '1000hrs'
         // },
       ]),
-      tableData : [
-        {
-          totalTimesheet: '10',
-          timesheetSubmitted: '7',
-          timesheetNotSubmitted: '3',
-          weekNo: '#3',
-          resource_name:'Johnson Emily'
-
-        },
-        {
-          totalTimesheet: '10',
-          timesheetSubmitted: '7',
-          timesheetNotSubmitted: '3',
-          weekNo: '#3',
-          resource_name:'Johnson Emily'
-
-        },
-        {
-          totalTimesheet: '15',
-          timesheetSubmitted: '10',
-          timesheetNotSubmitted: '5',
-          weekNo: '#2',
-          resource_name:'John Smith'
-        },
-        {
-          totalTimesheet: '20',
-          timesheetSubmitted: '18',
-          timesheetNotSubmitted: '2',
-          weekNo: '#1',
-          resource_name:'Williams Sarah'
-        },
-         {
-          totalTimesheet: '15',
-          timesheetSubmitted: '10',
-          timesheetNotSubmitted: '5',
-          weekNo: '#2',
-          resource_name:'John Smith'
-        },
-        {
-          totalTimesheet: '20',
-          timesheetSubmitted: '18',
-          timesheetNotSubmitted: '2',
-          weekNo: '#1',
-          resource_name:'Williams Sarah'
-        },
-         {
-          totalTimesheet: '15',
-          timesheetSubmitted: '10',
-          timesheetNotSubmitted: '5',
-          weekNo: '#2',
-          resource_name:'John Smith'
-        },
-        {
-          totalTimesheet: '20',
-          timesheetSubmitted: '18',
-          timesheetNotSubmitted: '2',
-          weekNo: '#1',
-          resource_name:'Williams Sarah'
-        }
-      ],
-      tableData2 : [
-        {
-          totalTimesheet: '10',
-          timesheetSubmitted: '7',
-          timesheetNotSubmitted: '3',
-          weekNo: '#3',
-          project_name:'Task management tool'
-
-        },
-        {
-          totalTimesheet: '15',
-          timesheetSubmitted: '10',
-          timesheetNotSubmitted: '5',
-          weekNo: '#2',
-          project_name:'Absence request management tool'
-        },
-        {
-          totalTimesheet: '20',
-          timesheetSubmitted: '18',
-          timesheetNotSubmitted: '2',
-          weekNo: '#1',
-          project_name:'Time tracking tool'
-        },
-        {
-          totalTimesheet: '10',
-          timesheetSubmitted: '7',
-          timesheetNotSubmitted: '3',
-          weekNo: '#3',
-          project_name:'Task management tool'
-
-        },
-      ]
+      tableData : [],
+      tableData2 : [],
     };
   },
   computed: {
@@ -553,7 +463,11 @@ export default {
     handleDateRangeChange(value) {
       if (this.isValidWeek(value.startDate, value.endDate)) {
         this.errorMessage = '';
-        // Process the valid date range
+        const start_date = new Date(value.startDate);
+        const formattedStartDate = start_date.toISOString().split('T')[0];
+        const end_date = new Date(value.endDate);
+        const formattedEndDate = end_date.toISOString().split('T')[0];
+        this.getDashboardAnalyticsData(formattedStartDate,formattedEndDate);
       } else {
         this.errorMessage = 'Please select a full week from Sunday to Saturday.';
         toast(this.errorMessage, {
@@ -590,7 +504,65 @@ export default {
       const endOfWeekDate = endOfWeek(startDate, { weekStartsOn: 0 }); // Saturday
       return isSameDay(startDate, startOfWeekDate) && isSameDay(endDate, endOfWeekDate);
     },
-    
+    async getDashboardAnalyticsData(start, end) {
+      this.getBillableNonBillableHours(start, end);
+      this.getTotalOverTime(start, end);
+      this.getTotalTimeSpent(start, end);
+      this.getTimesheetStatus(start, end);
+      this.getTimesheetData(start, end);
+      this.getProjectData(start, end);
+    },
+    async getBillableNonBillableHours(start, end) {
+      try {
+        const response = await getBillableHours(start, end);
+          
+      } catch (error) {
+          this.error = 'An error occurred. Please try again.';
+          this.isLoading = false;
+      }
+    },
+    async getTotalOverTime(start, end) {
+      try {
+        const response = await getTotalOt(start, end);
+      } catch (error) {
+          this.error = 'An error occurred. Please try again.';
+          this.isLoading = false;
+      }
+    },
+    async getTotalTimeSpent(start, end) {
+      try {
+        const response = await getTotalSpentTime(start, end);
+      } catch (error) {
+          this.error = 'An error occurred. Please try again.';
+          this.isLoading = false;
+      }
+    },
+    async getTimesheetStatus(start, end) {
+      try {
+        const response = await getTimeSheetApprovalStatus(start, end);
+      } catch (error) {
+          this.error = 'An error occurred. Please try again.';
+          this.isLoading = false;
+      }
+    },
+    async getTimesheetData(start, end) {
+      try {
+        const response = await getTimeSheetOverView(start, end);
+        this.tableData = response;
+      } catch (error) {
+          this.error = 'An error occurred. Please try again.';
+          this.isLoading = false;
+      }
+    },
+    async getProjectData(start, end) {
+      try {
+        const response = await getProjectOverView(start, end);
+        this.tableData2 = response;
+      } catch (error) {
+          this.error = 'An error occurred. Please try again.';
+          this.isLoading = false;
+      }
+    },
   },
   mounted() {
     // Simulate data fetching
@@ -599,7 +571,11 @@ export default {
     }, 100); // Simulating a 2-second load time
     const [start, end] = this.calculateCurrentWeeks();
     this.dateRange = { "startDate": start, "endDate": end };
-
+    const start_date = new Date(start);
+    const formattedStartDate = start_date.toISOString().split('T')[0];
+    const end_date = new Date(end);
+    const formattedEndDate = end_date.toISOString().split('T')[0];
+    this.getDashboardAnalyticsData(formattedStartDate,formattedEndDate);
   },
 };
 </script>

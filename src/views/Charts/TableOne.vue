@@ -17,15 +17,15 @@
             <tbody class="divide-y divide-gray-200 bg-white">
               <tr v-for="(item, index) in tableData" :key="index">
                 <td class="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 text-left">{{ item.resource_name }}</td>
-                <td class="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 text-left">{{ item.totalTimesheet }}</td>
-                <td class="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 text-left">{{ item.timesheetSubmitted }}</td>
-                <td class="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 text-left">{{ item.timesheetNotSubmitted }}</td>
+                <td class="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 text-left">{{ item.total_time_spent }}</td>
+                <td class="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 text-left">{{ item.over_time }}</td>
+                <td class="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 text-left">{{ item.avg_time_spent }}</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
-      <PaginationTemplate :paginationData="meta_data" @page-changed="getTimeLogs"/>
+      <!-- <PaginationTemplate :paginationData="meta_data" @page-changed="getTimeLogs"/> -->
     </div>
   </template>
   

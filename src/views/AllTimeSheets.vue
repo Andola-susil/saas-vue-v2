@@ -52,8 +52,8 @@
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">#{{ val.week_number }}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.start_date }}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.end_date }}</td>
-                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">0</td>
-                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">0</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{val.weekly_total_hour}}</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{val.total_time_spent}}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">0</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       <img v-if="val.status === 'pending'" src="/src/assets/images/pending.svg" alt="Pending" class="h-5 w-5" v-b-tooltip.hover title="Pending">
