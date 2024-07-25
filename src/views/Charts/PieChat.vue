@@ -74,10 +74,10 @@ const chart = ref(null)
         />
       </div>
     </div>
-    <div class="-mx-8 flex flex-wrap items-center justify-center gap-y-3">
+    <div class="-mx-8 flex-wrap items-center justify-center gap-y-3">
       <!-- Render data dynamically -->
       <template v-for="(item, index) in chartData.labels" :key="index">
-        <div class="w-full px-8 sm:w-1/2">
+        <div class="w-full px-8">
           <div class="flex w-full items-center">
             <span
               :class="'mr-2 block h-3 w-full max-w-3 rounded-full bg-' + apexOptions.colors[index]"
