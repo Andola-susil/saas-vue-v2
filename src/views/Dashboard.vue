@@ -4,46 +4,26 @@
     <div v-if="!isLoading">
       <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
-          <h1 class="text-base font-semibold leading-6 text-gray-900">Dashboard</h1>
-        </div>
+    <h1 class="text-base font-semibold leading-6 text-gray-900">Dashboard</h1> 
+</div>
       </div>
       <div class="mt-8 flow-root">
-        <!-- <h3 class="text-base font-semibold leading-6 text-gray-900">Last 30 days</h3> -->
         <div >
           <DateRangePicker v-model="dateRange" :ranges="false" :autoApply='true' :dateRange="dateRange" @input="onDateChange" @update:modelValue="handleDateRangeChange" />
         </div>
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
-          <DataCardOne
-            v-for="(item, index) in cardItems"
-            :key="index"
-            :title="item.title"
-            :total="item.total"
-            :growthRate="item.growthRate"
-            :totalHours="item.totalHours"
-          />
           <div class="rounded-sm border border-stroke bg-white  shadow-default dark:border-strokedark dark:bg-boxdark shadow-lg">
-            <PieChat :chartData="chartData_pie2" :apexOptions="apexOptions_pie2" :chartWidth="250" title="Timesheet"/>
+            <PieChat  :chartData="donutChartData1" :apexOptions="donutApexOptions1" width="220" title="Total hours spent"/>
           </div>
           <div class="rounded-sm border border-stroke bg-white  shadow-default dark:border-strokedark dark:bg-boxdark shadow-lg">
-            <div class="flex h-11.5 w-11.5 py-2 px-2 items-center justify-center rounded-full bg-meta-2 dark:bg-meta-4">
-              <h4 class="text-title-md font-bold text-black dark:text-white">156 hrs</h4>
-            </div>
-            <div class="flex justify-center"><span class="text-sm font-medium">Over Time</span></div>
-            <div className="p-4 sm:p-6 xl:p-10">
-              <div className="flex max-w-[470px] flex-col gap-10 pt-5 xl:pt-4">
-                <div className="relative h-2.5 w-full rounded-full bg-indigo-100 dark:bg-indigo-100">
-                  <div className="absolute left-0 h-full w-9/12 rounded-full bg-indigo-800">
-                    <span className="absolute bottom-full -right-4 z-1 mb-2 inline-block rounded-sm bg-indigo-800 px-2 py-1 text-xs font-bold text-white">
-                      <span className="absolute -bottom-1 left-1/2 -z-1 h-2 w-2 -translate-x-1/2 rotate-45 bg-indigo-800"></span>
-                      75%
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <PieChat  :chartData="donutChartData2" :apexOptions="donutApexOptions2" width="220" title="Time Sheet Status"/>
           </div>
           <div class="rounded-sm border border-stroke bg-white  shadow-default dark:border-strokedark dark:bg-boxdark shadow-lg">
-            <PieChat :chartData="chartData_pie" :apexOptions="apexOptions_pie" title="Billable hours"/>
+            <PieChat  :chartData="donutChartData3" :apexOptions="donutApexOptions3" width="220" title="Billable Vs Non-Billable"/>
+          </div>
+        
+          <div class="rounded-sm border border-stroke bg-white  shadow-default dark:border-strokedark dark:bg-boxdark shadow-lg">
+            <PieChat  :chartData="donutChartData4" :apexOptions="donutApexOptions4" width="220" title="Total Over Time"/>
           </div>
         </div>
         
@@ -53,16 +33,14 @@
       <div class="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
         <ChartOne :chartData="myDynamicChartData" :apexOptions="myDynamicApexOptions"  title="Average Daily Work Hours"/>
         <!-- <BarChat  :chartData="chartData" :chartOptions="apexOptions" title="Project Plans for week" />
-        <BarChat  :chartData="chartData2" :chartOptions="apexOptions" title="Approved vs Rejected Timesheets"/> -->
-        
-
-        <!-- <BarChat  :chartData="chartData3" :chartOptions="apexOptions" title="Completed vs Planned Task Hours" />
+        <BarChat  :chartData="chartData2" :chartOptions="apexOptions" title="Approved vs Rejected Timesheets"/> --><!-- <BarChat  :chartData="chartData3" :chartOptions="apexOptions" title="Completed vs Planned Task Hours" />
         <PieChat :chartData="chartData5" :apexOptions="apexOptions" title="Project Hours Distribution"/> -->
         <BarChat  :chartData="chartData4" :chartOptions="apexOptions" title="Weekly Work Hours Overview"/>
         <TableOne :tableData="tableData"/>
-        <TableTwo :tableData="tableData2"/>
-        <PieChat :chartData="chartData6" :apexOptions="apexOptions" title="Project Overtime Analytics"/>
-        
+        <div class="flex">
+          <TableTwo :tableData="tableData2"/>
+          <PieChat :chartData="chartData6" :apexOptions="apexOptions" width="340" title="Project Overtime Analytics"/>
+        </div>
         
        
       </div>
@@ -102,6 +80,7 @@ export default {
     return {
       isLoading: true,
       errorMessage: '',
+      selectedPeriod: '30days',
       dateRange: {
         startDate: null,
         endDate: null
@@ -183,7 +162,7 @@ export default {
               plotOptions: {
                 bar: {
                   borderRadius: 0,
-                  columnWidth: '35%'
+                  columnWidth: '20%'
                 }
               }
             }
@@ -193,7 +172,7 @@ export default {
           bar: {
             horizontal: false,
             borderRadius: 0,
-            columnWidth: '35%',
+            columnWidth: '20%',
             borderRadiusApplication: 'end',
             borderRadiusWhenStacked: 'last'
           }
@@ -219,11 +198,11 @@ export default {
           opacity: 1
         }
       },
-      apexOptions_pie: {
-        colors: ['#3056D3', '#80CAEE'],
+      apexOptions1: {
+        colors: ['#37CDCB', '#D55281'],
         chart: {
           type: 'bar',
-          height: 80,
+          height: 200,
           stacked: true,
           toolbar: {
             show: false
@@ -239,7 +218,7 @@ export default {
               plotOptions: {
                 bar: {
                   borderRadius: 0,
-                  columnWidth: '15%'
+                  columnWidth: '0%'
                 }
               }
             }
@@ -249,7 +228,7 @@ export default {
           bar: {
             horizontal: false,
             borderRadius: 0,
-            columnWidth: '15%',
+            columnWidth: '0%',
             borderRadiusApplication: 'end',
             borderRadiusWhenStacked: 'last'
           }
@@ -268,15 +247,163 @@ export default {
           fontWeight: 500,
           fontSize: '14px',
           markers: {
-            radius: 90
+            radius: 99
           }
         },
         fill: {
           opacity: 1
         }
       },
-      apexOptions_pie2: {
-        colors: ['#11f1bd70','#f16e11d9','#f1114f73'],
+      donutChartData1: {
+        series: [75, 25],
+        labels: ['Working Hours', 'Over Time']
+      },
+      donutChartData2: {
+        series: [65, 25,10],
+        labels: ['Approved', 'Pending', 'Rejected']
+      },
+      donutChartData3: {
+        series: [65, 25],
+        labels: ['Billable', 'Non-billable']
+      },
+      donutChartData4: {
+        series: [75, 25],
+        labels: ['Working Hours', 'Over Time']
+      },
+      donutApexOptions1: {
+        chart: {
+          type: 'donut',
+          width: 380
+        },
+        colors: ['#6577F3',  '#69e1ff'],
+        labels: ['Working Hours', 'Over Time'],
+        legend: {
+          show: false,
+          position: 'bottom'
+        },
+        plotOptions: {
+          pie: {
+            donut: {
+              size: '65%',
+              background: 'transparent'
+            }
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        responsive: [
+          {
+            breakpoint: 640,
+            options: {
+              chart: {
+                width: 200
+              }
+            }
+          }
+        ]
+      },
+      donutApexOptions2: {
+        chart: {
+          type: 'donut',
+          width: 380
+        },
+        colors: ['#69e1ff', '#6577F3', '#c9afed'],
+        labels: ['Approved', 'Pending', 'Rejected'],
+        legend: {
+          show: false,
+          position: 'bottom'
+        },
+        plotOptions: {
+          pie: {
+            donut: {
+              size: '65%',
+              background: 'transparent'
+            }
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        responsive: [
+          {
+            breakpoint: 640,
+            options: {
+              chart: {
+                width: 200
+              }
+            }
+          }
+        ]
+      },
+      donutApexOptions3: {
+        chart: {
+          type: 'donut',
+          width: 380
+        },
+        colors: [ '#c9afed', '#69e1ff'],
+        labels: ['Billable', 'Non-billable'],
+        legend: {
+          show: false,
+          position: 'bottom'
+        },
+        plotOptions: {
+          pie: {
+            donut: {
+              size: '65%',
+              background: 'transparent'
+            }
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        responsive: [
+          {
+            breakpoint: 640,
+            options: {
+              chart: {
+                width: 200
+              }
+            }
+          }
+        ]
+      },
+      donutApexOptions4: {
+        chart: {
+          type: 'donut',
+          width: 380
+        },
+        colors: ['#69e1ff','#6577F3'],
+        labels: ['Working Hours', 'Over Time'],
+        legend: {
+          show: false,
+          position: 'bottom'
+        },
+        plotOptions: {
+          pie: {
+            donut: {
+              size: '65%',
+              background: 'transparent'
+            }
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        responsive: [
+          {
+            breakpoint: 640,
+            options: {
+              chart: {
+                width: 200
+              }
+            }
+          }
+        ]
+      },
+      apexOptions_pie3: {
+        colors: ['#64AB07','#37CDCB','#4F5F92',],
         chart: {
           type: 'bar',
           height: 80,
@@ -333,8 +460,8 @@ export default {
       },
       myDynamicChartData: {
         series: [
-        { name: 'Total timesheet number', data: [10, 20, 2, 15, 18, 25, 30] },
-        { name: 'Total Hours Spent', data: [5, 15, 8, 12, 20, 18, 22] }
+        { name: 'Expected Time', data: [10, 20, 2, 15, 18, 25, 30] },
+        { name: 'Actual Time', data: [5, 15, 8, 12, 20, 18, 22] }
         ]
       },
       myDynamicApexOptions: {
@@ -349,14 +476,6 @@ export default {
       chartData6: {
         series: [30, 35, 20, 15],
         labels: ['Team A', 'Team B', 'Team C', 'Team D']
-      },
-      chartData_pie: {
-        series: [75, 25],
-        // labels: ['Billable', 'Non-billable']
-      },
-      chartData_pie2: {
-        series: [65, 25, 10],
-        // labels: ['Approved', 'Pending', 'Rejected']
       },
       apexOptions: {
         colors: ['#287be0', '#28e0d1'],
@@ -486,7 +605,7 @@ export default {
     },
     formatDate(date) {
       const d = new Date(date);
-      // Ensure time is set to 06:30:00.000Z
+      
       d.setUTCHours(6, 30, 0, 0);
       return d.toISOString();
     },
@@ -515,7 +634,7 @@ export default {
     async getBillableNonBillableHours(start, end) {
       try {
         const response = await getBillableHours(start, end);
-          
+        // this.donutChartData3.series = [response[0].total_billable,response[0].total_non_billable];
       } catch (error) {
           this.error = 'An error occurred. Please try again.';
           this.isLoading = false;
@@ -540,6 +659,7 @@ export default {
     async getTimesheetStatus(start, end) {
       try {
         const response = await getTimeSheetApprovalStatus(start, end);
+        // this.donutChartData2.series = [response[0].approved_timesheet_count,response[0].pending_timesheet_count,response[0].rejected_timesheet_count];
       } catch (error) {
           this.error = 'An error occurred. Please try again.';
           this.isLoading = false;
@@ -558,14 +678,19 @@ export default {
       try {
         const response = await getProjectOverView(start, end);
         this.tableData2 = response;
+        // this.chartData6.series = [];
+        this.chartData6.labels = [];
+        response.forEach(data => {
+          // this.chartData6.series.push(data.total_spent_hours);
+          this.chartData6.labels.push(data.project_name);
+        });
       } catch (error) {
           this.error = 'An error occurred. Please try again.';
           this.isLoading = false;
       }
     },
   },
-  mounted() {
-    // Simulate data fetching
+  mounted() { 
     setTimeout(() => {
       this.isLoading = false;
     }, 100); // Simulating a 2-second load time

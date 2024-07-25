@@ -79,7 +79,7 @@
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.end_date }}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{val.weekly_total_hour}}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ val.total_time_spent }}</td>
-                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">0</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{val.ot}}</td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       <img v-if="val.status == 'pending'" src="/src/assets/images/pending.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Pending">
                       <img v-else-if="val.status == 'reject'" src="/src/assets/images/ban.svg" alt="" class="h-5 w-5" v-b-tooltip.hover title="Rejected">
@@ -234,13 +234,44 @@ export default {
         this.selectAll = false;
       }
     },
+    getSecondsToHour(seconds){
+      var secondsPerMinute = 60;
+      var minutesPerHour = 60;
+      var hours = seconds / (secondsPerMinute * minutesPerHour);
+      return hours.toFixed(2);
+    },
     async getTimeLogs(page) {
       this.paginationData.current_page = page;
       this.error = null;
       this.isLoading = true;
       try {
         const response = await getAllTimeSheets(page, this.week_number, this.status,this.resource_id, this.sortBy, this.sortDirection);
-        this.time_log = response.items;
+        this.time_log = [];
+        if (response.items.length > 0) {
+          response.items.forEach(data => {
+            this.time_log.push({
+              approver_id: data.approver_id,
+              end_date: data.end_date,
+              id: data.id,
+              rejection_reason: data.rejection_reason,
+              resource_id: data.resource_id,
+              resource_name: data.resource_name,
+              start_date: data.start_date,
+              status: data.status,
+              tenant_id: data.tenant_id,
+              total_time_spent: this.getSecondsToHour(data.total_time_spent),
+              week_number: data.week_number,
+              weekly_total_hour: this.getSecondsToHour(data.weekly_total_hour),
+              ot: (data.total_time_spent - data.weekly_total_hour) > 0
+                ? this.getSecondsToHour(data.total_time_spent - data.weekly_total_hour)
+                : '00:00',
+            });
+          });
+        }else{
+          this.time_log = [];
+        }
+        
+        // this.time_log = response.items;
         this.meta_data = response.meta;
         this.isLoading = false;
       } catch (error) {
