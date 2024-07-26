@@ -62,7 +62,7 @@ import { computed,ref } from 'vue';
 import DateRangePicker from 'vue3-daterange-picker';
 import { startOfWeek, endOfWeek, isSameDay } from 'date-fns';
 import { toast } from 'vue3-toastify';
-import { getBillableHours, getTotalOt, getTotalSpentTime, getTimeSheetApprovalStatus, getTimeSheetOverView, getProjectOverView } from '../utils/dashboard.js';
+import { getBillableHours, getTotalOt, getTotalSpentTime, getTimeSheetApprovalStatus, getTimeSheetOverView, getProjectOverView, getDailyWorkHours } from '../utils/dashboard.js';
 
 export default {
   name: 'Dashboard',
@@ -524,6 +524,7 @@ export default {
       myDynamicApexOptions: {
         legend: { /* your options */ },
         colors: ['#c9afed', '#69e1ff'],
+        labels: ['Working Hours', 'Over Time'],
         // other options
       },
       chartData5: {
@@ -648,7 +649,7 @@ export default {
         this.errorMessage = 'Please select a full week from Sunday to Saturday.';
         toast(this.errorMessage, {
           "theme": "colored",
-          "type": "success",
+          "type": "error",
           "hideProgressBar": true,
           "dangerouslyHTMLString": true
         });
@@ -687,6 +688,7 @@ export default {
       this.getTimesheetStatus(start, end);
       this.getTimesheetData(start, end);
       this.getProjectData(start, end);
+      this.getAvgWorkingHours(start, end);
     },
     async getBillableNonBillableHours(start, end) {
       try {
@@ -744,8 +746,33 @@ export default {
           this.chartData6.series.push(data.total_spent_hours);
           this.chartData6.labels.push(data.project_name);
           this.apexOptions5.labels.push(data.project_name);
-          // console.log(this.apexOptions5.labels);
         });
+      } catch (error) {
+          this.error = 'An error occurred. Please try again.';
+          this.isLoading = false;
+      }
+    },
+    async getAvgWorkingHours(start, end) {
+      try {
+        const response = await getDailyWorkHours(start, end);
+        this.tableData2 = response;
+        this.chartData6.series = [];
+        this.chartData6.labels = [];
+        this.apexOptions5.labels = [];
+        var excepted_hours = [];
+        var total_hours_spent = [];
+        var week_days = [];
+        response.forEach(val => {
+          excepted_hours.push(val.excepted_hours);
+          total_hours_spent.push(val.total_hours_spent);
+          week_days.push(val.day_of_week);
+        });
+        this.myDynamicChartData.series[0].data = [];
+        this.myDynamicChartData.series[1].data = [];
+        this.myDynamicApexOptions.labels = [];
+        this.myDynamicChartData.series[0].data = excepted_hours;
+        this.myDynamicChartData.series[1].data = total_hours_spent;
+        this.myDynamicApexOptions.labels = week_days;
       } catch (error) {
           this.error = 'An error occurred. Please try again.';
           this.isLoading = false;

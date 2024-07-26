@@ -70,7 +70,7 @@
         display_approve_btns: false,
         disable_table: false,
         project_list :[],
-        task_list: {},
+        task_list: [],
         showCreateProjectPopup: false,
         project_id: 0,
         showCreateTaskPopup: false,
@@ -543,7 +543,9 @@
       },
       getSelectedTask(taskId, index) {
         if(index){
-          const selectedTask = this.task_list[this.project_id]?.[index];//this.task_list[this.project_id]?.find(p => p.value === taskId);
+          const selectedTask = this.task_list.find(p => p.value === taskId);
+          // const selectedTask = this.task_list[this.project_id]?.[index];
+          //this.task_list[this.project_id]?.find(p => p.value === taskId);
           if (selectedTask) {
             // console.log(this.tableData[parseInt(index)]);
             // this.tableData[parseInt(index)].task_name = selectedTask.label;
@@ -614,7 +616,7 @@
               editor: "list",
               verticalNavigation: "hybrid",
               editorParams: {
-                values: [],
+                values: this.task_list,
                 valuesLookup: "active",
                 valuesLookupField: "color",
                 clearable: true,
@@ -711,15 +713,13 @@
       getTaskList(project_id){
         try {
           const data = geTaskList(project_id).then((data) => {
-            this.task_list[project_id] = [];
-            this.task_list[project_id].push({ label: "<strong>Create new task</strong>", value: -1, id: "" });
+            this.task_list.push({ label: "<strong>Create new task</strong>", value: -1, id: "" });
             if (data.items.length > 0) {
               data.items.forEach(task => {
-                this.task_list[project_id].push({ label: task.task_title, value: task.id, id: task.id });
+                this.task_list.push({ label: task.task_title, value: task.id, id: task.id });
               });
-              console.log(this.task_list,'Here');
             }else{
-              console.log('Here2');
+              
             }
             // this.updateTable();
           })

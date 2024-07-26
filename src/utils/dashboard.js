@@ -123,3 +123,22 @@ export const getProjectOverView = async (start_date, end_date) => {
       throw error;
     }
 };
+
+//Get Total Project overview
+
+export const getDailyWorkHours = async (start_date, end_date) => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    const tenant_id = localStorage.getItem('tenant_id');
+    const response = await instance.get('/analytics/average_daily_work_hours', {
+      params: { 'start_date': start_date, 'end_date' : end_date },
+      headers: {
+          'Authorization': `Bearer ${token}`,
+          'x-tenant-id': tenant_id
+      }
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
