@@ -39,7 +39,7 @@
         <TableOne :tableData="tableData"/>
         <div class="flex">
           <TableTwo :tableData="tableData2"/>
-          <PieChat :chartData="chartData6" :apexOptions="apexOptions" width="340" title="Project Overtime Analytics"/>
+          <PieChat :chartData="chartData6" :apexOptions="apexOptions5" width="340" title="Project Overtime Analytics"/>
         </div>
         
        
@@ -198,6 +198,63 @@ export default {
           opacity: 1
         }
       },
+      apexOptions5: {
+        colors: ['#3056D3', '#c9afed', '#80CAEE','#69e1ff', '#6577F3'],
+        labels: ['Project'],
+        chart: {
+          type: 'bar',
+          height: 335,
+          stacked: true,
+          toolbar: {
+            show: false
+          },
+          zoom: {
+            enabled: false
+          }
+        },
+        responsive: [
+          {
+            breakpoint: 1536,
+            options: {
+              plotOptions: {
+                bar: {
+                  borderRadius: 0,
+                  columnWidth: '20%'
+                }
+              }
+            }
+          }
+        ],
+        plotOptions: {
+          bar: {
+            horizontal: false,
+            borderRadius: 0,
+            columnWidth: '20%',
+            borderRadiusApplication: 'end',
+            borderRadiusWhenStacked: 'last'
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        xaxis: {
+          type: 'category',
+          categories: ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+        },
+        legend: {
+          position: 'top',
+          horizontalAlign: 'left',
+          fontFamily: 'Satoshi',
+          fontWeight: 500,
+          fontSize: '14px',
+          markers: {
+            radius: 99
+          }
+        },
+        fill: {
+          opacity: 1
+        }
+      },
       apexOptions1: {
         colors: ['#37CDCB', '#D55281'],
         chart: {
@@ -256,7 +313,7 @@ export default {
       },
       donutChartData1: {
         series: [75, 25],
-        labels: ['Working Hours', 'Over Time']
+        labels: ['Spent Hours', 'Excepted Time']
       },
       donutChartData2: {
         series: [65, 25,10],
@@ -276,7 +333,7 @@ export default {
           width: 380
         },
         colors: ['#6577F3',  '#69e1ff'],
-        labels: ['Working Hours', 'Over Time'],
+        labels: ['Spent Hours', 'Excepted Time'],
         legend: {
           show: false,
           position: 'bottom'
@@ -634,7 +691,7 @@ export default {
     async getBillableNonBillableHours(start, end) {
       try {
         const response = await getBillableHours(start, end);
-        // this.donutChartData3.series = [response[0].total_billable,response[0].total_non_billable];
+        this.donutChartData3.series = [response[0].billable_hours,response[0].non_billable_hours];
       } catch (error) {
           this.error = 'An error occurred. Please try again.';
           this.isLoading = false;
@@ -643,6 +700,7 @@ export default {
     async getTotalOverTime(start, end) {
       try {
         const response = await getTotalOt(start, end);
+        this.donutChartData4.series = [response[0].exp_total_hrs,response[0].over_time];
       } catch (error) {
           this.error = 'An error occurred. Please try again.';
           this.isLoading = false;
@@ -651,6 +709,7 @@ export default {
     async getTotalTimeSpent(start, end) {
       try {
         const response = await getTotalSpentTime(start, end);
+        this.donutChartData1.series = [response[0].time_spent,response[0].exp_total_hrs];
       } catch (error) {
           this.error = 'An error occurred. Please try again.';
           this.isLoading = false;
@@ -659,7 +718,7 @@ export default {
     async getTimesheetStatus(start, end) {
       try {
         const response = await getTimeSheetApprovalStatus(start, end);
-        // this.donutChartData2.series = [response[0].approved_timesheet_count,response[0].pending_timesheet_count,response[0].rejected_timesheet_count];
+        this.donutChartData2.series = [response[0].approved_timesheet_count,response[0].pending_timesheet_count,response[0].rejected_timesheet_count];
       } catch (error) {
           this.error = 'An error occurred. Please try again.';
           this.isLoading = false;
@@ -678,11 +737,14 @@ export default {
       try {
         const response = await getProjectOverView(start, end);
         this.tableData2 = response;
-        // this.chartData6.series = [];
+        this.chartData6.series = [];
         this.chartData6.labels = [];
+        this.apexOptions5.labels = [];
         response.forEach(data => {
-          // this.chartData6.series.push(data.total_spent_hours);
+          this.chartData6.series.push(data.total_spent_hours);
           this.chartData6.labels.push(data.project_name);
+          this.apexOptions5.labels.push(data.project_name);
+          // console.log(this.apexOptions5.labels);
         });
       } catch (error) {
           this.error = 'An error occurred. Please try again.';
